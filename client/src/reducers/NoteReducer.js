@@ -1,4 +1,4 @@
-import { NOTE_ACTION_TYPE } from "actions/ActionTypes";
+import { NOTE_ACTION_TYPE } from "../actions/ActionTypes";
 
 const initialState = {
   isFetching: false,

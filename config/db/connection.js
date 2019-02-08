@@ -14,6 +14,7 @@ const connectDatabase = () => {
             if(!err) {
                 console.log('Database is connected!');
             } else {
+                console.log(err);
                 console.log('Error connecting database!');
             }
         });

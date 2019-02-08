@@ -1,6 +1,8 @@
 import { combineReducers } from 'redux';
-import NoteReducer from 'reducers/NoteReducer';
+import NoteReducer from './NoteReducer';
+import AuthReducer from './AuthReducer';
 
 export default combineReducers({
-    note: NoteReducer
+    note: NoteReducer,
+    auth: AuthReducer
 });
