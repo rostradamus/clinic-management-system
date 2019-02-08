@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import axios from "axios";
 import { NoteList, NoteDetail } from "components/note";
+import Header from "components/header/Header";
+import Login from "components/login/Login";
 import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
 
 const divStyle = {
@@ -8,14 +10,14 @@ const divStyle = {
   textAlign: "center"
 };
 
-const formStyle = {
-  marginTop: "4rem",
-  display: "inline-block"
-};
+// const formStyle = {
+//   marginTop: "4rem",
+//   display: "inline-block"
+// };
 
-const linkStyle = {
-  marginRight: "2rem"
-};
+// const linkStyle = {
+//   marginRight: "2rem"
+// };
 
 class App extends Component {
   constructor(props) {
@@ -49,24 +51,15 @@ class App extends Component {
       <Router>
         <div className="App" style={divStyle}>
           <header className="App-header">
-            Temporary Main Page
+            <Header />
           </header>
-          <form style={formStyle} onSubmit={this.sendHelloToServer.bind(this)}>
-            <input
-              type="text" value={this.state.name}
-              onChange={this.handleNameChange.bind(this)} />
-            <input type="submit" value="Submit" />
-          </form>
+
 
           <h3>{this.state.msg}</h3>
-
-          <div>
-            <Link to="/" style={linkStyle}>Home</Link>
-            <Link to="/note" style={linkStyle}>Notes</Link>
-          </div>
           <Switch>
             <Route key="noteList" exact path ="/note" component={NoteList} />
             <Route key="noteDetail" path="/note/:id" component={NoteDetail} />
+            <Route exact path="/login" component={Login} />
           </Switch>
 
         </div>
@@ -74,5 +67,12 @@ class App extends Component {
     );
   }
 }
+
+// "<form style={formStyle} onSubmit={this.sendHelloToServer.bind(this)}>
+//   <input
+//     type="text" value={this.state.name}
+//     onChange={this.handleNameChange.bind(this)} />
+//   <input type="submit" value="Submit" />
+// </form>"
 
 export default App;
