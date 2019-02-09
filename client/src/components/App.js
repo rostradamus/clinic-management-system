@@ -3,6 +3,8 @@ import axios from "axios";
 import { NoteList, NoteDetail } from "components/note";
 import Header from "components/header/Header";
 import Login from "components/login/Login";
+import Calendar from "components/calendar/Calendar";
+
 import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
 
 const divStyle = {
@@ -60,6 +62,7 @@ class App extends Component {
             <Route key="noteList" exact path ="/note" component={NoteList} />
             <Route key="noteDetail" path="/note/:id" component={NoteDetail} />
             <Route exact path="/login" component={Login} />
+            <Route exact path="/appointments" component={Calendar} />
           </Switch>
 
         </div>
