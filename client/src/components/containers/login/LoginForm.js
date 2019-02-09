@@ -2,9 +2,10 @@ import React, { Component }  from 'react';
 import { connect } from 'react-redux';
 import { AuthAction } from 'actions';
 import { bindActionCreators } from 'redux';
+import { Form, Button } from "semantic-ui-react";
 
 
-class Login extends Component {
+class LoginForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -34,23 +35,27 @@ class Login extends Component {
 
   render() {
     return(
-      <form onSubmit={this.handleSubmit}>
-        <label>
-          Email:
-          <input type="text" name="email"
-          value={this.state.email} onChange={this.handleInputChange} />
-        </label>
-        <label>
-          Password:
-          <input type="text" name="password"
-          value={this.state.password} onChange={this.handleInputChange} />
-        </label>
-        <button type="submit">Login</button>
-      </form>
+      <Form onSubmit={this.handleSubmit} style={{ width: "30rem", margin: "auto" }}>
+        <Form.Field>
+          <label style={{ textAlign: "left" }}>
+            Email:
+          </label>
+          <input type="text" name="emacil"
+            value={this.state.email} onChange={this.handleInputChange} />
+        </Form.Field>
+        <Form.Field>
+          <label style={{ textAlign: "left" }}>
+            Password:
+          </label>
+          <input type="password" name="password"
+            value={this.state.password} onChange={this.handleInputChange} />
+        </Form.Field>
+        <Button type="submit">Login</Button>
+      </Form>
     )
   }
 }
 
 const mapDispatchToProps = dispatch => bindActionCreators({fetchUser: AuthAction.fetchUser}, dispatch);
 
-export default connect(null, mapDispatchToProps)(Login)
+export default connect(null, mapDispatchToProps)(LoginForm)

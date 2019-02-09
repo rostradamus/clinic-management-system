@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { connect } from 'react-redux';
 import { Link } from "react-router-dom";
+import { Header, List } from "semantic-ui-react";
 import NoteAction from "actions/NoteAction";
 
 class NoteList extends Component {
@@ -11,19 +12,19 @@ class NoteList extends Component {
 
   _renderItem(item) {
     return (
-      <li key={item.note_id}>
-        <Link to={ `/note/${item.note_id}` }>{item.title}</Link>
-      </li>
+      <List.Item key={item.note_id}>
+        <List.Content as={Link} to={ `/note/${item.note_id}` } content={item.title} />
+      </List.Item>
     );
   }
 
   render() {
     return (
       <div>
-        <h2> Note List </h2>
-        <ul>
+        <Header size="medium"> Note List </Header>
+        <List>
           { this.props.note.items.map(this._renderItem.bind(this)) }
-        </ul>
+        </List>
       </div>
     );
   }
