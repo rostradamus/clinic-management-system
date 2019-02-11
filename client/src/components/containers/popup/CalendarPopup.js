@@ -92,17 +92,15 @@ class CalendarPopup extends Component {
     event.preventDefault();
     const copiedState = Object.assign(
       {...this.state},
-      { title: this._generateTitle(copiedState) }
+      { title: this._generateTitle(this.state) }
     );
-
     this.props.createAppointment(copiedState);
     this.props.onClose();
   }
 
-
-
-  _generateTitle(copiedState) {
-    return "Patient: " + copiedState.patient + " - Therapist: " + copiedState.practitioner;
+  _generateTitle({ patient, practitioner }) {
+    return "Patient: " + patient +
+      " - Therapist: " + practitioner;
   }
 
   _renderModalHeader() {
