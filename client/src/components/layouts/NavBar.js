@@ -81,7 +81,7 @@ class NavBar extends Component {
             as={ Link }
             to="/profile"/>
           <Dropdown.Item
-            icon="logout"
+            icon="log out"
             text="Logout"
             as={ Link }
             to="/logout"/>

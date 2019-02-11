@@ -1,49 +1,83 @@
 import React, {Component} from 'react';
-// import {connect} from 'react-redux';
-// import {Link} from 'react-router-dom';
+import {connect} from 'react-redux';
 import BigCalendar from 'react-big-calendar';
 import moment from 'moment';
+import { Container } from "semantic-ui-react";
+import { CalendarPopup } from 'components/containers/popup';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { CalendarPopupAction } from 'actions';
 
-const events = [];
+// Big Calendar requires explicit height set to properly display contents.
+// Need to refactor to make it dynamic according to user screen size.
+const containerStyle = {
+  height: "600px"
+}
 
 class Calendar extends Component {
-
   constructor(props) {
     super(props);
-
-    const minTime = new Date();
-    minTime.setHours(9,0,0);
-    const maxTime = new Date();
-    maxTime.setHours(17,0,0);
-
     moment.locale('en');
 
+    const minTime = new Date();
+    const maxTime = new Date();
+
+    minTime.setHours(9,0,0);
+    maxTime.setHours(17,0,0);
+
     this.state = {
-      events : events,
+      events : [],
       minTime : minTime,
-      maxTime : maxTime
+      maxTime : maxTime,
+      showPopup: false,
+      newAppointment: {},
+      isAddModalOpen: false,
+      selectedEvent: {}
     };
+    this.toggleAddModal = this.toggleAddModal.bind(this);
   }
 
+  componentDidMount() {
+    this.props.dispatch(CalendarPopupAction.fetchAppointments());
+  }
+
+  toggleAddModal(event) {
+    this.setState({
+      selectedEvent: event,
+      isAddModalOpen: !this.state.isAddModalOpen,
+    });
+  };
+
   render() {
+    // const today = new Date(new Date().setHours(new Date().getHours() - 3));
+    // defaultDate is used for presentation only. Param is year, month indexing, day
+    const defaultDate = new Date(2019, 1, 12);
     const localizer = BigCalendar.momentLocalizer(moment);
     return(
-      <div className="calendarContainer">
+      <Container className="calendarContainer" style={containerStyle}>
         <BigCalendar
           selectable
+          popup={true}
           localizer={localizer} // used to convert string to time vice versa
-          events={this.state.events}
+          events={this.props.events}
           defaultView={BigCalendar.Views.WORK_WEEK}
-          defaultDate={new Date(2018, 2, 8)}
+          defaultDate={defaultDate}
           views={[BigCalendar.Views.DAY, BigCalendar.Views.WORK_WEEK, BigCalendar.Views.MONTH]}
           min={this.state.minTime}
           max={this.state.maxTime}
+          onSelectEvent={this.toggleAddModal}
+          onSelectSlot={this.toggleAddModal}
         />
-      </div>
+        {this.state.isAddModalOpen ?
+          <CalendarPopup isOpen={ this.state.isAddModalOpen }
+            onClose={ this.toggleAddModal } event={ this.state.selectedEvent } />
+          : null
+        }
+      </Container>
     );
+
   }
 }
 
+const mapStateToProps = state => ({events: state.calendar});
 
-export default Calendar;
+export default connect(mapStateToProps)(Calendar);
