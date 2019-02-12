@@ -40,7 +40,7 @@ class LoginForm extends Component {
           <label style={{ textAlign: "left" }}>
             Email:
           </label>
-          <input type="text" name="emacil"
+          <input type="text" name="email"
             value={this.state.email} onChange={this.handleInputChange} />
         </Form.Field>
         <Form.Field>
