@@ -25,6 +25,7 @@ DB_USERNAME=username
 DB_PASSWORD=password
 DB_HOST=localhost
 DB_NAME=schedule_system
+SERVER_PORT=4000
 ```
 
 3. create a file *.env* in client root (i.e. ~/path/to/schedule_system/client/.env)
