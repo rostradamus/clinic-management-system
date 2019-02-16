@@ -39,8 +39,9 @@ app.get('/*', (req, res) => {
   })
 });
 
-const server = app.listen(5000,
-  () => console.log("Running server at 5000"));
+const serverPort = process.env.SERVER_PORT || 5000;
+const server = app.listen(serverPort,
+  () => console.log(`Running server at ${serverPort}`));
 
 process.on('SIGINT', () => {
   console.log('\nReceived kill signal, shutting down gracefully');
