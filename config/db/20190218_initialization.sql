@@ -1,4 +1,9 @@
-CREATE TABLE User
+DROP DATABASE IF EXISTS schedule_system;
+
+CREATE DATABASE schedule_system;
+use schedule_system;
+
+CREATE TABLE IF NOT EXISTS User
   (
     username varchar(255),
     password varchar(255) NOT NULL,
@@ -10,14 +15,14 @@ CREATE TABLE User
     PRIMARY KEY(username)
   );
 
-CREATE TABLE Administrator
+CREATE TABLE IF NOT EXISTS Administrator
   (
     username varchar(255),
     PRIMARY KEY(username),
     FOREIGN KEY (username) REFERENCES User(username)
   );
 
-CREATE TABLE Staff
+CREATE TABLE IF NOT EXISTS Staff
   (
     username varchar(255),
     therapist_code varchar(10) NOT NULL,
@@ -26,7 +31,7 @@ CREATE TABLE Staff
     FOREIGN KEY (username) REFERENCES User(username)
   );
 
-CREATE TABLE Patient
+CREATE TABLE IF NOT EXISTS Patient
   (
     username varchar(255),
     address varchar(255) NOT NULL,
@@ -39,7 +44,7 @@ CREATE TABLE Patient
     FOREIGN KEY (username) REFERENCES User(username)
   );
 
-CREATE TABLE Admission_record
+CREATE TABLE IF NOT EXISTS Admission_record
   (
     record_id varchar(255),
     patient_id varchar(255) NOT NULL,
@@ -52,7 +57,7 @@ CREATE TABLE Admission_record
     FOREIGN KEY (patient_id) REFERENCES Patient(username)
   );
 
-CREATE TABLE Appointment
+CREATE TABLE IF NOT EXISTS Appointment
   (
     appointment_id int,
     patient_id varchar(255) NOT NULL,
