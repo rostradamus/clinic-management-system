@@ -1,11 +1,11 @@
 -- Sample user data
-INSERT INTO User values ("seongchanlee", "samplepass1", "sample1@gmail.com", "778-123-4567", "Seongchan", "Lee", "Patient", true);
-INSERT INTO User values ("dennisyi", "samplepass2", "sample2@gmail.com", "778-891-0111", "Dennis", "Yi", "Administrator", true);
-INSERT INTO User values ("mikeyoon", "samplepass3", "sample3@gmail.com", "778-213-1415", "Mike", "Yoon", "Staff", true);
-INSERT INTO User values ("jamiejeon", "samplepass4", "sample4@gmail.com", "778-161-7181", "Jamie", "Jeon", "Patient", true);
-INSERT INTO User values ("kennypark", "samplepass5", "sample5@gmail.com", "778-920-2122", "Kenny", "Park", "Administrator", true);
-INSERT INTO User values ("rolee", "samplepass6", "sample6@gmail.com", "778-232-4252", "Ro", "Lee", "Staff", true);
-INSERT INTO User values ("davidkim", "samplepass7", "sample7@gmail.com", "778-627-2829", "David", "Kim", "Patient", true);
+INSERT INTO User values ("seongchanlee", "samplepass1", "sample1@gmail.com", "778-123-4567", "Seongchan", "Lee", "Patient", 0, true);
+INSERT INTO User values ("dennisyi", "samplepass2", "sample2@gmail.com", "778-891-0111", "Dennis", "Yi", "Administrator", 2, true);
+INSERT INTO User values ("mikeyoon", "samplepass3", "sample3@gmail.com", "778-213-1415", "Mike", "Yoon", "Staff", 1, true);
+INSERT INTO User values ("jamiejeon", "samplepass4", "sample4@gmail.com", "778-161-7181", "Jamie", "Jeon", "Patient", 0, true);
+INSERT INTO User values ("kennypark", "samplepass5", "sample5@gmail.com", "778-920-2122", "Kenny", "Park", "Administrator", 2, true);
+INSERT INTO User values ("rolee", "samplepass6", "sample6@gmail.com", "778-232-4252", "Ro", "Lee", "Staff", 1, true);
+INSERT INTO User values ("davidkim", "samplepass7", "sample7@gmail.com", "778-627-2829", "David", "Kim", "Patient", 0, true);
 
 -- Sample administrator data
 INSERT INTO Administrator values ("dennisyi");
