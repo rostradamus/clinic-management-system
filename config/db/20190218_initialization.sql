@@ -1,10 +1,3 @@
-DROP TABLE User;
-DROP TABLE Admin;
-DROP TABLE Staff;
-DROP TABLE Patient;
-DROP TABLE Admission_record;
-DROP TABLE Appointment;
-
 CREATE TABLE User
   (
     username varchar(255),
@@ -17,7 +10,7 @@ CREATE TABLE User
     PRIMARY KEY(username)
   );
 
-CREATE TABLE Admin
+CREATE TABLE Admininstrator
   (
     username varchar(255),
     PRIMARY KEY(username),
@@ -41,14 +34,14 @@ CREATE TABLE Patient
     patient_category int NOT NULL,
     is_in_patient boolean NOT NULL,
     patient_program varchar(5) NOT NULL,
-    birthday:date NOT NULL,
+    birthday date NOT NULL,
     PRIMARY KEY(username),
     FOREIGN KEY (username) REFERENCES User(username)
   );
 
 CREATE TABLE Admission_record
   (
-    record_id varchar(255).
+    record_id varchar(255),
     patient_id varchar(255) NOT NULL,
     admission_date date NOT NULL,
     discharge_date date,
@@ -74,4 +67,4 @@ CREATE TABLE Appointment
     FOREIGN KEY (record_id) REFERENCES Admission_record(record_id)
   );
 
-commit;  
+commit;
