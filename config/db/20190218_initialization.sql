@@ -5,7 +5,7 @@ CREATE TABLE User
     email varchar(255) NOT NULL,
     phone_num varchar(255) NOT NULL,
     name varchar(255) NOT NULL,
-    type varchar(255) NOT NULL,
+    type ENUM ('Administrator', 'Staff', 'Patient'),
     active boolean NOT NULL,
     PRIMARY KEY(username)
   );
