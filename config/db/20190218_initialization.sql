@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS Staff
 CREATE TABLE IF NOT EXISTS Patient
   (
     username varchar(255),
+    patient_num varchar(255),
     address varchar(255) NOT NULL,
     emergency_contact varchar(255),
     patient_category int NOT NULL,
