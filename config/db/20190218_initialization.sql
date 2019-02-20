@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS User
     first_name varchar(255) NOT NULL,
     last_name varchar(255) NOT NULL,
     type ENUM ('Administrator', 'Staff', 'Patient'),
-    permission_level ENUM (0, 1, 2),
+    permission_level ENUM ('Low', 'Medium', 'High'),
     active boolean NOT NULL,
     PRIMARY KEY(username)
   );
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS Patient
 
 CREATE TABLE IF NOT EXISTS Admission_record
   (
-    record_id INT AUTO_INCREMENT,
+    record_id int AUTO_INCREMENT,
     patient_id varchar(255) NOT NULL,
     admission_date date NOT NULL,
     discharge_date date,
@@ -62,10 +62,10 @@ CREATE TABLE IF NOT EXISTS Admission_record
 
 CREATE TABLE IF NOT EXISTS Appointment
   (
-    appointment_id INT AUTO_INCREMENT,
+    appointment_id int AUTO_INCREMENT,
     patient_id varchar(255) NOT NULL,
     staff_id varchar(255) NOT NULL,
-    record_id varchar(255) NOT NULL,
+    record_id int NOT NULL,
     type_of_therapy varchar(255) NOT NULL,
     duration int NOT NULL,
     note varchar(255),
