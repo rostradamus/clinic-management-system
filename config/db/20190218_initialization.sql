@@ -10,7 +10,7 @@ CREATE TABLE User
     PRIMARY KEY(username)
   );
 
-CREATE TABLE Admininstrator
+CREATE TABLE Administrator
   (
     username varchar(255),
     PRIMARY KEY(username),
