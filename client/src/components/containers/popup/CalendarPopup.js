@@ -31,32 +31,41 @@ class CalendarPopup extends Component {
     super(props);
     moment.locale('en');
 
+    // TODO: requires refactor when database is connected
     this.state = {
-      [POPUP_STATE_CONST.patient]: "",
-      [POPUP_STATE_CONST.practitioner]: "",
-      [POPUP_STATE_CONST.appointmentDate]: "",
-      [POPUP_STATE_CONST.start]: "",
-      [POPUP_STATE_CONST.end]: "",
-      [POPUP_STATE_CONST.repeat]: "n",
-      [POPUP_STATE_CONST.location]: "",
-      [POPUP_STATE_CONST.notes]: "NOTES OBJECT PLACEHOLDER"
+      id: -1,
+      patient: "",
+      practitioner: "",
+      appointmentDate: "",
+      start: "",
+      end: "",
+      repeat: "n",
+      location: "",
+      notes: "NOTES OBJECT PLACEHOLDER",
+      isUpdateAppointment: false
     };
-
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSelectChange = this.handleSelectChange.bind(this);
     this.handleTimeChange = this.handleTimeChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
   }
 
+  // TODO: requires refactor when database is connected
   static getDerivedStateFromProps(nextProps, prevState) {
-    const { start, end } = nextProps && nextProps.event;
-    const prevStart = prevState && prevState[POPUP_STATE_CONST.start];
-
+    const { id, patient, practitioner, start, end, notes, isUpdateAppointment } = nextProps && nextProps.event;
+    const prevStart = prevState && prevState.start;
     if (prevStart === "") {
       return {
-        [POPUP_STATE_CONST.appointmentDate]: start,
-        [POPUP_STATE_CONST.start]: start,
-        [POPUP_STATE_CONST.end]: end
+        id: isUpdateAppointment ? id : Math.floor(Math.random() * Math.floor(1000)),
+        patient: patient,
+        practitioner: practitioner,
+        appointmentDate: start,
+        start: start,
+        end: end,
+        repeat: "n",
+        location: "",
+        notes: notes,
+        isUpdateAppointment: isUpdateAppointment
       };
     }
     return {};
@@ -94,7 +103,11 @@ class CalendarPopup extends Component {
       {...this.state},
       { title: this._generateTitle(this.state) }
     );
-    this.props.createAppointment(copiedState);
+    if (this.state.isUpdateAppointment) {
+      this.props.updateAppointment(copiedState);
+    } else {
+      this.props.createAppointment(copiedState);
+    }
     this.props.onClose();
   }
 
@@ -124,22 +137,24 @@ class CalendarPopup extends Component {
   }
 
   _renderPatientForm() {
+    const placeholder = this.state.patient ? this.state.patient : "Search";
     return(
       <Form.Field >
         <label>Patient *</label>
-        <Input icon='search' iconPosition='left' placeholder='Search'
-          onChange={e => this.handleInputChange(e, POPUP_STATE_CONST.patient) }
+        <Input icon='search' iconPosition='left' placeholder={ placeholder }
+          onChange={e => this.handleInputChange(e, "patient") }
         />
       </Form.Field>
     );
   }
 
   _renderPractitionerForm() {
+    const placeholder = this.state.practitioner ? this.state.practitioner : "Search";
     return(
       <Form.Field >
         <label>Practitioner *</label>
-        <Input icon='search' iconPosition='left' placeholder='Search'
-          onChange={e => this.handleInputChange(e, POPUP_STATE_CONST.practitioner) }
+        <Input icon='search' iconPosition='left' placeholder={ placeholder }
+          onChange={e => this.handleInputChange(e, "practitioner") }
         />
       </Form.Field>
     );
@@ -158,7 +173,7 @@ class CalendarPopup extends Component {
             value={moment(appointmentDate).format('l')}
             iconPosition="left"
             onChange={
-              (e,data) => this.handleTimeChange(e, POPUP_STATE_CONST.appointmentDate, data)
+              (e,data) => this.handleTimeChange(e, "appointmentDate", data)
             }
           />
         </Form.Field>
@@ -171,7 +186,7 @@ class CalendarPopup extends Component {
             value={ moment(start).format("kk[:]mm") }
             iconPosition="left"
             onChange={
-              (e, data) => this.handleTimeChange(e, POPUP_STATE_CONST.start, data)
+              (e, data) => this.handleTimeChange(e, "start", data)
             }
           />
         </Form.Field>
@@ -184,7 +199,7 @@ class CalendarPopup extends Component {
             value={ moment(end).format("kk[:]mm") }
             iconPosition="left"
             onChange={
-              (e, data) => this.handleTimeChange(e, POPUP_STATE_CONST.end, data)
+              (e, data) => this.handleTimeChange(e, "end", data)
             }
           />
         </Form.Field>
@@ -193,12 +208,13 @@ class CalendarPopup extends Component {
   }
 
   _renderRepeatDropDownForm() {
+    const placeholder = this.state.repeat ? this.state.repeat : "Never";
     return(
       <Form.Field
         control={ Select }
         options={ REPEAT_CONST }
         label={{ children: 'Repeat', htmlFor: 'form-select-control-repeat' }}
-        placeholder='Never'
+        placeholder={ placeholder }
         search
         searchInput={{ id: 'form-select-control-repeat' }}
         onChange={ this.handleSelectChange }
@@ -206,20 +222,22 @@ class CalendarPopup extends Component {
     );
   }
   _renderLocationForm() {
+    const placeholder = this.state.location ? this.state.location : "Add Location";
     return(
       <Form.Field>
         <label>Location</label>
-        <Input placeholder='Add Location'
-          onChange={e => this.handleInputChange(e, POPUP_STATE_CONST.location) }
+        <Input placeholder= { placeholder }
+          onChange={e => this.handleInputChange(e, "location") }
         />
       </Form.Field>
     );
   }
 
   _renderNoteForm() {
+    const placeholder = this.state.notes ? this.state.notes : "Add Note";
     return(
-      <Form.TextArea label='Note' placeholder='Add Note'
-        onChange={e => this.handleInputChange(e, POPUP_STATE_CONST.notes) }
+      <Form.TextArea label='Note' placeholder={ placeholder }
+        onChange={e => this.handleInputChange(e, "notes") }
       />
     );
   }
@@ -233,7 +251,6 @@ class CalendarPopup extends Component {
         { this._renderRepeatDropDownForm() }
         { this._renderLocationForm() }
         { this._renderNoteForm() }
-
       </Form>
     );
   }
