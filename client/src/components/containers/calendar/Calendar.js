@@ -10,7 +10,7 @@ import { CalendarPopupAction } from 'actions';
 // Big Calendar requires explicit height set to properly display contents.
 // Need to refactor to make it dynamic according to user screen size.
 const containerStyle = {
-  height: "600px"
+  height: "45rem"
 }
 
 class Calendar extends Component {
@@ -40,7 +40,14 @@ class Calendar extends Component {
     this.props.dispatch(CalendarPopupAction.fetchAppointments());
   }
 
-  toggleAddModal(event) {
+  // TODO: requires refactor when database is connected
+  toggleAddModal(event, isUpdateAppointment) {
+    let selectedEvent = {};
+    if (event != null) {
+      isUpdateAppointment = isUpdateAppointment || false;
+      selectedEvent = Object.assign(event, { isUpdateAppointment });
+    }
+
     this.setState({
       selectedEvent: event,
       isAddModalOpen: !this.state.isAddModalOpen,
@@ -64,8 +71,8 @@ class Calendar extends Component {
           views={[BigCalendar.Views.DAY, BigCalendar.Views.WORK_WEEK, BigCalendar.Views.MONTH]}
           min={this.state.minTime}
           max={this.state.maxTime}
-          onSelectEvent={this.toggleAddModal}
-          onSelectSlot={this.toggleAddModal}
+          onSelectEvent={(e) => this.toggleAddModal(e, true)}
+          onSelectSlot={(e) => this.toggleAddModal(e, false)}
         />
         {this.state.isAddModalOpen ?
           <CalendarPopup isOpen={ this.state.isAddModalOpen }
@@ -74,7 +81,6 @@ class Calendar extends Component {
         }
       </Container>
     );
-
   }
 }
 
