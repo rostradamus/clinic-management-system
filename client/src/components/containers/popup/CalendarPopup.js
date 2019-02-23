@@ -9,10 +9,10 @@ import './CalendarPopup.css';
 
 // constants can be moved to constants dir
 const REPEAT_CONST = [
-  { key: 'd', text: 'Daily', value: 'daily' },
-  { key: 'w', text: 'Weekly', value: 'weekly' },
-  { key: 'm', text: 'Monthly', value: 'monthly' },
-  { key: 'n', text: 'Never', value: 'never' }
+  { key: 'Daily', text: 'Daily', value: 'Daily' },
+  { key: 'Weekly', text: 'Weekly', value: 'Weekly' },
+  { key: 'Monthly', text: 'Monthly', value: 'Monthly' },
+  { key: 'Never', text: 'Never', value: 'Never' }
 ];
 
 const POPUP_STATE_CONST = {
@@ -39,20 +39,20 @@ class CalendarPopup extends Component {
       appointmentDate: "",
       start: "",
       end: "",
-      repeat: "n",
+      repeat: "",
       location: "",
       notes: "NOTES OBJECT PLACEHOLDER",
       isUpdateAppointment: false
     };
-    this.handleInputChange = this.handleInputChange.bind(this);
-    this.handleSelectChange = this.handleSelectChange.bind(this);
-    this.handleTimeChange = this.handleTimeChange.bind(this);
+    this._handleInputChange = this._handleInputChange.bind(this);
+    this._handleSelectChange = this._handleSelectChange.bind(this);
+    this._handleTimeChange = this._handleTimeChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
   }
 
   // TODO: requires refactor when database is connected
   static getDerivedStateFromProps(nextProps, prevState) {
-    const { id, patient, practitioner, start, end, notes, isUpdateAppointment } = nextProps && nextProps.event;
+    const { id, patient, practitioner, start, end, notes, isUpdateAppointment, repeat } = nextProps && nextProps.event;
     const prevStart = prevState && prevState.start;
     if (prevStart === "") {
       return {
@@ -62,7 +62,7 @@ class CalendarPopup extends Component {
         appointmentDate: start,
         start: start,
         end: end,
-        repeat: "n",
+        repeat: repeat != null ? repeat : "Never",
         location: "",
         notes: notes,
         isUpdateAppointment: isUpdateAppointment
@@ -71,18 +71,16 @@ class CalendarPopup extends Component {
     return {};
   }
 
-  handleInputChange(event, key) {
+  _handleInputChange(event, key) {
     const value = event.target && event.target.value;
     this.setState({[key]: value});
   }
 
-  handleSelectChange(event, { value }) {
-    this.setState({
-      [POPUP_STATE_CONST.repeat]: value
-    });
+  _handleSelectChange(event, { value }) {
+    this.setState({ repeat: value });
   }
 
-  handleTimeChange(event, key, { value }) {
+  _handleTimeChange(event, key, { value }) {
     if (key !== POPUP_STATE_CONST.appointmentDate) {
       const hhmm = value.split(":");
       if (hhmm.length === 2) {
@@ -128,9 +126,8 @@ class CalendarPopup extends Component {
   _renderModalActionButton() {
     //this is for presentation purposes. Update and create is distinguished by this.props.event.title
     return(
-      <Button
+      <Button primary
         content={ this.props.event.title ? "Update" : "Create"}
-        primary
         onClick={ this.onSubmit }
       />
     );
@@ -142,7 +139,7 @@ class CalendarPopup extends Component {
       <Form.Field >
         <label>Patient *</label>
         <Input icon='search' iconPosition='left' placeholder={ placeholder }
-          onChange={e => this.handleInputChange(e, "patient") }
+          onChange={e => this._handleInputChange(e, "patient") }
         />
       </Form.Field>
     );
@@ -154,7 +151,7 @@ class CalendarPopup extends Component {
       <Form.Field >
         <label>Practitioner *</label>
         <Input icon='search' iconPosition='left' placeholder={ placeholder }
-          onChange={e => this.handleInputChange(e, "practitioner") }
+          onChange={e => this._handleInputChange(e, "practitioner") }
         />
       </Form.Field>
     );
@@ -173,7 +170,7 @@ class CalendarPopup extends Component {
             value={moment(appointmentDate).format('l')}
             iconPosition="left"
             onChange={
-              (e,data) => this.handleTimeChange(e, "appointmentDate", data)
+              (e,data) => this._handleTimeChange(e, "appointmentDate", data)
             }
           />
         </Form.Field>
@@ -186,7 +183,7 @@ class CalendarPopup extends Component {
             value={ moment(start).format("kk[:]mm") }
             iconPosition="left"
             onChange={
-              (e, data) => this.handleTimeChange(e, "start", data)
+              (e, data) => this._handleTimeChange(e, "start", data)
             }
           />
         </Form.Field>
@@ -199,13 +196,14 @@ class CalendarPopup extends Component {
             value={ moment(end).format("kk[:]mm") }
             iconPosition="left"
             onChange={
-              (e, data) => this.handleTimeChange(e, "end", data)
+              (e, data) => this._handleTimeChange(e, "end", data)
             }
           />
         </Form.Field>
       </Form.Group>
     );
   }
+
 
   _renderRepeatDropDownForm() {
     const placeholder = this.state.repeat ? this.state.repeat : "Never";
@@ -217,7 +215,7 @@ class CalendarPopup extends Component {
         placeholder={ placeholder }
         search
         searchInput={{ id: 'form-select-control-repeat' }}
-        onChange={ this.handleSelectChange }
+        onChange={ this._handleSelectChange }
       />
     );
   }
@@ -227,7 +225,7 @@ class CalendarPopup extends Component {
       <Form.Field>
         <label>Location</label>
         <Input placeholder= { placeholder }
-          onChange={e => this.handleInputChange(e, "location") }
+          onChange={e => this._handleInputChange(e, "location") }
         />
       </Form.Field>
     );
@@ -237,7 +235,7 @@ class CalendarPopup extends Component {
     const placeholder = this.state.notes ? this.state.notes : "Add Note";
     return(
       <Form.TextArea label='Note' placeholder={ placeholder }
-        onChange={e => this.handleInputChange(e, "notes") }
+        onChange={e => this._handleInputChange(e, "notes") }
       />
     );
   }

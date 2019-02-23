@@ -19,7 +19,6 @@ export default class CalendarPopupAction {
   };
 
   static updateAppointment = data => {
-    console.log("updateAppointment",data);
     return {
       type: APPOINTMENT_ACTION_TYPE.UPDATE_APPOINTMENT_REQUEST,
       payload: data

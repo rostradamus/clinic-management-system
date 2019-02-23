@@ -6,7 +6,7 @@ export default [
     practitioner: "Ro",
     start: new Date(2019, 1, 13, 14, 0, 0),
     end: new Date(2019, 1, 13, 16, 0, 0),
-    repeat: "never",
+    repeat: "Never",
     location: "Room A 104",
     notes: ""
   },
@@ -17,7 +17,7 @@ export default [
     practitioner: "Ro",
     start: new Date(2019, 1, 11, 15, 0, 0),
     end: new Date(2019, 1, 11, 16, 0, 0),
-    repeat: "weekly",
+    repeat: "Weekly",
     location: "Room A 102",
     notes: "Great improvement"
   },
@@ -28,7 +28,7 @@ export default [
     practitioner: "Mike",
     start: new Date(2019, 1, 11, 15, 0, 0),
     end: new Date(2019, 1, 11, 16, 0, 0),
-    repeat: "weekly",
+    repeat: "Weekly",
     location: "Room C 1022",
     notes: "Sprained ankle."
   },
@@ -39,7 +39,7 @@ export default [
     practitioner: "Dennis",
     start: new Date(2019, 1, 11, 9, 0, 0),
     end: new Date(2019, 1, 11, 11, 0, 0),
-    repeat: "never",
+    repeat: "Never",
     location: "Room A 1023",
     notes: "David is in good health"
   },
@@ -50,7 +50,7 @@ export default [
     practitioner: "Jamie",
     start: new Date(2019, 1, 12, 12, 0, 0),
     end: new Date(2019, 1, 12, 13, 0, 0),
-    repeat: "weekly",
+    repeat: "Weekly",
     location: "Room A 102",
     notes: "Swings needs to exercise regulary."
   },
@@ -61,7 +61,7 @@ export default [
     practitioner: "Jamie",
     start: new Date(2019, 1, 14, 13, 0, 0),
     end: new Date(2019, 1, 14, 14, 0, 0),
-    repeat: "never",
+    repeat: "Never",
     location: "Room A 102",
     notes: "Ricky has fully recovered."
   },
@@ -72,7 +72,7 @@ export default [
     practitioner: "Ro",
     start: new Date(2019, 1, 15, 11, 0, 0),
     end: new Date(2019, 1, 15, 12, 0, 0),
-    repeat: "weekly",
+    repeat: "Weekly",
     location: "Room B 222",
     notes: "Chris did not come today."
   },
@@ -83,7 +83,7 @@ export default [
     practitioner: "Ro",
     start: new Date(2019, 1, 12, 10, 0, 0),
     end: new Date(2019, 1, 12, 11, 0, 0),
-    repeat: "monthly",
+    repeat: "Monthly",
     location: "Room C 742",
     notes: "Kenny is lacking vitamins."
   },
@@ -94,7 +94,7 @@ export default [
     practitioner: "SeongChan",
     start: new Date(2019, 1, 14, 12, 0, 0),
     end: new Date(2019, 1, 14, 13, 0, 0),
-    repeat: "weekly",
+    repeat: "Weekly",
     location: "Room B 222",
     notes: "Chris is recovering."
   }

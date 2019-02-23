@@ -24,7 +24,7 @@ export default (state = initialState, action) => {
       return state;
 
     case APPOINTMENT_ACTION_TYPE.UPDATE_APPOINTMENT_REQUEST:
-      const updatedEvents = state.map(event => event.id == action.payload.id ? action.payload : event);
+      const updatedEvents = state.map(event => event.id === action.payload.id ? action.payload : event);
       return updatedEvents;
 
     case APPOINTMENT_ACTION_TYPE.UPDATE_APPOINTMENT_SUCCESS:
