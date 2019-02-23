@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import BigCalendar from 'react-big-calendar';
 import moment from 'moment';
-import { Container } from "semantic-ui-react";
+import { Grid } from "semantic-ui-react";
 import { CalendarPopup } from 'components/containers/popup';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { CalendarPopupAction } from 'actions';
@@ -49,7 +49,7 @@ class Calendar extends Component {
     }
 
     this.setState({
-      selectedEvent: event,
+      selectedEvent: selectedEvent,
       isAddModalOpen: !this.state.isAddModalOpen,
     });
   };
@@ -60,7 +60,7 @@ class Calendar extends Component {
     const defaultDate = new Date(2019, 1, 12);
     const localizer = BigCalendar.momentLocalizer(moment);
     return(
-      <Container className="calendarContainer" style={containerStyle}>
+      <Grid.Column className="appointmentCalendar" width={12} style={containerStyle}>
         <BigCalendar
           selectable
           popup={true}
@@ -79,7 +79,7 @@ class Calendar extends Component {
             onClose={ this.toggleAddModal } event={ this.state.selectedEvent } />
           : null
         }
-      </Container>
+      </Grid.Column>
     );
   }
 }
