@@ -44,6 +44,19 @@ $ Enter Password: your_password
 $ source ~/path/to/schedule-system/config/db/migrate.sql
 ```
 
+```
+<!-- DB initialization instruction -->
+$ mysql -u root -p
+$ Enter Password: your_password
+$ source ~/path/to/schedule-system/config/db/20190218_initialization.sql
+```
+
+```
+<!-- Demo data instruction -->
+$ Run DB initialization
+$ source ~/path/to/schedule-system/config/db/20190219_demo_data.sql
+```
+
 ### Commands to Run Application
 #### Dev Environment
 NOTE: to avoid any possible crash, running concurrent package will NOT be used at the moment. Instead, use two separate terminal tabs to run Server & Client
