@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS User
     username varchar(255),
     password varchar(255) NOT NULL,
     email varchar(255) NOT NULL,
-    phone_num varchar(255) NOT NULL,
+    phone_number varchar(255) NOT NULL,
     first_name varchar(255) NOT NULL,
     last_name varchar(255) NOT NULL,
     type ENUM ('Administrator', 'Staff', 'Patient'),
@@ -36,13 +36,13 @@ CREATE TABLE IF NOT EXISTS Staff
 CREATE TABLE IF NOT EXISTS Patient
   (
     username varchar(255),
-    patient_num varchar(255) NOT NULL,
+    patient_number varchar(255) NOT NULL,
     address varchar(255) NOT NULL,
     emergency_contact varchar(255),
     patient_category int NOT NULL,
     is_in_patient boolean NOT NULL,
     patient_program varchar(5) NOT NULL,
-    birthday date NOT NULL,
+    birth_date date NOT NULL,
     PRIMARY KEY(username),
     FOREIGN KEY (username) REFERENCES User(username)
   );
