@@ -84,7 +84,7 @@ class CardsGrid extends Component {
 	render() {
 		const { patients } = this.props;
 		return (
-			<div style={reportStyle.outerContainer} className='disable_scroll'>
+			<div style={reportStyle.outerContainer} className="disable_scroll">
 				<Grid style={reportStyle.grid} columns={4}>
 					{this._makeRows(this._filterPatients(patients))}
 				</Grid>

@@ -31,7 +31,7 @@ class ReportContainer extends Component {
 		this.props.requestPatients();
 	}
 
-	_handle(e, data) {
+	_handleSearch(e, data) {
 		this.props.handleSearchChange(data.value);
 	}
 
@@ -52,7 +52,7 @@ class ReportContainer extends Component {
 				<div style={reportStyle.container}>
 					<CategoryLabels />
 					<label style={reportStyle.patient}>Patients</label>
-					<Input onChange={this._handleSearch} style={reportStyle.search} iconPosition="left" icon="search" placeholder="Search" />
+					<Input onChange={this._handleSearch.bind(this)} style={reportStyle.search} iconPosition="left" icon="search" placeholder="Search" />
 				</div>
 				<CardsGrid />
 				<ReportPopup />
