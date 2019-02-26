@@ -1,17 +1,15 @@
 const routes = require('express').Router();
 
 
-routes.get("/", (req, res) => {
-  const db = require("@config/db/connection");
-  db.query("SELECT * FROM notes", (err, result, fields) => {
-    if (err) {
-      res.status(500);
-      res.send(err);
-      return;
-    }
-    res.status(200);
-    res.send(JSON.parse(JSON.stringify(result)));
-  });
+routes.get("/notes", (req, res) => {
+    const qm = require("@app/helpers/queryManager");
+    qm.getUserWithUsernameFromTable("mikeyoon", "User").then((result, err) => {
+      if (err) {
+        throw err;
+      }
+      res.status(200);
+      res.send(result);
+    })
 });
 
 routes.get("/:note_id", (req, res) => {
