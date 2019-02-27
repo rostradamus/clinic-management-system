@@ -22,26 +22,38 @@ function makeQuery (q) {
 
 /**
  * When resolved, returns an array of JSON objects.
- * 
+ *
  * @param {} table : the database table name
  */
 function getAllEntriesFromTable (table) {
-  let query = getBaseQuery(table);
+  const query = getBaseQuery(table);
   return makeQuery(query);
 }
 
 function getUserWithUsernameFromTable (table, username) {
-  let query = getBaseQuery(table) + ' WHERE username = "' + username + '"';
+  const query = getBaseQuery(table) + ' WHERE username = "' + username + '"';
   return makeQuery(query);
 }
 
 function getAdmissionRecordWithRecordId (id) {
-  let query = getBaseQuery("Admission_record") + ' WHERE record_id = "' + id + '"';
+  const query = getBaseQuery("Admission_record") + ' WHERE record_id = "' + id + '"';
+  return makeQuery(query);
+}
+
+function getAllActiveUsers () {
+  const query = getBaseQuery("User") + ' WHERE active = 1'
+  return makeQuery(query);
+}
+
+function deleteUserWithUsername (username) {
+  const query = 'UPDATE User SET active = false WHERE username = "' + username + '"';
   return makeQuery(query);
 }
 
 module.exports = {
   getAllEntriesFromTable,
   getUserWithUsernameFromTable,
-  getAdmissionRecordWithRecordId
+  getAdmissionRecordWithRecordId,
+  getAllActiveUsers,
+  deleteUserWithUsername
 };

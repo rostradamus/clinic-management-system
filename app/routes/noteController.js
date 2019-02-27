@@ -1,9 +1,8 @@
 const routes = require('express').Router();
-
+const qm = require("@app/helpers/queryManager");
 
 routes.get("/notes", (req, res) => {
-    const qm = require("@app/helpers/queryManager");
-    qm.getUserWithUsernameFromTable("mikeyoon", "User").then((result, err) => {
+    qm.getUserWithUsernameFromTable("User", "mikeyoon").then((result, err) => {
       if (err) {
         throw err;
       }
