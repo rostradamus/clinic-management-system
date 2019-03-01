@@ -24,7 +24,7 @@ module.exports = {
   },
 
   updateUserWithId: function(id, data) {
-    return qm.updateThenGetEntry(TABLE_NAME, id, data);
+    return qm.updateThenGetEntry(TABLE_NAME, id, data, { columns: VISIBILE_COLUMNS });
   },
 
   deleteUserWithId: function(id) {
