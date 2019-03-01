@@ -7,7 +7,7 @@ const passport = require('passport');
 const morgan = require('morgan');
 const path = require('path');
 
-const db = require("@config/db/connection");
+const db = require("@config/db/connection").connectDatabase();
 
 const app = express();
 app.use(morgan('dev'));
