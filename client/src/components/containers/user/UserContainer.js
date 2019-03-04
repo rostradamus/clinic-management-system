@@ -10,6 +10,12 @@ class UserContainer extends Component {
     super(props);
   }
 
+  componentWillUnmount() {
+    this.props.dispatch(UserAction.setFilter("all"));
+    this.props.dispatch(UserAction.setSort([]));
+    this.props.dispatch(UserAction.setSearchText(""));
+  }
+
   componentDidMount() {
     this.props.dispatch(UserAction.getUsers());
   }
@@ -32,8 +38,8 @@ class UserContainer extends Component {
             active={ filter === "all" }
             onClick={ this._handleMenuItemClick }>All</Menu.Item>
           <Menu.Item
-            name="admin"
-            active={ filter === "admin" }
+            name="administrator"
+            active={ filter === "administrator" }
             onClick={ this._handleMenuItemClick }>Admins</Menu.Item>
           <Menu.Item
             name="staff"

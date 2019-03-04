@@ -5,7 +5,7 @@ const initialState = {
   filter: "all",
   searchText: "",
   sort: {
-    key: "",
+    keys: [],
     direction: "ascending"
   },
   items: [],
@@ -23,24 +23,26 @@ export default (state = initialState, action) => {
     }
     case USER_ACTION_TYPE.FETCH_SUCCESS:
     case USER_ACTION_TYPE.FETCH_FAILURE:
-    case USER_ACTION_TYPE.ADD_SUCCESS:
     case USER_ACTION_TYPE.ADD_FAILURE:
     case USER_ACTION_TYPE.EDIT_FAILURE:
     case USER_ACTION_TYPE.DELETE_SUCCESS:
     case USER_ACTION_TYPE.DELETE_FAILURE: {
       return Object.assign({...state}, {isFetching: false}, action.payload);
     }
-
+    case USER_ACTION_TYPE.ADD_SUCCESS: {
+      return Object.assign({...state}, { items: state.items.push(action.payload) });
+    }
     case USER_ACTION_TYPE.EDIT_SUCCESS: {
       const items = state.items.map(user =>
-        user.userId === action.payload.userId ? action.payload : user);
+        user.id === action.payload.id ? action.payload : user);
       return Object.assign({...state}, { items });
     }
     case USER_ACTION_TYPE.SET_SORT: {
-      const { key, direction } = state.sort;
-      const newDirection = (key !== action.payload) ? "ascending" :
+      const { keys, direction } = state.sort;
+      const isKeyListEqual = keys.every((key, index) => key === action.payload[index]);
+      const newDirection = (!isKeyListEqual) ? "ascending" :
         (direction === "ascending" ? "descending" : "ascending");
-      return Object.assign({...state}, { sort: { key: action.payload, direction: newDirection } });
+      return Object.assign({...state}, { sort: { keys: action.payload, direction: newDirection } });
     }
     case USER_ACTION_TYPE.OPEN_POPUP:
     case USER_ACTION_TYPE.CLOSE_POPUP:

@@ -4,49 +4,56 @@ import { UserAction } from "actions";
 import { Table, Menu, Icon } from "semantic-ui-react";
 
 class UserTable extends Component {
-  handleSort(key) {
-    this.props.dispatch(UserAction.setSort(key));
-  }
+  handleSort(keys) {
+    this.props.dispatch(UserAction.setSort(keys));
+  };
 
   _renderTableRow(user) {
     return (
       <Table.Row
-        key={ user.userId }
+        key={ user.id }
         onClick={ () =>
           this.props.dispatch(UserAction.openUserPopup(user)) }>
-        <Table.Cell content={user.name} />
+        <Table.Cell content={`${user.first_name} ${user.last_name}`} />
         <Table.Cell content={user.email} />
+        <Table.Cell content={user.phone_number} />
         <Table.Cell content={user.type} />
-        <Table.Cell content={user.role} />
+        <Table.Cell content={user.permission_level} />
       </Table.Row>
     );
   }
 
   render() {
     const { sort, processedUsers } = this.props.user;
+    const sortKey = sort.keys.join(" ");
     return (
-      <Table basic="very" columns={4} selectable sortable>
+      <Table basic="very" columns={5} selectable sortable>
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell
-              sorted={sort.key === "name" ? sort.direction : null}
-              onClick={this.handleSort.bind(this, "name")}>
+              sorted={sortKey === "first_name last_name" ? sort.direction : null}
+              onClick={this.handleSort.bind(this, ["first_name", "last_name"])}>
               Name
             </Table.HeaderCell>
             <Table.HeaderCell
-              sorted={sort.key === "email" ? sort.direction : null}
-              onClick={this.handleSort.bind(this, "email")}>
+              sorted={sortKey === "email" ? sort.direction : null}
+              onClick={this.handleSort.bind(this, ["email"])}>
               Email
             </Table.HeaderCell>
             <Table.HeaderCell
-              sorted={sort.key === "type" ? sort.direction : null}
-              onClick={this.handleSort.bind(this, "type")}>
+              sorted={sortKey === "phone_number" ? sort.direction : null}
+              onClick={this.handleSort.bind(this, ["phone_number"])}>
+              Phone
+            </Table.HeaderCell>
+            <Table.HeaderCell
+              sorted={sortKey === "type" ? sort.direction : null}
+              onClick={this.handleSort.bind(this, ["type"])}>
               User Type
             </Table.HeaderCell>
             <Table.HeaderCell
-              sorted={sort.key === "role" ? sort.direction : null}
-              onClick={this.handleSort.bind(this, "role")}>
-              Role
+              sorted={sortKey === "permission_level" ? sort.direction : null}
+              onClick={this.handleSort.bind(this, ["permission_level"])}>
+              Permission
             </Table.HeaderCell>
           </Table.Row>
         </Table.Header>
@@ -85,9 +92,11 @@ const mapStateToProps = state => {
       Object.values(user).some(val => val.toString().toLowerCase().includes(searchText.toLowerCase())))
     .sort((user1, user2) => {
       const multiplier = sort.direction === "ascending" ? 1 : -1;
-      if (user1[sort.key] > user2[sort.key])
+      const comparable1 = sort.keys.reduce((acc, key) => acc + user1[key], "");
+      const comparable2 = sort.keys.reduce((acc, key) => acc + user2[key], "");
+      if (comparable1 > comparable2)
         return multiplier;
-      if (user1[sort.key] < user2[sort.key])
+      if (comparable1 < comparable2)
         return -1 * multiplier;
       return 0;
     });

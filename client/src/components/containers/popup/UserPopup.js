@@ -3,24 +3,21 @@ import { connect } from "react-redux";
 import { UserAction } from "actions";
 import { Modal, Button, Icon, Form } from "semantic-ui-react";
 
-const mockRoles = [
-  { key: "headPractitioner", text: "Head Practitioner", value: "Head Practitioner" },
-  { key: "practitioner", text: "Staff", value: "Staff" },
-  { key: "mentalTherapist", text: "Mental Therapist", value: "Mental Therapist" }
-];
-
 class UserPopup extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: "",
+      first_name: "",
+      last_name: "",
       email: "",
+      phone_number: "",
       type: "",
-      role: ""
+      permission_level: ""
     };
   }
+
   static getDerivedStateFromProps(props, state) {
-    if (props.user && props.user.userId !== state.userId) {
+    if (props.user && props.user.id !== state.id) {
       return {
         ...props.user
       };
@@ -40,7 +37,8 @@ class UserPopup extends Component {
   }
 
   render() {
-    const { name, email, type, role } = this.state;
+    const { first_name, last_name, email,
+      phone_number, type, permission_level } = this.state;
 
     return (
       <Modal
@@ -52,28 +50,38 @@ class UserPopup extends Component {
           <Form>
             <Form.Group widths="equal">
               <Form.Input fluid
-                label="Name"
-                name="name"
-                value={ name }
+                label="First Name"
+                name="first_name"
+                value={ first_name }
                 onChange={ this._handleInputChange.bind(this) } />
               <Form.Input fluid
-                label="Email"
-                name="email"
-                value={ email }
+                label="Last Name"
+                name="last_name"
+                value={ last_name }
                 onChange={ this._handleInputChange.bind(this) } />
             </Form.Group>
-            <Form.Input fluid readOnly
+            <Form.Input fluid
+              label="Email"
+              name="email"
+              value={ email }
+              onChange={ this._handleInputChange.bind(this) } />
+            <Form.Input fluid
+              label="Phone Number"
+              name="phone_number"
+              value={ phone_number }
+              onChange={ this._handleInputChange.bind(this) } />
+            <Form.Group widths="equal">
+              <Form.Input fluid readOnly
                 label="Type"
                 name="type"
                 placeholder={ type }
                 onChange={ this._handleInputChange.bind(this) } />
-            <Form.Select fluid
-              label="Role"
-              options={ mockRoles }
-              name="role"
-              selected={ role }
-              placeholder={ role }
-              onChange={ this._handleInputChange.bind(this) } />
+              <Form.Input fluid readOnly
+                label="Permission"
+                name="permission_level"
+                placeholder={ permission_level }
+                onChange={ this._handleInputChange.bind(this) } />
+            </Form.Group>
           </Form>
         </Modal.Content>
         <Modal.Actions>
