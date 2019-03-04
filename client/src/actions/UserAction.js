@@ -1,7 +1,5 @@
 import { USER_ACTION_TYPE } from "actions/ActionTypes";
-// import axios from "axios";
-// TODO: [REMOVE] TEMP USERS FOR POC
-import mockUsers from "./fixture/mockUser";
+import axios from "axios";
 
 export default class UserAction {
   static getUsers() {
@@ -11,9 +9,7 @@ export default class UserAction {
         payload: {}
       });
       try {
-        // TODO: [REMOVE] RETRIEVE MOCK USERS
-        // const res = await axios.get(`/api/user`);
-        const res = {data: mockUsers};
+        const res = await axios.get("/api/users");
         dispatch({
           type: USER_ACTION_TYPE.FETCH_SUCCESS,
           payload: {
@@ -38,9 +34,7 @@ export default class UserAction {
         payload: {}
       });
       try {
-        // TODO: [REMOVE] RETRIEVE MOCK USERS
-        // const res = await axios.get(`/api/user`);
-        const res = { data: mockUsers.find(user => user.id === id) };
+        const res = await axios.get(`/api/users/${id}`);
         dispatch({
           type: USER_ACTION_TYPE.FETCH_SUCCESS,
           payload: {
@@ -59,7 +53,24 @@ export default class UserAction {
   }
 
   static addUser(data) {
-
+    return async dispatch => {
+      dispatch({
+        type: USER_ACTION_TYPE.ADD_REQUEST,
+        payload: {}
+      });
+      try {
+        const res = await axios.post("/api/user/");
+        dispatch({
+          type: USER_ACTION_TYPE.ADD_SUCCESS,
+          payload: res.data
+        });
+      } catch (err) {
+        dispatch({
+          type: USER_ACTION_TYPE.ADD_FAILURE,
+          payload: { err }
+        });
+      }
+    }
   }
 
   static editUser(data) {
@@ -69,9 +80,7 @@ export default class UserAction {
         payload: {}
       });
       try {
-        // TODO: [REMOVE] RETRIEVE MOCK USERS
-        // const res = await axios.put(`/api/user/${data.userId}`, data);
-        const res = { data };
+        const res = await axios.put(`/api/users/${data.id}`, data);
         dispatch({
           type: USER_ACTION_TYPE.EDIT_SUCCESS,
           payload: res.data
@@ -105,10 +114,10 @@ export default class UserAction {
     };
   }
 
-  static setSort(key) {
+  static setSort(keys) {
     return {
       type: USER_ACTION_TYPE.SET_SORT,
-      payload: key
+      payload: keys
     };
   }
 
