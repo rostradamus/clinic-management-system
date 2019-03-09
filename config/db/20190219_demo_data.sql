@@ -27,7 +27,7 @@ INSERT INTO Admission_record values (null, "jamiejeon", '2018-12-12', null, "hea
 INSERT INTO Admission_record values (null, "davidkim", '2019-01-01', null, "arm injury", null, NOW());
 
 -- Sample Appointment data
-INSERT INTO Appointment values (null, "seongchanlee", "mikeyoon", 1, "type1", 120, null);
-INSERT INTO Appointment values (null, "seongchanlee", "rolee", 2, "type2", 150, null);
-INSERT INTO Appointment values (null, "jamiejeon", "mikeyoon", 3, "type1", 120, "hehe xd");
-INSERT INTO Appointment values (null, "davidkim", "rolee", 4, "type2", 150, "hue");
+INSERT INTO Appointment values (null, "seongchanlee", "mikeyoon", 1, "type1", '2019-01-01 13:00:00', '2019-01-01 13:30:00', "sample location 1", "none", null);
+INSERT INTO Appointment values (null, "seongchanlee", "rolee", 2, "type2", '2019-01-02 12:30:00', '2019-01-02 14:00:00', "sample location 2", "weekly", null);
+INSERT INTO Appointment values (null, "jamiejeon", "mikeyoon", 3, "type1", '2019-01-03 15:30:00', '2019-01-03 17:00:00', "sample location 2", "monthly", "hehe xd");
+INSERT INTO Appointment values (null, "davidkim", "rolee", 4, "type3", '2019-01-04 15:30:00', '2019-01-04 17:00:00', "sample location 2", "none", "hue");
