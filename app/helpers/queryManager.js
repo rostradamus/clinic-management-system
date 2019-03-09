@@ -28,6 +28,15 @@ module.exports = {
     return stmt;
   },
 
+  getQueryWithOverlap: function(options = {}) {
+    return new Promise((resolve, reject) => {
+      db.query(options, (err, results, fields) => {
+        if(err) return reject(err);
+        resolve(results);
+      });
+    })
+  },
+
   getWithIdBaseQuery: function(table, id, options = {}) {
     return mysql.format(`${this.getBaseQuery(table, options)} WHERE id = ?`, id);
   },
@@ -44,6 +53,10 @@ module.exports = {
 
   softDeleteBaseQuery: function(table, id) {
     return this.updateBaseQuery(table, id, { active: false});
+  },
+
+  hardDeleteBaseQuery: function(table, id) {
+    return mysql.format("DELETE FROM ?? WHERE id = ?", [table, id]);
   },
 
   makeQuery: function(q) {
@@ -101,6 +114,11 @@ module.exports = {
 
   softDeleteEntry: function(table, id, options = {}) {
     const query = this.softDeleteBaseQuery(table, id);
+    return this.makeQuery(query);
+  },
+
+  hardDeleteEntry: function(table, id, options = {}) {
+    const query = this.hardDeleteBaseQuery(table, id);
     return this.makeQuery(query);
   }
 }
