@@ -26,6 +26,11 @@ const POPUP_STATE_CONST = {
   notes: "notes"
 };
 
+const POPUP_ERROR_CONST = {
+  start: "startTimeError",
+  end: "endTimeError"
+};
+
 class CalendarPopup extends Component {
   constructor(props) {
     super(props);
@@ -42,12 +47,20 @@ class CalendarPopup extends Component {
       repeat: "",
       location: "",
       notes: "NOTES OBJECT PLACEHOLDER",
-      isUpdateAppointment: false
+      isUpdateAppointment: false,
+      // validation fields
+      startTimeError: false,
+      endTimeError: false
     };
+
+    this.handleSearchResult = this.handleSearchResult.bind(this);
     this._handleInputChange = this._handleInputChange.bind(this);
     this._handleSelectChange = this._handleSelectChange.bind(this);
     this._handleTimeChange = this._handleTimeChange.bind(this);
+    this._handleDateChange = this._handleDateChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+    this._updateTimeToCorrectDate = this._updateTimeToCorrectDate.bind(this);
+    this._validateTime = this._validateTime.bind(this);
   }
 
   // TODO: requires refactor when database is connected
@@ -71,28 +84,83 @@ class CalendarPopup extends Component {
     return {};
   }
 
+  handleSearchResult(key, result) {
+    this.setState({ [key]: result });
+  }
+
   _handleInputChange(event, key) {
     const value = event.target && event.target.value;
-    this.setState({[key]: value});
+    this.setState({ [key]: value });
   }
 
   _handleSelectChange(event, { value }) {
     this.setState({ repeat: value });
   }
 
+  _handleDateChange(event, { value }) {
+    if (value === "Invalid Date") return;
+
+    const chosenDate = moment(value, "MM-DD-YYYY");
+    const updatedStartTime = this._updateTimeToCorrectDate(POPUP_STATE_CONST.start, chosenDate);
+    const updatedEndTime = this._updateTimeToCorrectDate(POPUP_STATE_CONST.end, chosenDate);
+    this.setState({
+      appointmentDate: chosenDate.toDate(),
+      start: updatedStartTime,
+      end: updatedEndTime
+    });
+  }
+
   _handleTimeChange(event, key, { value }) {
-    if (key !== POPUP_STATE_CONST.appointmentDate) {
-      const hhmm = value.split(":");
-      if (hhmm.length === 2) {
-        const appointmentTime = moment(this.state.appointmentDate)
-          .hours(parseInt(hhmm[0]))
-          .minutes(parseInt(hhmm[1]))
-          .toDate();
-        this.setState({ [key]: appointmentTime });
+    const hhmm = value.split(":");
+    if (hhmm.length === 2) {
+      const appointmentTime = moment(this.state.appointmentDate)
+        .hours(parseInt(hhmm[0]))
+        .minutes(parseInt(hhmm[1]))
+        .toDate();
+
+      const timeError = this._validateTime(key, appointmentTime);
+      if (timeError) {
+        this.setState({
+          [key]: appointmentTime,
+          [POPUP_ERROR_CONST[key]]: timeError
+        });
+      } else {
+        this.setState({
+          [key]: appointmentTime,
+          startTimeError: false,
+          endTimeError: false
+        });
       }
-    } else {
-      this.setState({ [key]: new Date(value) });
     }
+  }
+
+  /**
+   * @param  {[String]} key [Will be either "start" or "end"]
+   * @param  {[Moment Obj]} chosenDate [Moment obj with date format MM-DD-YYYY]
+   * @return {[Date]}
+   */
+  _updateTimeToCorrectDate(key ,chosenDate) {
+    if (key === POPUP_STATE_CONST.start || key === POPUP_STATE_CONST.end) {
+      return moment(this.state[key])
+        .year(chosenDate.year())
+        .month(chosenDate.month())
+        .date(chosenDate.date())
+        .toDate();
+    }
+    // default error handling, may customize when necessary.
+    return new Date();
+  }
+
+  /**
+   * @param  {[String]} key [Will be either "start" or "end"]
+   * @param  {[Date]} time [end users chosen time wrapped in Date() object]
+   * @return {[boolean]} true if startTime doesn't conflict with endTime
+   */
+  _validateTime(key, time) {
+    const isKeyStart = key === POPUP_STATE_CONST.start;
+    const startTime = isKeyStart ? moment(time) : moment(this.state.start);
+    const endTime = isKeyStart ? moment(this.state.end) : moment(time);
+    return !startTime.isBefore(endTime);
   }
 
   onSubmit(event) {
@@ -115,19 +183,19 @@ class CalendarPopup extends Component {
   }
 
   _renderModalHeader() {
-    //this is for presentation purposes. Update and create is distinguished by this.props.event.title
+    const { isUpdateAppointment } = this.state;
     return (
       <Modal.Header>
-        { this.props.event.title ? "Update Appointment" : "New Appointment" }
+        { isUpdateAppointment ? "Update Appointment" : "New Appointment" }
       </Modal.Header>
     );
   }
 
   _renderModalActionButton() {
-    //this is for presentation purposes. Update and create is distinguished by this.props.event.title
+    const { isUpdateAppointment } = this.state;
     return(
       <Button primary
-        content={ this.props.event.title ? "Update" : "Create"}
+        content={ isUpdateAppointment ? "Update" : "Create"}
         onClick={ this.onSubmit }
       />
     );
@@ -151,14 +219,14 @@ class CalendarPopup extends Component {
       <Form.Field >
         <label>Practitioner *</label>
         <Input icon='search' iconPosition='left' placeholder={ placeholder }
-          onChange={e => this._handleInputChange(e, "practitioner") }
+          onChange={e => this._handleInputChange(e, "staff") }
         />
       </Form.Field>
     );
   }
 
   _renderDateTimeForm() {
-    const {start, end, appointmentDate} = this.state;
+    const {start, end, appointmentDate, startTimeError, endTimeError} = this.state;
     return(
       <Form.Group widths='equal'>
         <Form.Field >
@@ -167,15 +235,13 @@ class CalendarPopup extends Component {
             dateFormat="MM-DD-YYYY"
             name="date"
             placeholder="Date"
-            value={moment(appointmentDate).format('l')}
+            value={ moment(appointmentDate).format("l") }
             iconPosition="left"
-            onChange={
-              (e,data) => this._handleTimeChange(e, "appointmentDate", data)
-            }
+            onChange={ (e,data) => this._handleDateChange(e, data) }
           />
         </Form.Field>
 
-        <Form.Field >
+        <Form.Field error={ startTimeError } >
           <label>Start Time *</label>
           <TimeInput
             name="start"
@@ -188,7 +254,7 @@ class CalendarPopup extends Component {
           />
         </Form.Field>
 
-        <Form.Field >
+        <Form.Field error={ endTimeError } >
           <label>End Time *</label>
           <TimeInput
             name="end"
@@ -204,7 +270,6 @@ class CalendarPopup extends Component {
     );
   }
 
-
   _renderRepeatDropDownForm() {
     const placeholder = this.state.repeat ? this.state.repeat : "Never";
     return(
@@ -219,6 +284,7 @@ class CalendarPopup extends Component {
       />
     );
   }
+
   _renderLocationForm() {
     const placeholder = this.state.location ? this.state.location : "Add Location";
     return(
