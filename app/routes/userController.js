@@ -1,5 +1,8 @@
 const routes = require('express').Router();
 const userManager = require("@app/helpers/queryManager/user");
+const bcrypt = require("bcrypt");
+
+const BCRYPT_SALT_ROUNDS = 10;
 
 routes.get("/", (req, res) => {
   userManager.getAllActiveUsers()
@@ -13,7 +16,7 @@ routes.get("/", (req, res) => {
 });
 
 routes.get("/:user_id", (req, res) => {
-  userManager.getUserWithIdFromTable(req.params.user_id)
+  userManager.getUserWithId(req.params.user_id)
     .then(result => {
       if (result.length === 0) {
         res.status(404)
@@ -26,18 +29,21 @@ routes.get("/:user_id", (req, res) => {
     });
 });
 
-routes.post("/", (req, res) => {
-  userManager.createUser(req.body)
-    .then(result => {
-      if (result.length === 0)
-        throw new Error();
+routes.post("/", async (req, res) => {
+  try {
+    // TODO: TEMPORARY SOLUTION TO USER REGISTRATION
+    const initialPassword = req.body.phone_number.substr(-4);
+    const encryptedPassword = await bcrypt.hash(initialPassword, BCRYPT_SALT_ROUNDS);
+    const user = Object.assign({...req.body}, { password: encryptedPassword });
 
-      res.status(200);
-      res.send(result[0]);
-    })
-    .catch(err => {
-      res.status(500).json(err);
-    });
+    const result = await userManager.createUser(user);
+    if (result.length === 0)
+      throw new Error();
+    res.status(200);
+    res.send(result[0]);
+  } catch (e) {
+    res.status(500).json(e);
+  }
 });
 
 routes.put("/:user_id", (req, res) => {

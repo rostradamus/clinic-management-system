@@ -3,9 +3,19 @@ const qm = require("@app/helpers/queryManager");
 const TABLE_NAME = "User";
 const VISIBILE_COLUMNS = ["id", "username", "email", "phone_number",
   "first_name","last_name", "type", "permission_level"];
+const AUTH_ONLY_COLUMNS = ["password"];
 
 module.exports = {
-  getUserWithIdFromTable: function(id) {
+  getUserWithUsername: function(username, isForAuth) {
+    const options = {
+      columns: isForAuth ? [...VISIBILE_COLUMNS, ...AUTH_ONLY_COLUMNS] : VISIBILE_COLUMNS,
+      where: { username: username }
+    };
+    const query = qm.getBaseQuery(TABLE_NAME, options);
+    return qm.makeQuery(query);
+  },
+
+  getUserWithId: function(id) {
     const query = qm.getWithIdBaseQuery(TABLE_NAME, id, { columns: VISIBILE_COLUMNS });
     return qm.makeQuery(query);
   },
