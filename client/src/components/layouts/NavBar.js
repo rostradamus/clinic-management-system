@@ -5,9 +5,11 @@ import { Menu, Dropdown, Icon } from "semantic-ui-react";
 import { ReactComponent as Logo } from "assets/logo.svg";
 import { AuthAction } from "actions";
 import axios from "axios";
-const dropDownMenuStyle = {
-  "right": "1em"
-}
+
+const itemStyle = {
+  fontWeight: "bold"
+};
+
 class NavBar extends Component {
   constructor(props) {
     super(props);
@@ -26,9 +28,6 @@ class NavBar extends Component {
 
   _createNavButton({path, name, position}) {
     const { activeItem } = this.state;
-    const itemStyle = {
-      fontWeight: "bold"
-    };
     return (
       <Menu.Item
         position={ position }
@@ -80,28 +79,33 @@ class NavBar extends Component {
         trigger={ dropDownTriggerIcon }
         icon={ null }
         pointing>
-        <Dropdown.Menu style={dropDownMenuStyle}>
-          { this.props.auth.hasLoggedIn ? [<Dropdown.Item
-              key="profile"
-              icon="setting"
-              text="My Profile"
-              as={ Link }
-              to="/profile"/>,
-            <Dropdown.Item
-              key="logout"
-              icon="log out"
-              text="Logout"
-              onClick={ this.props.dispatch.bind(this, AuthAction.logoutUser(this.props.history)) }/> ]
-           : [<Dropdown.Item
-                key="login"
-                icon="sign in"
-                text="Login"
-                as={ Link }
-                to="/login"/>]
-          }
+        <Dropdown.Menu>
+          <Dropdown.Item
+            key="profile"
+            icon="setting"
+            text="My Profile"
+            as={ Link }
+            to="/profile"/>
+          <Dropdown.Item
+            key="logout"
+            icon="log out"
+            text="Logout"
+            onClick={ this.props.dispatch.bind(this, AuthAction.logoutUser(this.props.history)) }/>
         </Dropdown.Menu>
       </Dropdown>
     )
+  }
+
+  _renderUserLogin() {
+    return(
+      <Menu.Item
+        icon="sign in"
+        name='login'
+        as={ Link }
+        to="/login"
+        style={ itemStyle }
+      />
+    );
   }
 
   render() {
@@ -133,7 +137,7 @@ class NavBar extends Component {
           <Menu.Menu
             position="right"
             className="navbar-right-group"
-            children={ this._renderUserDropDown()  } />
+            children={ this.props.auth.hasLoggedIn ? this._renderUserDropDown() : this._renderUserLogin() } />
         </Menu>
       );
   }
