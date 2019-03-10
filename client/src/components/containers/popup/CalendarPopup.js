@@ -17,7 +17,7 @@ const REPEAT_CONST = [
 
 const POPUP_STATE_CONST = {
   patient: "patient",
-  practitioner: "practitioner",
+  staff: "staff",
   appointmentDate: "appointmentDate",
   start: "start",
   end: "end",
@@ -39,11 +39,11 @@ class CalendarPopup extends Component {
     // TODO: requires refactor when database is connected
     this.state = {
       id: -1,
-      patient: "",
-      practitioner: "",
-      appointmentDate: "",
-      start: "",
-      end: "",
+      patient: {}, // is now an obj {}
+      staff: {}, // change from practitioner -> staff and is now an obj {}
+      appointmentDate: "", // delete
+      start: "", // change to startTime
+      end: "", // change to endTime
       repeat: "",
       location: "",
       notes: "NOTES OBJECT PLACEHOLDER",
@@ -65,13 +65,12 @@ class CalendarPopup extends Component {
 
   // TODO: requires refactor when database is connected
   static getDerivedStateFromProps(nextProps, prevState) {
-    const { id, patient, practitioner, start, end, notes, isUpdateAppointment, repeat } = nextProps && nextProps.event;
-    const prevStart = prevState && prevState.start;
-    if (prevStart === "") {
+    const { id, patient, staff, start, end, notes, isUpdateAppointment, repeat } = nextProps && nextProps.event;
+    if (nextProps.event) {
       return {
         id: isUpdateAppointment ? id : Math.floor(Math.random() * Math.floor(1000)),
         patient: patient,
-        practitioner: practitioner,
+        staff: staff,
         appointmentDate: start,
         start: start,
         end: end,
@@ -177,9 +176,11 @@ class CalendarPopup extends Component {
     this.props.onClose();
   }
 
-  _generateTitle({ patient, practitioner }) {
+  // TODO: need to target nested info
+  _generateTitle({ patient, staff }) {
+    // return `Patient: ${patient.first_name} ${patient.last_name} - Staff: ${staff.first_name} ${staff.last_name}`;
     return "Patient: " + patient +
-      " - Therapist: " + practitioner;
+      " - Therapist: " + staff;
   }
 
   _renderModalHeader() {
@@ -202,7 +203,8 @@ class CalendarPopup extends Component {
   }
 
   _renderPatientForm() {
-    const placeholder = this.state.patient ? this.state.patient : "Search";
+    const { patient } = this.state;
+    const placeholder = patient ? `${patient.first_name} ${patient.last_name}` : "Search";
     return(
       <Form.Field >
         <label>Patient *</label>
@@ -213,11 +215,12 @@ class CalendarPopup extends Component {
     );
   }
 
-  _renderPractitionerForm() {
-    const placeholder = this.state.practitioner ? this.state.practitioner : "Search";
+  _renderStaffForm() {
+    const { staff } = this.state;
+    const placeholder = staff ? `${staff.first_name} ${staff.last_name}` : "Search";
     return(
       <Form.Field >
-        <label>Practitioner *</label>
+        <label>Staff *</label>
         <Input icon='search' iconPosition='left' placeholder={ placeholder }
           onChange={e => this._handleInputChange(e, "staff") }
         />
@@ -310,7 +313,7 @@ class CalendarPopup extends Component {
     return(
       <Form>
         { this._renderPatientForm() }
-        { this._renderPractitionerForm() }
+        { this._renderStaffForm() }
         { this._renderDateTimeForm() }
         { this._renderRepeatDropDownForm() }
         { this._renderLocationForm() }
