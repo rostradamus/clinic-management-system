@@ -38,23 +38,16 @@ NODE_PATH=src/
 1. MySQL version 8.0.13 is definitely being supported. Not guaranteed for other version
 
 ```
-<!-- Migration instruction -->
-$ mysql -u root -p
-$ Enter Password: your_password
-$ source ~/path/to/schedule-system/config/db/migrate.sql
-```
-
-```
 <!-- DB initialization instruction -->
 $ mysql -u root -p
 $ Enter Password: your_password
-$ source ~/path/to/schedule-system/config/db/20190218_initialization.sql
+$ source ~/path/to/schedule-system/config/db/sql/201903092035_create_database.sql
 ```
 
 ```
 <!-- Demo data instruction -->
 $ Run DB initialization
-$ source ~/path/to/schedule-system/config/db/20190219_demo_data.sql
+$ source ~/path/to/schedule-system/config/db/sql/201903092036_demo_data.sql
 ```
 
 ### Commands to Run Application
