@@ -58,5 +58,4 @@ process.on('SIGINT', () => {
     db.end();
     console.log("db connection closed");
   };
-
 });

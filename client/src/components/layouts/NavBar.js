@@ -1,9 +1,13 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { Menu, Dropdown, Icon } from "semantic-ui-react";
 import { ReactComponent as Logo } from "assets/logo.svg";
-
+import { AuthAction } from "actions";
+import axios from "axios";
+const dropDownMenuStyle = {
+  "right": "1em"
+}
 class NavBar extends Component {
   constructor(props) {
     super(props);
@@ -69,27 +73,32 @@ class NavBar extends Component {
         name="user circle outline"
         size="big"/>
     );
+
     return (
-      <Dropdown item
+      <Dropdown
+        item
         trigger={ dropDownTriggerIcon }
         icon={ null }
-        pointing="top">
-        <Dropdown.Menu>
-          <Dropdown.Item
-            icon="setting"
-            text="My Profile"
-            as={ Link }
-            to="/profile"/>
-          <Dropdown.Item
-            icon="log out"
-            text="Logout"
-            as={ Link }
-            to="/logout"/>
-          <Dropdown.Item
-            icon="sign in"
-            text="Login"
-            as={ Link }
-            to="/login"/>
+        pointing>
+        <Dropdown.Menu style={dropDownMenuStyle}>
+          { this.props.auth.hasLoggedIn ? [<Dropdown.Item
+              key="profile"
+              icon="setting"
+              text="My Profile"
+              as={ Link }
+              to="/profile"/>,
+            <Dropdown.Item
+              key="logout"
+              icon="log out"
+              text="Logout"
+              onClick={ this.props.dispatch.bind(this, AuthAction.logoutUser(this.props.history)) }/> ]
+           : [<Dropdown.Item
+                key="login"
+                icon="sign in"
+                text="Login"
+                as={ Link }
+                to="/login"/>]
+          }
         </Dropdown.Menu>
       </Dropdown>
     )
@@ -132,4 +141,4 @@ class NavBar extends Component {
 
 const mapStateToProps = state => state;
 
-export default connect(mapStateToProps)(NavBar);
+export default connect(mapStateToProps)(withRouter(NavBar));

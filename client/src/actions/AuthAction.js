@@ -2,24 +2,60 @@ import { AUTH_ACTION_TYPE } from "actions/ActionTypes";
 import axios from "axios";
 
 export default class AuthAction {
-  static fetchUser = (email, password) => {
-    return async (dispatch) => {
-      const res = await axios.post("/api/authenticate", {
-        params: {
-          email: email,
-          password: password
-        }
-      });
-
+  static loginUser = ({username, password}) => {
+    return async dispatch => {
       dispatch({
         type: AUTH_ACTION_TYPE.LOGIN_REQUEST,
-        payload: res.data
+        payload: { isFetching: true }
       });
+      let res;
+      try {
+        res = await axios.post("/api/user/session", {
+          username: username,
+          password: password
+        });
+        console.log(res);
+        dispatch({
+          type: AUTH_ACTION_TYPE.LOGIN_SUCCESS,
+          payload: {
+            current_user: res.data,
+            isFetching: false,
+            hasLoggedIn: true
+          }
+        });
+      } catch(err) {
+        dispatch({
+          type: AUTH_ACTION_TYPE.LOGIN_FAILURE,
+          payload: { err }
+        });
+        throw err;
+      }
     }
   };
 
-  static logoutUser = () => {
-    return;
-  }
-}
-
+  static logoutUser = history => {
+    return async dispatch => {
+      dispatch({
+        type: AUTH_ACTION_TYPE.LOGOUT_REQUEST,
+        payload: { isFetching: true }
+      });
+      try {
+        await axios.delete("/api/user/session");
+        dispatch({
+          type: AUTH_ACTION_TYPE.LOGOUT_SUCCESS,
+          payload: {
+            current_user: null,
+            isFetching: false,
+            hasLoggedIn: false
+          }
+        });
+        history.push("/login");
+      } catch(err) {
+        dispatch({
+          type: AUTH_ACTION_TYPE.LOGOUT_FAILURE,
+          payload: { err }
+        })
+      }
+    }
+  };
+};
