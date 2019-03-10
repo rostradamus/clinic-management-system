@@ -34,7 +34,10 @@ routes.post("/", async (req, res) => {
     // TODO: TEMPORARY SOLUTION TO USER REGISTRATION
     const initialPassword = req.body.phone_number.substr(-4);
     const encryptedPassword = await bcrypt.hash(initialPassword, BCRYPT_SALT_ROUNDS);
-    const user = Object.assign({...req.body}, { password: encryptedPassword });
+    const user = Object.assign(
+      {...req.body},
+      { password: process.env.NODE_ENV === "production" ? encryptedPassword : initialPassword }
+    );
 
     const result = await userManager.createUser(user);
     if (result.length === 0)

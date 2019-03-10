@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { NoteList, NoteDetail } from "components/note";
 import * as Layouts from "components/layouts";
 import * as Containers from "components/containers";
 import { Container } from "semantic-ui-react";

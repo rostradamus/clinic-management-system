@@ -22,16 +22,24 @@ passport.use(new LocalStrategy((username, password, done) => {
       if (result.length === 0) {
         return done(null, false, { message: "Incorrect Username."});
       }
-      bcrypt.compare(password, result[0].password)
-        .then(res => {
-          if (res) {
-            delete result[0].password;
-            return done(null, result[0]);
-          } else {
-            return done(null ,false, { message: "Incorrect Password."});
-          }
-        })
-        .catch(err => { throw err; });
+      if (process.env.NODE_ENV === "production") {
+        bcrypt.compare(password, result[0].password)
+          .then(res => {
+            if (res) {
+              delete result[0].password;
+              return done(null, result[0]);
+            } else {
+              return done(null ,false, { message: "Incorrect Password."});
+            }
+          })
+          .catch(err => { throw err; });
+      } else {
+        if (password === result[0].password) {
+          return done(null, result[0]);
+        } else {
+          return done(null ,false, { message: "Incorrect Password."});
+        }
+      }
     })
     .catch(err => done(err));
   })
