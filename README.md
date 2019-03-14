@@ -19,6 +19,7 @@ NOTE: Using .env file for setup is highly recommended
 2. add following lines into .env file
 
 (For *secret_key*, see https://randomkeygen.com/ --> **CodeIgniter Encryption Keys**)
+(For NODE_MAILER_PASSWORD, ask the developer in responsibility.)
 ```
 COOKIE_SESSION_KEY=secret_key
 DB_USERNAME=username
@@ -26,6 +27,8 @@ DB_PASSWORD=password
 DB_HOST=localhost
 DB_NAME=schedule_system
 SERVER_PORT=4000
+NODE_MAILER_USER=gfstrongtest123@gmail.com
+NODE_MAILER_PASSWORD=********
 ```
 
 3. create a file *.env* in client root (i.e. ~/path/to/schedule_system/client/.env)
