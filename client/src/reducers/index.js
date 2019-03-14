@@ -3,10 +3,12 @@ import AuthReducer from "./AuthReducer";
 import CalendarReducer from "./CalendarReducer";
 import UserReducer from "./UserReducer";
 import ReportReducer from "./ReportReducer";
+import PatientStaffSearchReducer from "./PatientStaffSearchReducer";
 
 export default combineReducers({
-	auth: AuthReducer,
-	calendar: CalendarReducer,
-	user: UserReducer,
-	report: ReportReducer
+  auth: AuthReducer,
+  calendar: CalendarReducer,
+  user: UserReducer,
+  report: ReportReducer,
+  patientStaffSearch: PatientStaffSearchReducer
 });
