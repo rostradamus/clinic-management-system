@@ -66,22 +66,21 @@ module.exports = {
     return qm.makeQuery(query);
   },
 
-  getAppointmentAccordingToUser: function(username, userType) {
+  getAppointmentAccordingToUser: function(id, type) {
     let queryString = "";
-    if (userType === "Staff") {
+    if (type === "Staff") {
       queryString = "SELECT * FROM appointment " +
         "LEFT JOIN (SELECT ?? FROM user WHERE type = 'Patient' AND active = 1) " +
-        "AS patient ON appointment.patient_id = patient.username " +
+        "AS patient ON appointment.patient_id = patient.id " +
         "WHERE appointment.staff_id = ?";
     } else {
       queryString = "SELECT * FROM appointment " +
         "LEFT JOIN (SELECT ?? FROM user WHERE type = 'Staff' AND active = 1) " +
-        "AS staff ON appointment.staff_id = staff.username " +
+        "AS staff ON appointment.staff_id = staff.id " +
         "WHERE appointment.patient_id = ?";
     }
-    const query = mysql.format(queryString, [USER_VISIBLE_COLUMNS, username]);
-    const options = {sql: query, nestTables: true}
-
+    const query = mysql.format(queryString, [USER_VISIBLE_COLUMNS, id]);
+    const options = {sql: query, nestTables: true};
     return qm.getQueryWithOverlap(options);
   }
 }

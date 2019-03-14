@@ -11,9 +11,8 @@ const initialState = {
   "notes": ""
 };
 
-function generateTitle(event) {
-  if (event.patient && event.staff) {
-    const {patient, staff} = event;
+function generateTitle({patient, staff}) {
+  if (patient && staff) {
     const title = `Patient: ${patient.first_name} ${patient.last_name} - Staff: ${staff.first_name} ${staff.last_name}`;
     return title;
   }
@@ -22,11 +21,11 @@ function generateTitle(event) {
 
 export default (state = initialState, action) => {
   switch (action.type) {
-    case APPOINTMENT_ACTION_TYPE.FETCH_APPOINTMENTS: {
-      const results = action.payload.map(event => {
+    case APPOINTMENT_ACTION_TYPE.FETCH_SUCCESS: {
+      const results = action.payload.items.map(event => {
         return Object.assign({...event}, { title : generateTitle(event)});
       });
-      return results;
+      return [...state, ...results];
     }
 
     case APPOINTMENT_ACTION_TYPE.CREATE_APPOINTMENT_REQUEST: {

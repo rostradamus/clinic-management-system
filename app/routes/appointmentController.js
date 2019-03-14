@@ -25,13 +25,14 @@ routes.get("/:user_id", (req, res) => {
       );
     }
 
-    const { username, type } = users[0];
-    appointmentManager.getAppointmentAccordingToUser(username, type).then(appointments => {
+    const { id, type } = users[0];
+    appointmentManager.getAppointmentAccordingToUser(id, type).then(appointments => {
       if (appointments.length === 0) {
         res.status(404).json(
           { message: `No appointment exist for user with id = ${req.params.user_id}`}
         );
       }
+
       const resAppointments = appointments.map(row => {
         let { appointment } = row;
         if (type === "Patient") {
@@ -50,13 +51,8 @@ routes.get("/:user_id", (req, res) => {
 
       res.status(200);
       res.send(resAppointments);
-
-    }).catch(err => {
-      res.status(500).json(err);
-    });
-  }).catch(err => {
-    res.status(500).json(err);
-  });
+    }).catch(err => res.status(500).json(err));
+  }).catch(err => res.status(500).json(err));
 });
 
 // POST /api/appointments

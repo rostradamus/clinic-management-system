@@ -1,0 +1,16 @@
+.ui.grid.calendarContainer .calendarGridColumn {
+  height: 100%;
+}
+
+.ui.header.calendarUser.userName {
+  font-size: 3rem;
+}
+
+p.calendarUser.userType p.calendarUser.userId {
+  font-size: 1.1rem;
+  color: #424242;
+}
+
+.ui.grid.calendarContainer .appointmentCalendar {
+  height: 45rem;
+}
