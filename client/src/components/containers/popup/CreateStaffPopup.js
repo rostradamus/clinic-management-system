@@ -2,11 +2,14 @@ import React, { Component } from "react";
 import { Modal, Grid, Button, Header, Input, Form, Container, Divider} from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import * as moment from 'moment';
+import { UserAction } from 'actions';
 import { STATE_CONST } from './CreateUserPopup';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import './CreateUserPopup.css';
 
 
-export default class CreateStaffPopup extends Component{
+class CreateStaffPopup extends Component{
   constructor(props) {
     super(props);
     moment.locale('en');
@@ -39,11 +42,14 @@ export default class CreateStaffPopup extends Component{
     this.setState({ [field] : new Date(value) });
   }
 
-  handleCreate(event){
+ handleCreate(event){
     // leaving commented out code just in case.
     // const copiedState = Object.assign({...this.state});
     // this.props.createPatient(copiedState);
     // this.props.onNextClick();
+    event.preventDefault();
+    const copiedState = Object.assign({...this.state});
+    this.props.createUser(copiedState);
     this.setState({isCreated:true});
   }
 
@@ -143,7 +149,7 @@ export default class CreateStaffPopup extends Component{
             primary
             className="next-btn"
             floated="right"
-            onClick={e => this.onNextClick()}
+            onClick={e => this.onNextClick(e)}
           >
             {this.state.isCreated? "Done": "Create"}
           </Button>
@@ -152,11 +158,11 @@ export default class CreateStaffPopup extends Component{
     );
   }
 
-  onNextClick(){
+  onNextClick(event){
     if(this.state.isCreated){
       this.props.onClose();
     }else{
-      this.handleCreate();
+      this.handleCreate(event);
     }
   }
 
@@ -170,3 +176,14 @@ export default class CreateStaffPopup extends Component{
     );
   }
 }
+
+const mapDispatchToProps = dispatch => {
+  return bindActionCreators(
+    {
+      createUser: UserAction.addUser,
+    },
+    dispatch
+  );
+}
+
+export default connect(null, mapDispatchToProps)(CreateStaffPopup);
