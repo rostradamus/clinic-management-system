@@ -59,3 +59,6 @@ process.on('SIGINT', () => {
     console.log("db connection closed");
   };
 });
+
+//module exports is used for unit testing.
+module.exports = server;
