@@ -14,6 +14,8 @@ describe('appointmentQueryManager unit test', () => {
       const res = await getAppointmentAccordingToUserSpy(id, type);
       expect(res.length).to.equal(2);
       expect(getAppointmentAccordingToUserSpy.callCount).to.equal(1);
+
+      getAppointmentAccordingToUserSpy.restore();
     });
 
     it("user with id= -1 type= '' should return result length of 0", async () => {
