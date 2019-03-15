@@ -1,24 +1,8 @@
-require('module-alias/register');
-const chai = require("chai");
-const sinon = require("sinon");
-let { assert, expect } = chai;
-let { spy } = sinon;
-
 describe('appointmentQueryManager unit test', () => {
-  let server;
   let appointmentQueryManager;
 
   before(() => {
-    server = require('../server', {bustCache: true} );
     appointmentQueryManager = require('@app/helpers/queryManager/appointment');
-  });
-
-  after((done) =>{
-    server.close(() =>{
-      // This is used to remove require('../server') from cache so that it will not affect other tests
-      delete require.cache[require.resolve('../server')];
-      done();
-    });
   });
 
   describe("getAppointmentAccordingToUser", ()=> {
@@ -39,5 +23,3 @@ describe('appointmentQueryManager unit test', () => {
     });
   });
 });
-
-
