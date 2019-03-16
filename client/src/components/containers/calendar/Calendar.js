@@ -5,11 +5,8 @@ import moment from 'moment';
 import { Grid, Header } from "semantic-ui-react";
 import { CalendarPopup } from 'components/containers/popup';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { CalendarPopupAction } from 'actions';
 import "./Calendar.css";
-
-// Big Calendar requires explicit height set to properly display contents.
-// Need to refactor to make it dynamic according to user screen size.
+import { isEqual } from 'lodash';
 
 const gridColumnStyle = {
   minWidth: "750px"
@@ -35,22 +32,27 @@ class Calendar extends Component {
       minTime : minTime,
       maxTime : maxTime,
       showPopup: false,
-      newAppointment: {},
       isAddModalOpen: false,
-      selectedEvent: {}
+      selectedEvent: {},
+      selectedUser: {}
+      // newAppointment: {}
     };
 
     this.toggleAddModal = this.toggleAddModal.bind(this);
     this.parseEventsToCalendarEvents = this.parseEventsToCalendarEvents.bind(this);
   }
 
-  //Todo: find logic to update component state
   static getDerivedStateFromProps(nextProps, prevState) {
-    return { events : nextProps.events};
+    if (nextProps.events.length !== prevState.events.length ||
+      !isEqual(nextProps.selectedUser, prevState.selectedUser)) {
+      // TODO: after auth is implemented include current user
+      return { events: nextProps.events, selectedUser: nextProps.selectedUser };
+    }
+    return {};
   }
 
   componentDidMount() {
-    // TODO: remove since calendar is not loading schedule on Mount
+    // TODO: if current.type !== "Administrator" fetchAppointment with current user
   }
 
   // TODO: requires refactor when database is connected
@@ -156,6 +158,9 @@ class Calendar extends Component {
   }
 }
 
-const mapStateToProps = state => ({events: state.calendar});
+const mapStateToProps = state => {
+  // TODO: when auth is connected integrate currentUser from auth
+  return {...state.calendar};
+}
 
 export default connect(mapStateToProps)(Calendar);

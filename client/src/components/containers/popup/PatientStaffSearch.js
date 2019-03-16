@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Modal, Menu, Input, Table } from 'semantic-ui-react';
-import { PatientStaffSearchAction, CalendarPopupAction } from "actions";
+import { PatientStaffSearchAction, CalendarAction } from "actions";
 
 class PatientStaffSearch extends Component {
   constructor(props) {
@@ -22,8 +22,6 @@ class PatientStaffSearch extends Component {
 
   // Todo
   static getDerivedStateFromProps(nextProps, prevState) {
-    // console.log("nextProps",nextProps);
-    // console.log("prevState",prevState);
     if (prevState.items.length !== nextProps.items.length) {
       return {
         items: nextProps.items,
@@ -59,8 +57,8 @@ class PatientStaffSearch extends Component {
 
   }
 
-  _handleUserSelect({ id }) {
-    this.props.fetchAppointments(id);
+  _handleUserSelect(user) {
+    this.props.fetchAppointments(user);
     this.props.onClose();
   }
 
@@ -149,7 +147,7 @@ const mapDispatchToProps = dispatch => {
   return bindActionCreators(
     {
       getPatientAndStaff: PatientStaffSearchAction.getPatientAndStaff,
-      fetchAppointments: CalendarPopupAction.fetchAppointments
+      fetchAppointments: CalendarAction.fetchAppointments
     },
     dispatch
   );

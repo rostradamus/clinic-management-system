@@ -1,17 +1,17 @@
 import { APPOINTMENT_ACTION_TYPE } from "actions/ActionTypes";
 import axios from "axios";
-import mockData from 'components/containers/calendar/mockData';
 
-export default class CalendarPopupAction {
+export default class CalendarAction {
 
-  static fetchAppointments = (userId) => {
+  static fetchAppointments = (user) => {
     return async dispatch => {
       try {
-        const res = await axios.get(`/api/appointments/${userId}`);
+        const res = await axios.get(`/api/appointments/${user.id}`);
         dispatch({
           type: APPOINTMENT_ACTION_TYPE.FETCH_SUCCESS,
           payload: {
-            items: res.data
+            events: res.data,
+            selectedUser: user
           }
         });
       } catch (err) {

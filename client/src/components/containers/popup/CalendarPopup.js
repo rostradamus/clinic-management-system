@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Button, Modal, Form, Input, Select } from 'semantic-ui-react';
 import { DateInput, TimeInput } from 'semantic-ui-calendar-react';
-import { CalendarPopupAction } from 'actions';
+import { CalendarAction } from 'actions';
 import * as moment from 'moment';
 import './CalendarPopup.css';
 
@@ -337,8 +337,8 @@ class CalendarPopup extends Component {
 const mapDispatchToProps = dispatch => {
   return bindActionCreators(
     {
-      createAppointment: CalendarPopupAction.createAppointment,
-      updateAppointment: CalendarPopupAction.updateAppointment
+      createAppointment: CalendarAction.createAppointment,
+      updateAppointment: CalendarAction.updateAppointment
     },
     dispatch
   );
