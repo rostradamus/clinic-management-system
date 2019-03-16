@@ -1,4 +1,4 @@
-const { staffs, patients, appointments, expectedResult } = require('./appointmentControllerSpecMockData');
+const { staffs, patients, appointments, expectedResult } = require('@test/fixtures/appointmentControllerSpecMockData');
 const appointmentManager = require('@app/helpers/queryManager/appointment');
 
 describe("appointmentController Unit Tests", () => {
