@@ -20,7 +20,7 @@ routes.get("/:user_id", (req, res) => {
     .then(result => {
       if (result.length === 0) {
         res.status(404)
-          .json({ message: `User with id = ${req.params.user_id} does NOT exit`});
+          .json({ message: `User with id = ${req.params.user_id} does NOT exist`});
       }
       res.status(200);
       res.send(result[0]);

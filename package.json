@@ -22,7 +22,8 @@
     "@app": "./app",
     "@routes": "./app/routes",
     "@client": "./client",
-    "@config": "./config"
+    "@config": "./config",
+    "@test": "./test"
   },
   "author": "",
   "license": "BSD-3-Clause",
