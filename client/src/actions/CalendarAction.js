@@ -6,7 +6,7 @@ export default class CalendarAction {
   static fetchAppointments = (user) => {
     return async dispatch => {
       try {
-        const res = await axios.get(`/api/appointments/${user.id}`);
+        const res = await axios.get(`/api/appointments/users/${userId}`);
         dispatch({
           type: APPOINTMENT_ACTION_TYPE.FETCH_SUCCESS,
           payload: {

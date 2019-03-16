@@ -36,10 +36,6 @@ module.exports = {
   },
 
   getAllAppointmentsWithStaffAndPatient: function() {
-    // const queryString = "SELECT * FROM appointment a " +
-    //   "LEFT JOIN User patient on a.patient_id = patient.username " +
-    //   "LEFT JOIN User staff on a.staff_id = staff.username";
-
     const queryString = "SELECT * FROM appointment " +
       "LEFT JOIN (SELECT ?? FROM user WHERE type = 'Patient' AND active = 1) " +
       "AS patient ON appointment.patient_id = patient.username " +
