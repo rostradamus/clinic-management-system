@@ -16,43 +16,40 @@ routes.get("/", (req, res) => {
     });
 });
 
-// GET /api/appointments/{id}
-routes.get("/:user_id", (req, res) => {
-  appointmentManager.getUserWithIdFromTable(req.params.user_id).then(users => {
-    if (users.length === 0) {
-      res.status(404).json(
-        { message: `User with id = ${req.params.user_id} does NOT exit`}
-      );
-    }
+// GET /api/appointments/users/{user_id}/
+routes.get("/users/:user_id/", async (req, res) => {
+  try {
+    const users = await appointmentManager.getUserWithIdFromTable(req.params.user_id);
+    if (users.length === 0)
+      res.status(404).json({ message: `User with id = ${req.params.user_id} does NOT exist`});
 
     const { id, type } = users[0];
-    appointmentManager.getAppointmentAccordingToUser(id, type).then(appointments => {
-      if (appointments.length === 0) {
-        res.status(404).json(
-          { message: `No appointment exist for user with id = ${req.params.user_id}`}
-        );
+    const appointments = await appointmentManager.getAppointmentAccordingToUser(id, type);
+    if (appointments.length === 0)
+      res.status(404).json({ message: `No appointment exist for user with id = ${req.params.user_id}`});
+
+    const resAppointments = appointments.map(row => {
+      let { appointment } = row;
+      if (type === "Patient") {
+        // means row contains Staff
+        const { staff } = row;
+        appointment.patient = users[0];
+        appointment.staff = staff;
+      } else {
+        // means row contains Patient
+        const { patient } = row;
+        appointment.staff = users[0];
+        appointment.patient = patient;
       }
+      return appointment;
+    });
 
-      const resAppointments = appointments.map(row => {
-        let { appointment } = row;
-        if (type === "Patient") {
-          // means row contains Staff
-          const { staff } = row;
-          appointment.patient = users[0];
-          appointment.staff = staff;
-        } else {
-          // means row contains Patient
-          const { patient } = row;
-          appointment.staff = users[0];
-          appointment.patient = patient;
-        }
-        return appointment;
-      });
-
-      res.status(200);
-      res.send(resAppointments);
-    }).catch(err => res.status(500).json(err));
-  }).catch(err => res.status(500).json(err));
+    res.status(200);
+    res.send(resAppointments);
+  } catch (err) {
+    console.log("afsasf");
+    res.status(500).json(err)
+  }
 });
 
 // POST /api/appointments
