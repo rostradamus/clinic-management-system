@@ -1,54 +1,30 @@
 import React, { Component } from "react";
-import { Grid, Card, Label, Button } from "semantic-ui-react";
+import { Grid, Card, Label, Container } from "semantic-ui-react";
 import { connect } from "react-redux";
 import { ReportAction } from "actions";
-import "./CardGrid.css";
+import "./CardsGrid.css";
 
 const reportStyle = {
-  outerContainer: { overflowX: "auto", overflowY: "hidden", width: "100%" },
-  card: { maxWidth: "205px", minWidth: "205px", height: "120px", border: "2px solid #eeeeee", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.25)", cursor: "pointer" },
-  type: { fontSize: "32px", color: "#000000" },
-  grid: { marginTop: "30px", display: "flex" },
-  header: { fontSize: "20px", fontWeight: "bold", color: "#000000" },
-  meta: { fontSize: "14px", paddingTop: "10px" },
-  description: { fontSize: "14px", paddingTop: "10px", display: "flex" },
   label: (idx) => ({ marginRight: "8px", marginTop: "3px", backgroundColor: reportStyle.colors[idx] }),
-  colors: [ "#2a9d8f", "#e9c46a", "#e76f51" ]
+  colors: ["#2a9d8f", "#e9c46a", "#e76f51"]
 };
 
 class CardsGrid extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      patients: []
-    };
-  }
-  componentDidMount() {
-    this.props.requestPatients().then(() => {
-      this.setState({
-        patients: this.props.patients
-      });
-    });
-    this.props.resetSearchField();
-  }
-
   // Create a single card
   _makePatientCard(patient) {
     return (
-      <Grid.Column style={{ minWidth: "200px" }} key={patient.id} onClick={() => this.props.setInfo(patient)}>
-        <Card style={reportStyle.card} onClick={this.props.openPopup}>
-          <Card.Content>
-            <Card.Header style={reportStyle.header}>{patient.name}</Card.Header>
-            <Card.Meta style={reportStyle.meta}>
-              <span>{patient.patientId}</span>
-            </Card.Meta>
-            <Card.Description style={reportStyle.description}>
-              <Label style={reportStyle.label(patient.diagnosis.type - 1)} empty circular key={"#0"} />
-              <p style={{ fontWeight: "bold" }}>{patient.diagnosis.name}</p>
-            </Card.Description>
-          </Card.Content>
-        </Card>
-      </Grid.Column>
+      <Card className="card_ct" onClick={this.props.openPopup}>
+        <Card.Content onClick={() => this.props.setInfo(patient)}>
+          <Card.Header className="header_ct">{patient.name}</Card.Header>
+          <Card.Meta className="meta_ct">
+            <span>{patient.patientId}</span>
+          </Card.Meta>
+          <Card.Description className="description_ct">
+            <Label style={reportStyle.label(patient.diagnosis.type - 1)} empty circular key={"#0"} />
+            <p style={{ fontWeight: "bold" }}>{patient.patientId}</p>
+          </Card.Description>
+        </Card.Content>
+      </Card>
     );
   }
 
@@ -62,13 +38,9 @@ class CardsGrid extends Component {
 
   // Stack rows of patient cards
   _makeRows(patientsList) {
-    const subArrays = _chunk(patientsList, 4);
+    const subArrays = _chunk(patientsList, 5);
     const rows = subArrays.map((subArray, idx) => {
-      return (
-        <Grid.Row style={{ minWidth: "870px", maxWidth: "870px", height: "152px" }} columns={4} key={idx}>
-          {this._makeRow(subArray)}
-        </Grid.Row>
-      );
+      return this._makeRow(subArray);
     });
     return rows;
 
@@ -97,12 +69,13 @@ class CardsGrid extends Component {
   }
 
   render() {
+    const { patients } = this.props;
     return (
-      <div style={reportStyle.outerContainer} className="disable_scroll">
-        <Grid style={reportStyle.grid} columns={4}>
-          {this._makeRows(this._filterPatients(this.state.patients))}
+      <Container className="disable_scroll outerContainer">
+        <Grid className="grid_ct" columns={5}>
+          {this._makeRows(this._filterPatients(patients))}
         </Grid>
-      </div>
+      </Container>
     );
   }
 }
@@ -121,4 +94,7 @@ const mapDsipatchToProps = (dispatch) => ({
   requestPatients: () => dispatch(ReportAction.getPatients())
 });
 
-export default connect(mapStateToProps, mapDsipatchToProps)(CardsGrid);
+export default connect(
+  mapStateToProps,
+  mapDsipatchToProps
+)(CardsGrid);

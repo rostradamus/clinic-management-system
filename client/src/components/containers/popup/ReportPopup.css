@@ -1,0 +1,112 @@
+/* header is the problem*/
+.ui.modal > .header.header_ct {
+  margin-left: 1.5em;
+  margin-right: 1.5em;
+  padding-bottom: 0.5em;
+}
+.ui.container.headerContainer {
+  display: flex;
+}
+.name {
+  font-size: 44px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+.details {
+  width: 100px;
+  font-size: 15px;
+  color: #696969;
+  margin: 0px;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.details2 {
+  font-size: 15px;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: #383838;
+}
+.ui.label.date {
+  max-width: 10.5rem;
+  min-width: 3.5rem;
+  margin-top: auto;
+  margin-bottom: auto;
+  height: 35px;
+  border-radius: 8px;
+  background-color: #aaba32;
+  text-align: center;
+  color: #fefefe;
+  font-size: 13px;
+  font-weight: 500;
+}
+.admDis {
+  font-size: 12px;
+  color: #696969;
+  margin: 3px;
+  margin-left: 5px;
+}
+.dataContainer {
+  display: flex !important;
+  flex-direction: row;
+  align-items: center;
+  margin-right: -0.4em;
+  margin-bottom: -12px;
+}
+.container.dataBox {
+  width: 10px;
+}
+.ui.label.separator {
+  background-color: #ffffff;
+  padding-top: 30px;
+}
+.endToEnd {
+  width: 80%;
+  display: flex !important;
+  justify-content: space-between !important;
+}
+.patientInfo {
+  width: 20%;
+}
+.contentContainer {
+  height: 400px;
+  padding-left: 35px;
+  padding-right: 35px;
+}
+.contentContainer.content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 0px;
+}
+.ui.header.descriptionHeader {
+  font-size: 24px;
+  font-weight: 300 !important;
+  margin: 0px;
+}
+.description.description_ct {
+  display: flex;
+  flex-direction: column;
+}
+.ui.container.stat {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+.statValue {
+  font-size: 20px;
+  font-size: 10vw;
+  margin-bottom: 0px;
+  font-weight: 300;
+  color: #0077b5;
+}
+.ui.container.statContainer {
+  display: flex;
+  justify-content: space-evenly;
+  width: 100%;
+  margin-bottom: 30px;
+}
+.ui.image {
+  margin-top: 40px !important;
+  display: inherit !important;
+}
