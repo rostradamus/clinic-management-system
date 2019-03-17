@@ -47,41 +47,46 @@ routes.get("/users/:user_id/", async (req, res) => {
     res.status(200);
     res.send(resAppointments);
   } catch (err) {
-    console.log("afsasf");
     res.status(500).json(err)
   }
 });
 
 // POST /api/appointments
-routes.post("/", (req, res) => {
-  appointmentManager.createAppointment(req.body)
-    .then(result1 => {
-      if (result1.length === 0) {
-        throw new Error();
-      }
-      // appointmentManager.getStaffAndPatientInfoWithAppointmentId(result1[0].id)
-      //   .then(result2 => {
-      //     result1[0].patient = result2[1];
-      //     result1[0].staff = result2[0];
-      //     delete result1[0].patient_id;
-      //     delete result1[0].staff_id;
-      //     res.status(200);
-      //     res.send(result1[0]);
-      //   }).catch(err2 => {
-      //     res.status(500).json(err2);
-      //   });
-      appointmentManager.getAppointmentWithIdWithStaffAndPatient(result1[0].id)
-        .then(result2 => {
-          res.status(201);
-          res.send(result2);
-        })
-        .catch(err2 => {
-          res.status(500).json(err2);
-        });
-    })
-    .catch(err1 => {
-      res.status(500).json(err1);
-    });
+routes.post("/", async (req, res) => {
+  try {
+    const data = {
+      patient_id: 1,
+      staff_id: 3,
+      record_id: 1, // requires a query
+      type_of_therapy: "SLP", // require a query
+      start_date: new Date(),
+      end_date: new Date(),
+      repetition: 'none',
+      start_time: "11:15:00",
+      end_time: "12:30:00"
+    };
+
+    const appointments = await appointmentManager.createAppointment(data);
+    if (appointments.length === 0) {
+      throw new Error();
+    }
+    const { patient_id, staff_id} = appointments[0];
+    const patients = await appointmentManager.getUserWithIdFromTable(patient_id);
+    const staffs = await appointmentManager.getUserWithIdFromTable(staff_id);
+
+    if (patients.length === 0 || staffs.length ===0) {
+      throw new error;
+    }
+
+    let resAppointment = appointments[0];
+    resAppointment.patient = patients[0];
+    resAppointment.staff = staffs[0];
+
+    res.status(200);
+    res.send(resAppointment);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 // PUT /api/appointments/{id}

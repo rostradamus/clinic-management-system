@@ -4,7 +4,7 @@ import { Link, withRouter } from "react-router-dom";
 import { Menu, Dropdown, Icon } from "semantic-ui-react";
 import { ReactComponent as Logo } from "assets/logo.svg";
 import { AuthAction } from "actions";
-import axios from "axios";
+// import axios from "axios";
 
 const itemStyle = {
   fontWeight: "bold"

@@ -68,7 +68,7 @@ class CalendarPopup extends Component {
     const { id, patient, staff, start, end, notes, isUpdateAppointment, repeat } = nextProps && nextProps.event;
     if (nextProps.event) {
       return {
-        id: isUpdateAppointment ? id : Math.floor(Math.random() * Math.floor(1000)),
+        id: isUpdateAppointment ? id : -1,
         patient: patient,
         staff: staff,
         appointmentDate: start,
