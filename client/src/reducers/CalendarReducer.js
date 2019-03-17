@@ -14,16 +14,18 @@ export default (state = initialState, action) => {
       return Object.assign({...state}, {...action.payload});
     }
 
-    case APPOINTMENT_ACTION_TYPE.CREATE_APPOINTMENT_SUCCESS: {
-      const updatedEvents = state.map(event => event.id === action.payload.id ? action.payload : event);
-      return updatedEvents;
+    case APPOINTMENT_ACTION_TYPE.CREATE_SUCCESS: {
+      return Object.assign({...state},
+        { events: [...state.events, action.payload] }
+      );
     }
-    case APPOINTMENT_ACTION_TYPE.CREATE_APPOINTMENT_FAILURE: {
+
+    case APPOINTMENT_ACTION_TYPE.CREATE_FAILURE: {
       return state;
     }
 
-    case APPOINTMENT_ACTION_TYPE.UPDATE_APPOINTMENT_SUCCESS:
-    case APPOINTMENT_ACTION_TYPE.UPDATE_APPOINTMENT_FAILURE: {
+    case APPOINTMENT_ACTION_TYPE.UPDATE_SUCCESS:
+    case APPOINTMENT_ACTION_TYPE.UPDATE_FAILURE: {
       return state;
     }
 
