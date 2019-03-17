@@ -1,18 +1,14 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Label, Input } from "semantic-ui-react";
+import { Label, Input, Container } from "semantic-ui-react";
 import { ReportAction } from "actions";
 import CardsGrid from "./CardsGrid";
 import ReportPopup from "components/containers/popup/ReportPopup";
+import "./ReportContainer.css";
 
 const reportStyle = {
-  container: { display: "flex", flexDirection: "column" },
-  patient: { fontSize: "28px", fontWeight: "300", paddingTop: "20px", paddingBottom: "10px" },
-  search: { width: "460px", height: "49px", marginTop: "10px", textAlign: "left" },
-  type: { fontSize: "32px", color: "#000000" },
-  category: { fontSize: "28px", color: "#000000", fontWeight: "300", margin: "0px" },
-  types: [ "I", "II", "III" ],
-  colors: [ "#2a9d8f", "#e9c46a", "#e76f51" ],
+  types: ["I", "II", "III"],
+  colors: ["#2a9d8f", "#e9c46a", "#e76f51"],
   labelStyle: (idx) => ({
     width: "200px",
     height: "100px",
@@ -27,6 +23,10 @@ const reportStyle = {
 };
 
 class ReportContainer extends Component {
+  componentDidMount() {
+    this.props.requestPatients();
+  }
+
   _handleSearch(e, data) {
     this.props.handleSearchChange(data.value);
   }
@@ -34,37 +34,40 @@ class ReportContainer extends Component {
   render() {
     const CategoryLabels = () => (
       <div>
-        <h2 style={reportStyle.category}>Category Summaries</h2>
+        <h2 className="category">Category Summaries</h2>
         {reportStyle.types.map((type, idx) => (
           <Label style={reportStyle.labelStyle(idx)} key={type}>
-            <h3 style={reportStyle.type}>{type}</h3>
+            <h3 className="type">{type}</h3>
           </Label>
         ))}
       </div>
     );
 
     return (
-      <div className="ui container">
-        <div style={reportStyle.container}>
+      <Container>
+        <Container className="container_ct">
           <CategoryLabels />
-          <label style={reportStyle.patient}>Patients</label>
-          <Input onChange={this._handleSearch.bind(this)} style={reportStyle.search} iconPosition="left" icon="search" placeholder="Search" />
-        </div>
+          <label className="patient">Patients</label>
+          <Input onChange={this._handleSearch.bind(this)} className="search" iconPosition="left" icon="search" placeholder="Search" />
+        </Container>
         <CardsGrid />
         <ReportPopup />
-      </div>
+      </Container>
     );
   }
 }
 
 const mapDispatchToProps = (dispatch) => ({
-  handleSearchChange: input => dispatch(ReportAction.setSearch(input))
+  requestPatients: () => dispatch(ReportAction.getPatients()),
+  handleSearchChange: (input) => dispatch(ReportAction.setSearch(input))
 });
 
 const mapStateToProp = (state) => ({
   patientForPopup: state.report.popupInfo,
-  openPopup: state.report.openPopup,
-  patients: state.report.patients
+  openPopup: state.report.openPopup
 });
 
-export default connect(mapStateToProp, mapDispatchToProps)(ReportContainer);
+export default connect(
+  mapStateToProp,
+  mapDispatchToProps
+)(ReportContainer);
