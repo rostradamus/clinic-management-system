@@ -1,32 +1,29 @@
 const routes = require('express').Router();
 const appointmentManager = require("@app/helpers/queryManager/appointment");
+// TODO: Remove as moment will be added as global variable.
+const moment = require('moment');
 
-
-// GET /api/appointments
-// NOT USED BUT SAVED FOR FUTURE USE
-routes.get("/", (req, res) => {
-  // TODO: Add query parameter handling
-  appointmentManager.getAllAppointmentsWithStaffAndPatient()
-    .then(result1 => {
-      res.status(200);
-      res.send(result1);
-    })
-    .catch(err1 => {
-      res.status(500).json(err1);
-    });
-});
+// Helper functions
+let isValidPostRequestBody = (body) => {
+  const {patient, staff, start, end} = body;
+  return patient && staff && start && end &&
+    moment(start).isValid() && moment(end).isValid();
+}
 
 // GET /api/appointments/users/{user_id}/
-routes.get("/users/:user_id/", async (req, res) => {
+// TODO: instead of front end creating title, start, end field backend will do it to reduce number of
+// iterations done on list of appointments
+routes.get("/", async (req, res) => {
   try {
-    const users = await appointmentManager.getUserWithIdFromTable(req.params.user_id);
+    const { user_id } = req.query;
+    const users = await appointmentManager.getUserWithIdFromTable(user_id);
     if (users.length === 0)
-      res.status(404).json({ message: `User with id = ${req.params.user_id} does NOT exist`});
+      res.status(404).json({ message: `User with id = ${user_id} does NOT exist`});
 
     const { id, type } = users[0];
     const appointments = await appointmentManager.getAppointmentAccordingToUser(id, type);
     if (appointments.length === 0)
-      res.status(404).json({ message: `No appointment exist for user with id = ${req.params.user_id}`});
+      res.status(404).json({ message: `No appointment exist for user with id = ${user_id}`});
 
     const resAppointments = appointments.map(row => {
       let { appointment } = row;
@@ -53,17 +50,26 @@ routes.get("/users/:user_id/", async (req, res) => {
 
 // POST /api/appointments
 routes.post("/", async (req, res) => {
+  if (!isValidPostRequestBody(req.body)) throw new Error();
+  const {patient, staff, start, end} = req.body; //
+
+  // Need to go through all admissionRecord to find one active admission record
+  const admissionRecords = await appointmentManager.getPatientAdmissionRecord(patient);
+  if (admissionRecords.length === 0) throw new Error();
+
   try {
     const data = {
-      patient_id: 1,
-      staff_id: 3,
-      record_id: 1, // requires a query
-      type_of_therapy: "SLP", // require a query
-      start_date: new Date(),
-      end_date: new Date(),
-      repetition: 'none',
-      start_time: "11:15:00",
-      end_time: "12:30:00"
+      patient_id: patient.id,
+      staff_id: staff.id,
+      record_id: admissionRecords[0].id,
+      patient_category: admissionRecords[0].patient_category,
+      type_of_therapy: "STUB",
+      start_date: new Date(start),
+      // end_date: new Date(end), // This is used with repetition commented out as it is not part of MVP
+      repetition: "none", // This is not part of mvp. Value is inside req.body
+      start_time: moment(start).format("HH:mm:ss"),
+      end_time: moment(end).format("HH:mm:ss"),
+      is_cancelled: false
     };
 
     const appointments = await appointmentManager.createAppointment(data);
@@ -71,16 +77,10 @@ routes.post("/", async (req, res) => {
       throw new Error();
     }
     const { patient_id, staff_id} = appointments[0];
-    const patients = await appointmentManager.getUserWithIdFromTable(patient_id);
-    const staffs = await appointmentManager.getUserWithIdFromTable(staff_id);
-
-    if (patients.length === 0 || staffs.length ===0) {
-      throw new error;
-    }
 
     let resAppointment = appointments[0];
-    resAppointment.patient = patients[0];
-    resAppointment.staff = staffs[0];
+    resAppointment.patient = patient;
+    resAppointment.staff = staff;
 
     res.status(200);
     res.send(resAppointment);

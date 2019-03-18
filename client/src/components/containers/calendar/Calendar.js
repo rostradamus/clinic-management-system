@@ -4,6 +4,7 @@ import BigCalendar from 'react-big-calendar';
 import moment from 'moment';
 import { isEqual } from 'lodash';
 import { Grid, Header, Label, Icon, Segment } from "semantic-ui-react";
+import { PatientStaffSearchAction } from 'actions';
 import { CalendarPopup } from 'components/containers/popup';
 import { ReactComponent as PlaceholderImg } from "assets/calendarPlaceholder.svg";
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -47,6 +48,7 @@ class Calendar extends Component {
   }
 
   componentDidMount() {
+    this.props.dispatch(PatientStaffSearchAction.getPatientAndStaff());
     // TODO: if current.type !== "Administrator" fetchAppointment with current user
   }
 
@@ -93,18 +95,17 @@ class Calendar extends Component {
   /**
    * Using events start date, time and end date and time generate a start and end time.
    * This is used for BigCalendar Compatibility.
-   * @param  {Date String} options.start_date [Date Object Stringified]
-   * @param  {Time String} options.start_time ["HH:MM:SS"]
-   * @param  {Date String} options.end_date   [Date Object Stringified]
-   * @param  {Time String} options.end_time   ["HH:MM:SS"]
+   * @param  {Date String} options.start_date [Date Object Stringified. It is used for both start and end time]
+   * @param  {Time String} options.start_time ["HH:mm:ss"]
+   * @param  {Time String} options.end_time   ["HH:mm:ss"]
    * @return {Object} [If at least one parameter is null then return an object otherwise returns {start:..., end:...}]
    */
-  _generateStartAndEndTime({ start_date, start_time, end_date, end_time }) {
-    if (!start_date || !start_time || !end_date || !end_time) return {};
+  _generateStartAndEndTime({ start_date, start_time, end_time }) {
+    if (!start_date || !start_time || !end_time) return {};
     const splitStartTime = start_time.split(":");
     const splitEndTime = end_time.split(":");
     const start = moment(start_date).hours(splitStartTime[0]).minutes(splitStartTime[1]).toDate();
-    const end = moment(end_date).hours(splitEndTime[0]).minutes(splitEndTime[1]).toDate();
+    const end = moment(start_date).hours(splitEndTime[0]).minutes(splitEndTime[1]).toDate();
     return { start, end };
   }
 
@@ -146,11 +147,9 @@ class Calendar extends Component {
         <Grid.Column width={MAIN_CALENDAR_COL_WIDTH}>
           <Segment className="calendarPlaceholder">
             <PlaceholderImg className="placeholderImage" />
-            {/* <Header textAlign="center"> */}
             <p id="placeholderText">
-            Click the "Select View" button to choose either a patient or staff.
+              Click the "Select View" button to choose either a patient or staff.
             </p>
-            {/* </Header> */}
           </Segment>
         </Grid.Column>
       );
@@ -188,8 +187,13 @@ class Calendar extends Component {
         </Grid.Row>
 
         {this.state.isAddModalOpen ?
-          <CalendarPopup isOpen={this.state.isAddModalOpen}
-            onClose={this.toggleAddModal} event={this.state.selectedEvent} />
+          <CalendarPopup
+            isOpen={this.state.isAddModalOpen}
+            onClose={this.toggleAddModal}
+            event={this.state.selectedEvent}
+            patientsStaffs={this.props.patientsStaffs}
+            selectedUser={this.state.selectedUser}
+          />
           : null
         }
       </Grid.Column>
@@ -199,7 +203,10 @@ class Calendar extends Component {
 
 const mapStateToProps = state => {
   // TODO: when auth is connected integrate currentUser from auth
-  return { ...state.calendar };
+  return {
+    ...state.calendar,
+    patientsStaffs: state.patientStaffSearch
+  };
 }
 
 export default connect(mapStateToProps)(Calendar);

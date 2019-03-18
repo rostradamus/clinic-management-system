@@ -35,6 +35,12 @@ module.exports = {
     return qm.hardDeleteEntry(TABLE_NAME, id);
   },
 
+  // TODO: use AdmissionRecordManager to handle query after it has been implemented.
+  getPatientAdmissionRecord: function(patient) {
+    const query = mysql.format("SELECT * FROM admission_record WHERE patient_id = ?", [patient.id]);
+    return qm.makeQuery(query);
+  },
+
   getAllAppointmentsWithStaffAndPatient: function() {
     const queryString = "SELECT * FROM appointment " +
       "LEFT JOIN (SELECT ?? FROM user WHERE type = 'Patient' AND active = 1) " +

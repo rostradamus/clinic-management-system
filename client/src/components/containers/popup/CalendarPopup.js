@@ -1,11 +1,15 @@
 import React, {Component} from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+// import { isEqual } from 'lodash';
 import { Button, Modal, Form, Input, Select } from 'semantic-ui-react';
 import { DateInput, TimeInput } from 'semantic-ui-calendar-react';
 import { CalendarAction } from 'actions';
+import { SearchInput } from 'components/containers/search';
 import * as moment from 'moment';
 import './CalendarPopup.css';
+
+
 
 // constants can be moved to constants dir
 const REPEAT_CONST = [
@@ -38,15 +42,15 @@ class CalendarPopup extends Component {
 
     // TODO: requires refactor when database is connected
     this.state = {
+      selectedUser: {},
       id: -1,
-      patient: {}, // is now an obj {}
-      staff: {}, // change from practitioner -> staff and is now an obj {}
-      appointmentDate: "", // delete
-      start: "", // change to startTime
-      end: "", // change to endTime
+      patient: {},
+      staff: {},
+      start: "",
+      end: "",
       repeat: "",
-      location: "",
-      notes: "NOTES OBJECT PLACEHOLDER",
+      location: "", // may delete if unnecessary
+      notes: "Add Note", // may delete if unnecessary
       isUpdateAppointment: false,
       // validation fields
       startTimeError: false,
@@ -61,26 +65,50 @@ class CalendarPopup extends Component {
     this.onSubmit = this.onSubmit.bind(this);
     this._updateTimeToCorrectDate = this._updateTimeToCorrectDate.bind(this);
     this._validateTime = this._validateTime.bind(this);
+
+    this.handleSearchInputSelect = this.handleSearchInputSelect.bind(this);
   }
 
-  // TODO: requires refactor when database is connected
   static getDerivedStateFromProps(nextProps, prevState) {
-    const { id, patient, staff, start, end, notes, isUpdateAppointment, repeat } = nextProps && nextProps.event;
-    if (nextProps.event) {
-      return {
-        id: isUpdateAppointment ? id : -1,
-        patient: patient,
-        staff: staff,
-        appointmentDate: start,
+    const { start, end, isUpdateAppointment } = nextProps.event;
+    const { selectedUser } = nextProps;
+    if (nextProps.event && !isUpdateAppointment && !prevState.start && !prevState.end) {
+      let resData = {
         start: start,
         end: end,
-        repeat: repeat != null ? repeat : "Never",
-        location: "",
-        notes: notes,
-        isUpdateAppointment: isUpdateAppointment
+        repeat: "Never", // not part of mvp
+        location: "", // may delete if it is not in use
+        notes: "", // may delete if it is not in use
+        isUpdateAppointment: isUpdateAppointment,
       };
+
+      if (selectedUser && selectedUser.type === "Patient") {
+        resData.selectedUser = selectedUser;
+        resData.patient = selectedUser;
+      } else if (selectedUser && selectedUser.type === "Staff") {
+        resData.selectedUser = selectedUser;
+        resData.staff = selectedUser;
+      }
+
+      return resData;
     }
+
+    // TODO: patient, staff, appointment_id should be set properly (Only passed when is an Update)
+    // if (nextProps.event && isUpdateAppointment && patient && staff)
     return {};
+  }
+
+  /**
+   * Function that is passed to SearchInput children that updates this state
+   * @param  {User Obj} selectedUser [User Object that is passed when selected]
+   * @param  {String} type         [Enum: "Staff", "Patient"]
+   */
+  handleSearchInputSelect(selectedUser, type) {
+    if (type === "Staff") {
+      this.setState({ staff: selectedUser });
+    } else if (type === "Patient") {
+      this.setState({ patient: selectedUser });
+    }
   }
 
   handleSearchResult(key, result) {
@@ -98,7 +126,6 @@ class CalendarPopup extends Component {
 
   _handleDateChange(event, { value }) {
     if (value === "Invalid Date") return;
-
     const chosenDate = moment(value, "MM-DD-YYYY");
     const updatedStartTime = this._updateTimeToCorrectDate(POPUP_STATE_CONST.start, chosenDate);
     const updatedEndTime = this._updateTimeToCorrectDate(POPUP_STATE_CONST.end, chosenDate);
@@ -112,7 +139,7 @@ class CalendarPopup extends Component {
   _handleTimeChange(event, key, { value }) {
     const hhmm = value.split(":");
     if (hhmm.length === 2) {
-      const appointmentTime = moment(this.state.appointmentDate)
+      const appointmentTime = moment(this.state[key])
         .hours(parseInt(hhmm[0]))
         .minutes(parseInt(hhmm[1]))
         .toDate();
@@ -165,8 +192,7 @@ class CalendarPopup extends Component {
   onSubmit(event) {
     event.preventDefault();
     const copiedState = Object.assign(
-      {...this.state},
-      { title: this._generateTitle(this.state) }
+      {...this.state}
     );
     if (this.state.isUpdateAppointment) {
       this.props.updateAppointment(copiedState);
@@ -174,13 +200,6 @@ class CalendarPopup extends Component {
       this.props.createAppointment(copiedState);
     }
     this.props.onClose();
-  }
-
-  // TODO: need to target nested info
-  _generateTitle({ patient, staff }) {
-    // return `Patient: ${patient.first_name} ${patient.last_name} - Staff: ${staff.first_name} ${staff.last_name}`;
-    return "Patient: " + patient +
-      " - Therapist: " + staff;
   }
 
   _renderModalHeader() {
@@ -203,33 +222,39 @@ class CalendarPopup extends Component {
   }
 
   _renderPatientForm() {
-    const { patient } = this.state;
-    const placeholder = patient ? `${patient.first_name} ${patient.last_name}` : "Search";
+    const patients = this.props.patientsStaffs;
+    const { selectedUser } = this.state;
     return(
       <Form.Field >
         <label>Patient *</label>
-        <Input icon='search' iconPosition='left' placeholder={ placeholder }
-          onChange={e => this._handleInputChange(e, "patient") }
+        <SearchInput
+          type="Patient"
+          results={patients}
+          handleSearchInputSelect={this.handleSearchInputSelect}
+          selectedUser={selectedUser && selectedUser.type === "Patient" ? selectedUser : null}
         />
       </Form.Field>
     );
   }
 
   _renderStaffForm() {
-    const { staff } = this.state;
-    const placeholder = staff ? `${staff.first_name} ${staff.last_name}` : "Search";
+    const staffs = this.props.patientsStaffs;
+    const { selectedUser } = this.state;
     return(
       <Form.Field >
         <label>Staff *</label>
-        <Input icon='search' iconPosition='left' placeholder={ placeholder }
-          onChange={e => this._handleInputChange(e, "staff") }
+        <SearchInput
+          type="Staff"
+          results={staffs}
+          handleSearchInputSelect={this.handleSearchInputSelect}
+          selectedUser={selectedUser && selectedUser.type === "Staff" ? selectedUser : null}
         />
       </Form.Field>
     );
   }
 
   _renderDateTimeForm() {
-    const {start, end, appointmentDate, startTimeError, endTimeError} = this.state;
+    const {start, end, startTimeError, endTimeError} = this.state;
     return(
       <Form.Group widths='equal'>
         <Form.Field >
@@ -238,7 +263,7 @@ class CalendarPopup extends Component {
             dateFormat="MM-DD-YYYY"
             name="date"
             placeholder="Date"
-            value={ moment(appointmentDate).format("l") }
+            value={ moment(start).format("l") }
             iconPosition="left"
             onChange={ (e,data) => this._handleDateChange(e, data) }
           />
@@ -249,7 +274,7 @@ class CalendarPopup extends Component {
           <TimeInput
             name="start"
             placeholder="Start"
-            value={ moment(start).format("kk[:]mm") }
+            value={ moment(start).format("HH:mm") }
             iconPosition="left"
             onChange={
               (e, data) => this._handleTimeChange(e, "start", data)
@@ -262,7 +287,7 @@ class CalendarPopup extends Component {
           <TimeInput
             name="end"
             placeholder="End"
-            value={ moment(end).format("kk[:]mm") }
+            value={ moment(end).format("HH:mm") }
             iconPosition="left"
             onChange={
               (e, data) => this._handleTimeChange(e, "end", data)
