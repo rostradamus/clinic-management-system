@@ -3,9 +3,9 @@ import { Grid } from "semantic-ui-react";
 import Calendar from "./Calendar";
 import CalendarSideBar from "./CalendarSideBar";
 
-// Temporary solution for column stacking.
 const gridStyle = {
-  minWidth: "1000px"
+  minWidth: "1000px",
+  height: "100%"
 }
 
 export default class CalendarContainer extends Component {
