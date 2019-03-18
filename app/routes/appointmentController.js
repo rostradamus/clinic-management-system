@@ -26,15 +26,15 @@ routes.get("/", async (req, res) => {
       res.status(404).json({ message: `No appointment exist for user with id = ${user_id}`});
 
     const resAppointments = appointments.map(row => {
-      let { appointment } = row;
+      let appointment = row.Appointment;
       if (type === "Patient") {
         // means row contains Staff
-        const { staff } = row;
+        const staff = row.Staff;
         appointment.patient = users[0];
         appointment.staff = staff;
       } else {
         // means row contains Patient
-        const { patient } = row;
+        const patient = row.Patient;
         appointment.staff = users[0];
         appointment.patient = patient;
       }
@@ -89,49 +89,16 @@ routes.post("/", async (req, res) => {
   }
 });
 
-// PUT /api/appointments/{id}
+// TODO: PUT /api/appointments/{id}
 routes.put("/:appointment_id", (req, res) => {
-  appointmentManager.updateAppointmentWithId(req.params.appointment_id, req.body)
-    .then(result1 => {
-      if (result1.length === 0) {
-        res.sendStatus(404);
-      }
-      // appointmentManager.getStaffAndPatientInfoWithAppointmentId(req.params.appointment_id)
-      //   .then(result2 => {
-      //     result1[0].patient = result2[1];
-      //     result1[0].staff = result2[0];
-      //     delete result1[0].patient_id;
-      //     delete result1[0].staff_id;
-      //     res.status(200);
-      //     res.send(result1[0]);
-      //   }).catch(err2 => {
-      //     res.status(500).json(err2);
-      //   });
-      appointmentManager.getAppointmentWithIdWithStaffAndPatient(req.params.appointment_id)
-        .then(result2 => {
-          res.status(200);
-          res.send(result2);
-        })
-        .catch(err2 => {
-          res.status(500).json(err2);
-        });
-    })
-    .catch(err1 => {
-      res.status(500).json(err1);
-    });
+  res.status(200);
+  res.send({ msg: "STUB" });
 });
 
-// DELETE /api/appointments/{id}
+// TODO: DELETE /api/appointments/{id}
 routes.delete("/:appointment_id", (req, res) => {
-  appointmentManager.deleteAppointmentWithId(req.params.appointment_id)
-    .then(result => {
-      if (result.affectedRows === 0)
-        res.sendStatus(404);
-      res.sendStatus(204);
-    })
-    .catch(err => {
-      res.status(500).json(err);
-    });
+  res.status(200);
+  res.send({ msg: "STUB" });
 });
 
 module.exports = routes;

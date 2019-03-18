@@ -10,18 +10,6 @@ const USER_VISIBLE_COLUMNS = ["id", "username", "email", "phone_number",
   "first_name","last_name", "type", "permission_level"];
 
 module.exports = {
-  getAppointmentWithIdWithStaffAndPatient: function(id) {
-    const queryString = "SELECT * FROM appointment " +
-      "LEFT JOIN (SELECT ?? FROM user WHERE type = 'Patient' AND active = 1) " +
-      "AS patient ON appointment.patient_id = patient.username " +
-      "LEFT JOIN (SELECT ?? FROM user WHERE type = 'Staff' AND active = 1) " +
-      "AS staff ON appointment.staff_id = staff.username " +
-      "WHERE appointment.id = " + id;
-
-    const query = mysql.format(queryString, [USER_VISIBLE_COLUMNS, USER_VISIBLE_COLUMNS]);
-    const options = {sql: query, nestTables: true}
-    return qm.getQueryWithOverlap(options);
-  },
 
   createAppointment: function(data) {
     return qm.createThenGetEntry(TABLE_NAME, data, { columns: VISIBLE_COLUMNS });
@@ -41,27 +29,41 @@ module.exports = {
     return qm.makeQuery(query);
   },
 
-  getAllAppointmentsWithStaffAndPatient: function() {
-    const queryString = "SELECT * FROM appointment " +
-      "LEFT JOIN (SELECT ?? FROM user WHERE type = 'Patient' AND active = 1) " +
-      "AS patient ON appointment.patient_id = patient.username " +
-      "LEFT JOIN (SELECT ?? FROM user WHERE type = 'Staff' AND active = 1) " +
-      "AS staff ON appointment.staff_id = staff.username";
+  // TODO: Currently not in used, will leave for future reference
+  // getAppointmentWithIdWithStaffAndPatient: function(id) {
+  //   const queryString = "SELECT * FROM Appointment " +
+  //     "LEFT JOIN (SELECT ?? FROM User WHERE type = 'Patient' AND active = 1) " +
+  //     "AS Patient ON Appointment.patient_id = Patient.username " +
+  //     "LEFT JOIN (SELECT ?? FROM User WHERE type = 'Staff' AND active = 1) " +
+  //     "AS Staff ON Appointment.staff_id = Staff.username " +
+  //     "WHERE Appointment.id = " + id;
 
-    const query = mysql.format(queryString, [USER_VISIBLE_COLUMNS, USER_VISIBLE_COLUMNS]);
-    const options = {sql: query, nestTables: true}
-    return qm.getQueryWithOverlap(options);
-  },
+  //   const query = mysql.format(queryString, [USER_VISIBLE_COLUMNS, USER_VISIBLE_COLUMNS]);
+  //   const options = {sql: query, nestTables: true}
+  //   return qm.getQueryWithOverlap(options);
+  // },
 
-  getStaffAndPatientInfoForAllAppointments: function() {
-    const query = mysql.format("SELECT ? FROM User AS u RIGHT OUTER JOIN appointment AS a ON a.patient_id = u.username OR a.staff_id = u.username ORDER BY a.id, type", [USER_VISIBLE_COLUMNS]);
-    return qm.makeQuery(query);
-  },
+  // getAllAppointmentsWithStaffAndPatient: function() {
+  //   const queryString = "SELECT * FROM appointment " +
+  //     "LEFT JOIN (SELECT ?? FROM user WHERE type = 'Patient' AND active = 1) " +
+  //     "AS patient ON appointment.patient_id = patient.username " +
+  //     "LEFT JOIN (SELECT ?? FROM user WHERE type = 'Staff' AND active = 1) " +
+  //     "AS staff ON appointment.staff_id = staff.username";
 
-  getStaffAndPatientInfoWithAppointmentId: function(id) {
-    const query = mysql.format("SELECT ?? FROM User AS u LEFT OUTER JOIN appointment as a on a.patient_id = u.username OR a.staff_id = u.username WHERE a.id = " + id + " ORDER BY type", [USER_VISIBLE_COLUMNS]);
-    return qm.makeQuery(query);
-  },
+  //   const query = mysql.format(queryString, [USER_VISIBLE_COLUMNS, USER_VISIBLE_COLUMNS]);
+  //   const options = {sql: query, nestTables: true}
+  //   return qm.getQueryWithOverlap(options);
+  // },
+
+  // getStaffAndPatientInfoForAllAppointments: function() {
+  //   const query = mysql.format("SELECT ? FROM User AS u RIGHT OUTER JOIN appointment AS a ON a.patient_id = u.username OR a.staff_id = u.username ORDER BY a.id, type", [USER_VISIBLE_COLUMNS]);
+  //   return qm.makeQuery(query);
+  // },
+
+  // getStaffAndPatientInfoWithAppointmentId: function(id) {
+  //   const query = mysql.format("SELECT ?? FROM User AS u LEFT OUTER JOIN appointment as a on a.patient_id = u.username OR a.staff_id = u.username WHERE a.id = " + id + " ORDER BY type", [USER_VISIBLE_COLUMNS]);
+  //   return qm.makeQuery(query);
+  // },
 
   getUserWithIdFromTable: function(id) {
     const query = qm.getWithIdBaseQuery(USER_TABLE_NAME, id, { columns: USER_VISIBLE_COLUMNS });
@@ -71,15 +73,15 @@ module.exports = {
   getAppointmentAccordingToUser: function(id, type) {
     let queryString = "";
     if (type === "Staff") {
-      queryString = "SELECT * FROM appointment " +
-        "LEFT JOIN (SELECT ?? FROM user WHERE type = 'Patient' AND active = 1) " +
-        "AS patient ON appointment.patient_id = patient.id " +
-        "WHERE appointment.staff_id = ?";
+      queryString = "SELECT * FROM Appointment " +
+        "LEFT JOIN (SELECT ?? FROM User WHERE type = 'Patient' AND active = 1) " +
+        "AS Patient ON Appointment.patient_id = Patient.id " +
+        "WHERE Appointment.staff_id = ?";
     } else {
-      queryString = "SELECT * FROM appointment " +
-        "LEFT JOIN (SELECT ?? FROM user WHERE type = 'Staff' AND active = 1) " +
-        "AS staff ON appointment.staff_id = staff.id " +
-        "WHERE appointment.patient_id = ?";
+      queryString = "SELECT * FROM Appointment " +
+        "LEFT JOIN (SELECT ?? FROM User WHERE type = 'Staff' AND active = 1) " +
+        "AS Staff ON Appointment.staff_id = Staff.id " +
+        "WHERE Appointment.patient_id = ?";
     }
     const query = mysql.format(queryString, [USER_VISIBLE_COLUMNS, id]);
     const options = {sql: query, nestTables: true};
