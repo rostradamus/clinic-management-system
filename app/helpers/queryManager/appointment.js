@@ -25,7 +25,7 @@ module.exports = {
 
   // TODO: use AdmissionRecordManager to handle query after it has been implemented.
   getPatientAdmissionRecord: function(patient) {
-    const query = mysql.format("SELECT * FROM admission_record WHERE patient_id = ?", [patient.id]);
+    const query = mysql.format("SELECT * FROM Admission_record WHERE patient_id = ?", [patient.id]);
     return qm.makeQuery(query);
   },
 
