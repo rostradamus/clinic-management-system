@@ -58,7 +58,11 @@ class CalendarSideBar extends Component {
         </Grid.Row>
 
         <Grid.Row>
-          <Button size='medium' style={buttonStyle}>Print</Button>
+          <Button 
+            size='medium' 
+            style={buttonStyle}>
+            Print
+          </Button>
         </Grid.Row>
 
         {this.state.isSearchOpen ?

@@ -1,16 +1,38 @@
-.ui.grid.calendarContainer .calendarGridColumn {
-  height: 100%;
+
+/* Calendar Container */
+
+.ui.grid.calendarContainer .appointmentCalendar {
+  height: 48rem;
+}
+
+.ui.grid.calendarContainer .calendarPlaceholder {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 58rem;
+  box-shadow: none;
+  border: none;
 }
 
 .ui.header.calendarUser.userName {
   font-size: 3rem;
 }
 
-p.calendarUser.userType p.calendarUser.userId {
-  font-size: 1.1rem;
-  color: #424242;
+.row.calendarUser.userTypeRow {
+  padding-top: 10px;
+  padding-bottom: 30px;
 }
 
-.ui.grid.calendarContainer .appointmentCalendar {
-  height: 45rem;
+.placeholderImage {
+  width: 180px;
+  height: 180px;
+}
+
+#placeholderText {
+  color: #757575;
+  padding-top: 20px;
+  width: 250px;
+  font-size: 16px;
+  text-align: center;
 }
