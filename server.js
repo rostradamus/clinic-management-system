@@ -7,6 +7,11 @@ const passport = require('passport');
 const morgan = require('morgan');
 const path = require('path');
 
+// Moment.js configuration
+const moment = require("moment");
+moment.locale("en");
+global.moment = moment;
+
 const db = require("@config/db/connection").connectDatabase();
 
 const app = express();

@@ -2,7 +2,7 @@ const connection = require("@config/db/connection");
 const db = connection.connectDatabase();
 const mysql = require('mysql');
 
-// Public Functions
+// Public
 
 /**
  * When resolved, returns an array of JSON objects.
@@ -22,8 +22,8 @@ module.exports = {
     } else {
       stmt = mysql.format("SELECT * FROM ??", table);
     }
-    if (options.where && Object.keys(options).length > 0) {
-      stmt = mysql.format(`${stmt} WHERE ?`, [options.where]);
+    if (options.where && Object.keys(options.where).length > 0) {
+      stmt = this.appendWhereQuery(stmt, options.where);
     }
     return stmt;
   },
@@ -81,35 +81,32 @@ module.exports = {
   },
 
   createThenGetEntry: async function(table, data, options = {}) {
-    await db.beginTransaction();
+    const insertQuery = this.createBaseQuery(table, data);
+    const insertResult = await this.makeQuery(insertQuery);
+    const selectQuery = this.getWithIdBaseQuery(
+      table,
+      data.id ? data.id : insertResult.insertId,
+      options
+    );
+    return await this.makeQuery(selectQuery);
+  },
+
+  createEntry: async function(table, data) {
     let result;
     try {
       const insertQuery = this.createBaseQuery(table, data);
-      const insertResult = await this.makeQuery(insertQuery);
-      const selectQuery = this.getWithIdBaseQuery(table, insertResult.insertId, options);
-      result = await this.makeQuery(selectQuery);
-      await db.commit();
+      result = await this.makeQuery(insertQuery);
     } catch(e) {
-      await db.rollback();
       throw e;
     }
     return result;
   },
 
   updateThenGetEntry: async function(table, id, data, options = {}) {
-    await db.beginTransaction();
-    let result;
-    try {
-      const updateQuery = this.updateBaseQuery(table, id, data);
-      const updateResult = await this.makeQuery(updateQuery);
-      const selectQuery = this.getWithIdBaseQuery(table, id, options);
-      result = await this.makeQuery(selectQuery);
-      await db.commit();
-    } catch(e) {
-      await db.rollback();
-      throw e;
-    }
-    return result;
+    const updateQuery = this.updateBaseQuery(table, id, data);
+    const updateResult = await this.makeQuery(updateQuery);
+    const selectQuery = this.getWithIdBaseQuery(table, id, options);
+    return await this.makeQuery(selectQuery);
   },
 
   softDeleteEntry: function(table, id, options = {}) {
@@ -120,5 +117,18 @@ module.exports = {
   hardDeleteEntry: function(table, id, options = {}) {
     const query = this.hardDeleteBaseQuery(table, id);
     return this.makeQuery(query);
+  },
+
+  appendWhereQuery: function(sql, where) {
+    if (!where && Object.keys(where).length === 0)
+      return sql;
+    sql = mysql.format(`${sql} WHERE`);
+    Object.entries(where).forEach((column, index) => {
+      if (index !== 0)
+        sql = mysql.format(`${sql} AND`);
+      sql = mysql.format(`${sql} ?? = ?`, [column[0], column[1]]);
+    });
+    return sql;
   }
-}
+};
+

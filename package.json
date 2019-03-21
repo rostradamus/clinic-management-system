@@ -37,6 +37,7 @@
     "express": "^4.16.4",
     "ical-generator": "^1.6.0",
     "module-alias": "^2.1.0",
+    "moment": "^2.24.0",
     "morgan": "^1.9.1",
     "mysql": "^2.16.0",
     "nodemailer": "^5.1.1",

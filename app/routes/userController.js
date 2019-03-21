@@ -19,7 +19,7 @@ routes.get("/:user_id", (req, res) => {
   userManager.getUserWithId(req.params.user_id)
     .then(result => {
       if (result.length === 0) {
-        res.status(404)
+        return res.status(404)
           .json({ message: `User with id = ${req.params.user_id} does NOT exist`});
       }
       res.status(200);
@@ -29,31 +29,11 @@ routes.get("/:user_id", (req, res) => {
     });
 });
 
-routes.post("/", async (req, res) => {
-  try {
-    // TODO: TEMPORARY SOLUTION TO USER REGISTRATION
-    const initialPassword = req.body.phone_number.substr(-4);
-    const encryptedPassword = await bcrypt.hash(initialPassword, BCRYPT_SALT_ROUNDS);
-    const user = Object.assign(
-      {...req.body},
-      { password: process.env.NODE_ENV === "production" ? encryptedPassword : initialPassword }
-    );
-
-    const result = await userManager.createUser(user);
-    if (result.length === 0)
-      throw new Error();
-    res.status(200);
-    res.send(result[0]);
-  } catch (e) {
-    res.status(500).json(e);
-  }
-});
-
 routes.put("/:user_id", (req, res) => {
   userManager.updateUserWithId(req.params.user_id, req.body)
     .then(result => {
       if (result.length === 0)
-        res.sendStatus(404);
+        return res.sendStatus(404);
       res.status(200);
       res.send(result[0]);
     })
@@ -63,7 +43,7 @@ routes.put("/:user_id", (req, res) => {
 });
 
 routes.delete("/:user_id", (req, res) => {
-  userManager.deleteUserWithId(req.params.user_id)
+  userManager.softDeleteUserWithId(req.params.user_id)
     .then(result => {
       if (result.affectedRows === 0)
         res.sendStatus(404);
