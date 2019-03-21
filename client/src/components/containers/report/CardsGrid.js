@@ -21,7 +21,7 @@ class CardsGrid extends Component {
           </Card.Meta>
           <Card.Description className="description_ct">
             <Label style={reportStyle.label(patient.diagnosis.type - 1)} empty circular key={"#0"} />
-            <p style={{ fontWeight: "bold" }}>{patient.patientId}</p>
+            <p className="diagnosis">{patient.diagnosis.name}</p>
           </Card.Description>
         </Card.Content>
       </Card>

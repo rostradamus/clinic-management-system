@@ -1,3 +1,14 @@
+.ui.label.label_rc {
+  width: 14.325rem;
+  height: 7.125rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.25);
+  text-align: center;
+  margin: 1.25rem;
+  margin-left: 0px;
+  padding-top: 2rem;
+}
+
 .ui.container.container_ct {
   display: flex;
   flex-direction: column;
@@ -5,26 +16,30 @@
 }
 
 .patient {
-  font-size: 28px;
+  font-size: calc(14px + 1.25rem);
   font-weight: 300;
-  padding-top: 20px;
-  padding-bottom: 10px;
+  padding-top: 1.5rem;
+  padding-bottom: 0.8rem;
 }
 
 .ui.input.search {
-  max-width: 35em;
-  height: 49px;
+  width: 35em;
+  height: 3.5rem;
   margin-top: 10px;
   text-align: left;
 }
 
 .type {
-  font-size: 32px;
+  font-size: calc(14px + 1.5rem);
   color: #000000;
 }
-
+@media only screen and (min-width: 2000px) {
+  .type {
+    font-size: calc(14px + 2.5rem);
+  }
+}
 .category {
-  font-size: 28px;
+  font-size: calc(14px + 1.25rem);
   color: #000000;
   font-weight: 300;
   margin: 0px;
