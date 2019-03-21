@@ -10,28 +10,21 @@ import { ReactComponent as PlaceholderImg } from "assets/calendarPlaceholder.svg
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import "./Calendar.css";
 
+moment.locale('en');
 const MAIN_CALENDAR_COL_WIDTH = 13;
+const appointmentStartTime = moment().hours(8).minute(0).second(0).toDate();
+const appointmentEndTime = moment().hours(17).minute(0).second(0).toDate();
 
 class Calendar extends Component {
   constructor(props) {
     super(props);
-    moment.locale('en');
-
-    const minTime = new Date();
-    const maxTime = new Date();
-
-    minTime.setHours(8, 0, 0);
-    maxTime.setHours(17, 0, 0);
 
     this.state = {
       events: [],
-      minTime: minTime,
-      maxTime: maxTime,
       showPopup: false,
       isAddModalOpen: false,
       selectedEvent: {},
       selectedUser: {}
-      // newAppointment: {}
     };
 
     this.toggleAddModal = this.toggleAddModal.bind(this);
@@ -137,7 +130,7 @@ class Calendar extends Component {
   }
 
   render() {
-    const today = new Date(new Date().setHours(new Date().getHours() - 3));
+    const today = moment().toDate();
     const localizer = BigCalendar.momentLocalizer(moment);
     const { selectedUser } = this.state;
 
@@ -179,8 +172,8 @@ class Calendar extends Component {
             defaultView={BigCalendar.Views.WORK_WEEK}
             defaultDate={today}
             views={[BigCalendar.Views.DAY, BigCalendar.Views.WORK_WEEK, BigCalendar.Views.MONTH]}
-            min={this.state.minTime}
-            max={this.state.maxTime}
+            min={ appointmentStartTime }
+            max={ appointmentEndTime }
             onSelectEvent={(e) => this.toggleAddModal(e, true)}
             onSelectSlot={(e) => this.toggleAddModal(e, false)}
           />

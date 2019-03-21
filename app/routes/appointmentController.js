@@ -27,6 +27,8 @@ routes.get("/", async (req, res) => {
 
     const resAppointments = appointments.map(row => {
       let appointment = row.Appointment;
+      appointment.start_date = moment(appointment.start_date).format("YYYY-MM-DD");
+
       if (type === "Patient") {
         // means row contains Staff
         const staff = row.Staff;
@@ -64,7 +66,7 @@ routes.post("/", async (req, res) => {
       record_id: admissionRecords[0].id,
       patient_category: admissionRecords[0].patient_category,
       type_of_therapy: "STUB",
-      start_date: new Date(start),
+      start_date: moment(start).format("YYYY-MM-DD"),
       // end_date: new Date(end), // This is used with repetition commented out as it is not part of MVP
       repetition: "none", // This is not part of mvp. Value is inside req.body
       start_time: moment(start).format("HH:mm:ss"),
@@ -79,6 +81,8 @@ routes.post("/", async (req, res) => {
     const { patient_id, staff_id} = appointments[0];
 
     let resAppointment = appointments[0];
+    resAppointment.start_date = moment(resAppointment.start_date).format("YYYY-MM-DD");
+
     resAppointment.patient = patient;
     resAppointment.staff = staff;
 
