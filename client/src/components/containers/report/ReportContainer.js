@@ -10,15 +10,7 @@ const reportStyle = {
   types: ["I", "II", "III"],
   colors: ["#2a9d8f", "#e9c46a", "#e76f51"],
   labelStyle: (idx) => ({
-    width: "200px",
-    height: "100px",
-    borderRadius: "12px",
-    boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.25)",
-    backgroundColor: reportStyle.colors[idx],
-    textAlign: "center",
-    margin: "20px",
-    marginLeft: "0px",
-    paddingTop: "28px"
+    backgroundColor: reportStyle.colors[idx]
   })
 };
 
@@ -36,7 +28,7 @@ class ReportContainer extends Component {
       <div>
         <h2 className="category">Category Summaries</h2>
         {reportStyle.types.map((type, idx) => (
-          <Label style={reportStyle.labelStyle(idx)} key={type}>
+          <Label className="label_rc" style={reportStyle.labelStyle(idx)} key={type}>
             <h3 className="type">{type}</h3>
           </Label>
         ))}

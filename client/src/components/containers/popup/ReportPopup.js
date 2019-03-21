@@ -35,9 +35,9 @@ class ReportPopup extends Component {
             </div>
             <div className="endToEnd">
               <div>
-                <p className="details2">{popupInfo.patientId}</p>
-                <p className="details2">{this._returnDiagnosis("name")}</p>
-                <p className="details2">{this._returnDiagnosis("type")}</p>
+                <p className="patient_detail">{popupInfo.patientId}</p>
+                <p className="patient_detail">{this._returnDiagnosis("name")}</p>
+                <p className="patient_detail">{this._returnDiagnosis("type")}</p>
               </div>
               <div className="dataContainer">
                 <div className="dateBox">
@@ -81,10 +81,10 @@ class ReportPopup extends Component {
           </Container>
         </Modal.Content>
         <Modal.Actions>
-          <Button onClick={this.props.closePopup}>
+          <Button className="btn_pu" onClick={this.props.closePopup}>
             Close <Icon name="chevron right" />
           </Button>
-          <Button primary onClick={this._print}>
+          <Button primary className="btn_pu" onClick={this._print}>
             Print <Icon name="chevron right" />
           </Button>
         </Modal.Actions>
