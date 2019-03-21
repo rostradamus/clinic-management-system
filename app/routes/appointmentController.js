@@ -11,8 +11,6 @@ let isValidPostRequestBody = (body) => {
 }
 
 // GET /api/appointments/users/{user_id}/
-// TODO: instead of front end creating title, start, end field backend will do it to reduce number of
-// iterations done on list of appointments
 routes.get("/", async (req, res) => {
   try {
     const { user_id } = req.query;
@@ -30,12 +28,12 @@ routes.get("/", async (req, res) => {
       appointment.start_date = moment(appointment.start_date).format("YYYY-MM-DD");
 
       if (type === "Patient") {
-        // means row contains Staff
+        //Row contains a Staff object
         const staff = row.Staff;
         appointment.patient = users[0];
         appointment.staff = staff;
       } else {
-        // means row contains Patient
+        //Row contains a Patient object
         const patient = row.Patient;
         appointment.staff = users[0];
         appointment.patient = patient;
@@ -50,13 +48,16 @@ routes.get("/", async (req, res) => {
   }
 });
 
+// TODO: Backend validation of fields
 // POST /api/appointments
 routes.post("/", async (req, res) => {
+  // TODO: add a more informative error message
   if (!isValidPostRequestBody(req.body)) throw new Error();
-  const {patient, staff, start, end} = req.body; //
+  const {patient, staff, start, end} = req.body;
 
   // Need to go through all admissionRecord to find one active admission record
   const admissionRecords = await appointmentManager.getPatientAdmissionRecord(patient);
+  // TODO: after MessageUtils is merged in add more detailed information of error messages.
   if (admissionRecords.length === 0) throw new Error();
 
   try {
@@ -76,6 +77,7 @@ routes.post("/", async (req, res) => {
 
     const appointments = await appointmentManager.createAppointment(data);
     if (appointments.length === 0) {
+      // TODO: after MessageUtils is merged in add more detailed information of error messages.
       throw new Error();
     }
     const { patient_id, staff_id} = appointments[0];
@@ -93,10 +95,46 @@ routes.post("/", async (req, res) => {
   }
 });
 
-// TODO: PUT /api/appointments/{id}
-routes.put("/:appointment_id", (req, res) => {
-  res.status(200);
-  res.send({ msg: "STUB" });
+// TODO: Backend validation of fields
+// PUT /api/appointments/:appointment_id
+routes.put("/:appointment_id", async (req, res) => {
+  const {patient, staff, start, end} = req.body;
+  const { appointment_id } = req.params;
+
+  try {
+    // This is used since patients can also change.
+    const admissionRecords = await appointmentManager.getPatientAdmissionRecord(patient);
+    // TODO: after MessageUtils is merged in add more detailed information of error messages.
+    if (admissionRecords.length === 0) throw new Error();
+
+    const data = {
+      patient_id: patient.id,
+      staff_id: staff.id,
+      record_id: admissionRecords[0].id,
+      patient_category: admissionRecords[0].patient_category,
+      type_of_therapy: "STUB", // TODO: this may also be updated depending on the change of user
+      start_date: moment(start).format("YYYY-MM-DD"),
+      start_time: moment(start).format("HH:mm:ss"),
+      end_time: moment(end).format("HH:mm:ss"),
+      is_cancelled: false // TODO: this can also change in the front end.
+    };
+
+    const updatedAppointment = await appointmentManager.updateAppointmentWithId(appointment_id, data);
+    if (updatedAppointment.length === 0) {
+      // TODO: after MessageUtils is merged in add more detailed information of error messages.
+      throw new Error();
+    }
+
+    let resAppointment = updatedAppointment[0];
+    resAppointment.start_date = moment(resAppointment.start_date).format("YYYY-MM-DD");
+    resAppointment.patient = patient;
+    resAppointment.staff = staff;
+
+    res.status(200);
+    res.send(resAppointment);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 // TODO: DELETE /api/appointments/{id}

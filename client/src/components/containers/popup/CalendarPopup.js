@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-// import { isEqual } from 'lodash';
+import { isEqual } from 'lodash';
 import { Button, Modal, Form, Input, Select } from 'semantic-ui-react';
 import { DateInput, TimeInput } from 'semantic-ui-calendar-react';
 import { CalendarAction } from 'actions';
@@ -13,10 +13,10 @@ import './CalendarPopup.css';
 
 // constants can be moved to constants dir
 const REPEAT_CONST = [
+  { key: 'Never', text: 'Never', value: 'Never' },
   { key: 'Daily', text: 'Daily', value: 'Daily' },
   { key: 'Weekly', text: 'Weekly', value: 'Weekly' },
-  { key: 'Monthly', text: 'Monthly', value: 'Monthly' },
-  { key: 'Never', text: 'Never', value: 'Never' }
+  { key: 'Monthly', text: 'Monthly', value: 'Monthly' }
 ];
 
 const POPUP_STATE_CONST = {
@@ -48,7 +48,7 @@ class CalendarPopup extends Component {
       staff: {},
       start: "",
       end: "",
-      repeat: "",
+      repeat: REPEAT_CONST[0].key,
       location: "", // may delete if unnecessary
       notes: "Add Note", // may delete if unnecessary
       isUpdateAppointment: false,
@@ -67,18 +67,17 @@ class CalendarPopup extends Component {
     this._validateTime = this._validateTime.bind(this);
 
     this.handleSearchInputSelect = this.handleSearchInputSelect.bind(this);
+    this._getAppropriateUser = this._getAppropriateUser.bind(this);
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
-    const { start, end, isUpdateAppointment } = nextProps.event;
-    const { selectedUser } = nextProps;
-    if (nextProps.event && !isUpdateAppointment && !prevState.start && !prevState.end) {
+    const { event, selectedUser } = nextProps;
+    const { start, end, isUpdateAppointment, id, staff, patient } = event;
+
+    if (event && !isUpdateAppointment && !prevState.start && !prevState.end) {
       let resData = {
         start: start,
         end: end,
-        repeat: "Never", // not part of mvp
-        location: "", // may delete if it is not in use
-        notes: "", // may delete if it is not in use
         isUpdateAppointment: isUpdateAppointment,
       };
 
@@ -89,12 +88,14 @@ class CalendarPopup extends Component {
         resData.selectedUser = selectedUser;
         resData.staff = selectedUser;
       }
-
       return resData;
     }
 
-    // TODO: patient, staff, appointment_id should be set properly (Only passed when is an Update)
-    // if (nextProps.event && isUpdateAppointment && patient && staff)
+    if (event && isUpdateAppointment && !prevState.start && !prevState.end &&
+      patient && staff && !isEqual(patient, {}) && !isEqual(staff, {})) {
+      return { id, patient, staff, start, end, isUpdateAppointment };
+    }
+
     return {};
   }
 
@@ -189,6 +190,22 @@ class CalendarPopup extends Component {
     return !startTime.isBefore(endTime);
   }
 
+  /**
+   * Returns appropriate user (staff or patient) depending on selected user and form type
+   * @param  {[String]} formType [Enum String "Patient", "Staff"]
+   * @return {[User Obj]}  [if it is an update return user obj depending on form type. Otherwise
+   *                       return based on selectedUser's type]
+   */
+   _getAppropriateUser(formType) {
+    //TODO: "Patient" and "Staff" move to Constant.
+    const {isUpdateAppointment, selectedUser, staff, patient} = this.state;
+    if (isUpdateAppointment) {
+      return formType === "Patient" ? patient : staff;
+    }
+
+    return selectedUser && selectedUser.type === formType ? selectedUser : null;
+  }
+
   onSubmit(event) {
     event.preventDefault();
     const copiedState = Object.assign(
@@ -223,7 +240,6 @@ class CalendarPopup extends Component {
 
   _renderPatientForm() {
     const patients = this.props.patientsStaffs;
-    const { selectedUser } = this.state;
     return(
       <Form.Field >
         <label>Patient *</label>
@@ -231,7 +247,7 @@ class CalendarPopup extends Component {
           type="Patient"
           results={patients}
           handleSearchInputSelect={this.handleSearchInputSelect}
-          selectedUser={selectedUser && selectedUser.type === "Patient" ? selectedUser : null}
+          selectedUser={this._getAppropriateUser("Patient")}
         />
       </Form.Field>
     );
@@ -239,7 +255,6 @@ class CalendarPopup extends Component {
 
   _renderStaffForm() {
     const staffs = this.props.patientsStaffs;
-    const { selectedUser } = this.state;
     return(
       <Form.Field >
         <label>Staff *</label>
@@ -247,7 +262,7 @@ class CalendarPopup extends Component {
           type="Staff"
           results={staffs}
           handleSearchInputSelect={this.handleSearchInputSelect}
-          selectedUser={selectedUser && selectedUser.type === "Staff" ? selectedUser : null}
+          selectedUser={this._getAppropriateUser("Staff")}
         />
       </Form.Field>
     );
@@ -340,9 +355,11 @@ class CalendarPopup extends Component {
         { this._renderPatientForm() }
         { this._renderStaffForm() }
         { this._renderDateTimeForm() }
-        { this._renderRepeatDropDownForm() }
-        { this._renderLocationForm() }
-        { this._renderNoteForm() }
+        {/**
+          { this._renderRepeatDropDownForm() }
+          { this._renderLocationForm() }
+          { this._renderNoteForm() }
+         **/}
       </Form>
     );
   }
