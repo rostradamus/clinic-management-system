@@ -89,11 +89,11 @@ describe("userController Unit Tests", () => {
   });
 
   describe("delete '/api/users/:user_id'", () => {
-    let deleteUserWithIdStub;
+    let softDeleteUserWithIdStub;
 
     it("two affected rows should return status of 204", async () => {
       const mockResult = { affectedRows: 2 };
-      deleteUserWithIdStub = stub(userManager, "deleteUserWithId").resolves(mockResult);
+      softDeleteUserWithIdStub = stub(userManager, "softDeleteUserWithId").resolves(mockResult);
 
       const res = await chai.request(server)
         .del('/api/users/123123')
@@ -101,15 +101,15 @@ describe("userController Unit Tests", () => {
 
       expect(res.status).to.equal(204);
       expect(res.body).to.deep.equal({});
-      expect(deleteUserWithIdStub.callCount).to.equal(1);
+      expect(softDeleteUserWithIdStub.callCount).to.equal(1);
 
-      userManager.deleteUserWithId.restore();
+      userManager.softDeleteUserWithId.restore();
     });
 
     // commented out as warning message appears
     // it("zero affected rows should return status of 404", async () => {
     //   const mockResult = { affectedRows: 0 };
-    //   deleteUserWithIdStub = stub(userManager, "deleteUserWithId").resolves(mockResult);
+    //   softDeleteUserWithIdStub = stub(userManager, "softDeleteUserWithId").resolves(mockResult);
 
     //   const res = await chai.request(server)
     //     .del('/api/users/321312')
@@ -117,9 +117,9 @@ describe("userController Unit Tests", () => {
 
     //   expect(res.status).to.equal(404);
     //   expect(res.body).to.deep.equal({});
-    //   expect(deleteUserWithIdStub.callCount).to.equal(1);
+    //   expect(softDeleteUserWithIdStub.callCount).to.equal(1);
 
-    //   userManager.deleteUserWithId.restore();
+    //   userManager.softDeleteUserWithId.restore();
     // });
   });
 });
