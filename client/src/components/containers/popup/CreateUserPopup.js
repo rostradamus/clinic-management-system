@@ -5,26 +5,22 @@ import CreateStaffPopup from "./CreateStaffPopup";
 import './CreateUserPopup.css';
 
 export const STATE_CONST = {
-  userName:"User Name",
-  password:"Password",
-  firstName:"First Name",
-  lastName:"Last Name",
+  first_name:"First Name",
+  last_name:"Last Name",
   email:"Email",
-  phoneNum:"Phone Number",
-  birthDate:"Birth Date",
+  phone_number:"Phone Number",
+  date_of_birth:"Birth Date",
   address:"Address",
-  emergencyContactName:"Name",
-  emergencyContactPhoneNum:"Phone Number",
   mrn:"MRN Number",
-  typeofInjury:"Type of Injury",
-  patientType:"Type of Patient",
-  admissionDate:"Admission Date",
-  dischargeDate:"Discharge Date",
-  patientProgram:"Patient Program",
-  patientCategory:"Patient Category",
-  permissionLevel:"Permission Level",
-  therapistType:"Therapist Type",
-  notes:"Notes",
+  type_of_injury:"Type of Injury",
+  patient_type:"Type of Patient",
+  admission_date:"Admission Date",
+  discharge_date:"Discharge Date",
+  patient_program:"Patient Program",
+  patient_category:"Patient Category",
+  permission_level:"Permission Level",
+  therapist_type:"Therapist Type",
+  comment:"Notes",
 };
 
 
@@ -113,7 +109,7 @@ export default class CreateUserPopup extends Component{
         }
 
         {onNext && typeUser === 'Patient' && <CreatePatientPopup onClose={ onClose }onPrev = {this.onPrevClick}/>}
-        {onNext && typeUser !== 'Patient' && <CreateStaffPopup onClose={ onClose }onPrev= {this.onPrevClick} typeUser={this.state.typeUser}/>}
+        {onNext && typeUser !== 'Patient' && <CreateStaffPopup onClose={ onClose }onPrev= {this.onPrevClick} isStaff={this.state.typeUser==='Staff'}/>}
       </Modal>
     );
   }
