@@ -10,9 +10,6 @@ export default (state = initialState, action) => {
     case APPOINTMENT_ACTION_TYPE.FETCH_SUCCESS: {
       return Object.assign({...state}, {...action.payload});
     }
-    case APPOINTMENT_ACTION_TYPE.UPDATE_APPOINTMENT_FAILURE: {
-      return Object.assign({...state}, {...action.payload});
-    }
 
     case APPOINTMENT_ACTION_TYPE.CREATE_SUCCESS: {
       return Object.assign({...state},
@@ -20,11 +17,15 @@ export default (state = initialState, action) => {
       );
     }
 
-    case APPOINTMENT_ACTION_TYPE.CREATE_FAILURE: {
-      return state;
+    case APPOINTMENT_ACTION_TYPE.UPDATE_SUCCESS: {
+      const updatedEvents = state.events.map(event => event.id === action.payload.id ? action.payload : event);
+      return Object.assign({...state},
+        { events: updatedEvents }
+      );
     }
 
-    case APPOINTMENT_ACTION_TYPE.UPDATE_SUCCESS:
+    case APPOINTMENT_ACTION_TYPE.FETCH_FAILURE:
+    case APPOINTMENT_ACTION_TYPE.CREATE_FAILURE:
     case APPOINTMENT_ACTION_TYPE.UPDATE_FAILURE: {
       return state;
     }

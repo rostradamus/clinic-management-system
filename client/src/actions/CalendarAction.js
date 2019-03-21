@@ -30,8 +30,8 @@ export default class CalendarAction {
 
   static createAppointment = data => {
     return async dispatch => {
-      const res = await axios.post(`/api/appointments/`, data);
       try {
+        const res = await axios.post(`/api/appointments/`, data);
         dispatch({
           type: APPOINTMENT_ACTION_TYPE.CREATE_SUCCESS,
           payload: res.data
@@ -46,9 +46,23 @@ export default class CalendarAction {
   };
 
   static updateAppointment = data => {
-    return {
-      type: APPOINTMENT_ACTION_TYPE.UPDATE_SUCCESS,
-      payload: data
+    return async dispatch => {
+      try {
+        const res = await axios.put(`/api/appointments/${data.id}`, data);
+        dispatch({
+          type: APPOINTMENT_ACTION_TYPE.UPDATE_SUCCESS,
+          payload: res.data
+        });
+      } catch (err) {
+        dispatch({
+          type: APPOINTMENT_ACTION_TYPE.UPDATE_FAILURE,
+          payload: data
+        });
+      }
     }
-  }
+  };
+
+  //TODO:
+  static deleteAppointment = data => {
+  };
 }

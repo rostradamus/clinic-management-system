@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import BigCalendar from 'react-big-calendar';
 import moment from 'moment';
-import { isEqual } from 'lodash';
+import { differenceWith, isEqual, isEmpty } from 'lodash';
 import { Grid, Header, Label, Icon, Segment } from "semantic-ui-react";
 import { PatientStaffSearchAction } from 'actions';
 import { CalendarPopup } from 'components/containers/popup';
@@ -32,10 +32,11 @@ class Calendar extends Component {
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
-    if (nextProps.events.length !== prevState.events.length ||
-      !isEqual(nextProps.selectedUser, prevState.selectedUser)) {
+    const { events, selectedUser } = nextProps;
+    if (!isEmpty(differenceWith(events, prevState.events, isEqual)) ||
+      !isEqual(selectedUser, prevState.selectedUser)) {
       // TODO: after auth is implemented include current user
-      return { events: nextProps.events, selectedUser: nextProps.selectedUser };
+      return { events: events, selectedUser: selectedUser };
     }
     return {};
   }
