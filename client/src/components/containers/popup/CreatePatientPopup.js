@@ -2,8 +2,7 @@ import React, { Component } from "react";
 import { Modal, Grid, Button, Select, Header, Input, Form, Container, Divider} from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import * as moment from 'moment';
-import { UserAction } from 'actions';
-//import { PatientAction } from 'actions';
+import { UserAction, PatientAction} from 'actions';
 import { STATE_CONST } from './CreateUserPopup';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -23,46 +22,42 @@ class CreatePatientPopup extends Component{
     this.state = {
       slideIndex:1,
       exists: false,
+      patientId:'',
       form: {
-            //userName:'',
-            //password:'',
-            firstName: '',
-            lastName:'',
-            email:'',
-            phoneNum:'',
-            birthDate:'',
-            address:'',
-            notes:'',
-            emergencyContactName:'',
-            emergencyContactPhoneNum:'',
-            mrn:'',
-            typeofInjury:'',
-            patientType:'',
-            admissionDate:'',
-            dischargeDate:'',
-            //patientProgram:'',  // erase?
-            patientCategory:'',
-            permissionLevel:''},
+        user: {
+          first_name: '',
+          last_name:'',
+          phone_number:'',
+          email:'',
+          permission_level:''
+        },
+        patient:{
+          mrn:'',
+          date_of_birth:'',
+          address:'',
+          is_in_patient:true,
+          patient_program:''
+        },
+        admission : {
+          type_of_injury:'',
+          admission_date:'',
+          discharge_date:'',
+          comment:'',
+          patient_category:'1'
+        }
+      },
       error: {
-            //userName:false,
-            // password:false,
-            firstName: false,
-            lastName:false,
-            email:false,
-            phoneNum:false,
-            birthDate:false,
-            address:false,
-            notes:false,
-            emergencyContactName:false,
-            emergencyContactPhoneNum:false,
-            mrn:false,
-            typeofInjury:false,
-            patientType:false,
-            admissionDate:false,
-            dischargeDate:false,
-            patientProgram:false,
-            patientCategory:false,
-            permissionLevel:false
+        mrn:false,
+        first_name: false,
+        last_name:false,
+        phone_number:false,
+        date_of_birth:false,
+        address:false,
+        is_in_patient:false,
+        patient_program:false,
+        type_of_injury:false,
+        admission_date:false,
+        patient_category:false
       }
     };
     this.handleInputChange=this.handleInputChange.bind(this);
@@ -72,88 +67,104 @@ class CreatePatientPopup extends Component{
     this.handlemrnSubmit=this.handlemrnSubmit.bind(this);
     this.handleNewAccountSubmit=this.handleNewAccountSubmit.bind(this);
     this.handleNewAdmissionSubmit=this.handleNewAdmissionSubmit.bind(this);
-
   }
 
-  handleInputChange(event, key) {
+  handleInputChange(event, key, formtype) {
     const value = event.target && event.target.value;
     this.setState({form: {
       ...this.state.form,
-      [key]: value}});
+      [formtype]: {
+        ...this.state.form[formtype],
+        [key]:value
+      }
+    },error: {
+      ...this.state.error,
+        [key]:false
+      }
+    });
   }
 
-  handleDateChange(field, { value }) {
-    this.setState({form:{
-      ...this.state.form,
-      [field]: new Date(value)}});
-  }
-
-
-  handleSelectChange(field, { value }) {
+  handleDateChange(field, { value }, formtype) {
     this.setState({form: {
       ...this.state.form,
-      [field]: value}});
+      [formtype]: {
+        ...this.state.form[formtype],
+        [field]: new Date(value)}}
+      ,error: {
+      ...this.state.error,
+        [field]:false
+      }
+    });
+  }
+
+  handleSelectChange(field, { value }) {
+    if(field === 'is_in_patient') value = !this.state.form.patient.is_in_patient;
+    this.setState({form: {
+      ...this.state.form,
+      patient:{
+        ...this.state.form.patient,
+      [field]: value}}
+    })
   }
 
   handlemrnSubmit(){
-    const valid = true;
-    // todo: check if email is valid
-
-    // todo: check if email exists in the system
-    // if(this.props.getMrn(this.state.form.mrn)){
-
-    // }
+    const mrn = this.state.form.patient['mrn'];
+    const valid = this.validateField(['mrn']) && mrn.length == 7 && Number.isInteger(parseInt(mrn,10));
+    //  TODO: const exists = this.props.getPatient(mrn)//
     const exists = true;
     const {slideIndex} = this.state;
-    if(valid){}
-    if(!exists){
-      //const index = slideIndex + 2;
-      // existing patient
-      this.setState({
-        exists: true,
-        slideIndex: slideIndex + 2});
-    }else {
-      this.setState({slideIndex: slideIndex + 1})
+      if(valid){
+        if(exists){
+        this.setState({
+          exists: true,
+          slideIndex: slideIndex + 2});
+      }
+        else {
+        this.setState({slideIndex: slideIndex + 1})
+      }
     }
-   }
+  }
 
    handleNewAdmissionSubmit(event){
-    //todo: check if admission record is valid
-    const valid = true;
-    const {slideIndex} = this.state;
-    if(valid){
-      event.preventDefault();
+    const admissionFields = ['type_of_injury','admission_date','patient_category'];
+    const {slideIndex, form} = this.state;
+    event.preventDefault();
+    if(this.validateField(admissionFields)){
       const copiedState = Object.assign({...this.state.form});
       if(this.state.exists){
-        // existing patient
-        //this.props.createAdmissionRecord(copiedState);
+        const admissionRecord = Object.assign(
+          {admissionRecord:{
+            ...this.state.form.admission,
+            patientId: this.state.patientId
+          }});
+       //TODO: this.props.createAdmissionRecord(admissionRecord);
       }else {
-        //this.props.createUser(copiedState);
+        const { user, patient, admissionRecord } = this.state.form;
+       //TODO:  this.props.createUser({user, patient, admissionRecord})
         this.setState({isCreated:true});
-        //todo: error message
+        //TODO: error message
       }
       this.setState({slideIndex: slideIndex + 1});
      }
   }
 
    handleNewAccountSubmit(){
-    //todo:check if new form is valid
-    const valid = true;
-    const {slideIndex} = this.state;
-    if(valid){
-      this.setState({slideIndex: slideIndex + 1});
-    }else{
-      //todo: error message
-    }
+    const fields = ['last_name', 'first_name', 'phone_number', 'mrn','date_of_birth','address','is_in_patient','patient_program'];
+    if(this.validateField(fields)){
+      const {slideIndex} = this.state;
+        this.setState({slideIndex: slideIndex + 1});
+      }else{
+        //TODO: error message
+      }
    }
 
   rendermrnCheck() {
     return (
       <Modal.Content>
         <Form>
-          <Form.Field>
+          <Form.Field error= {this.state.error['mrn']}>
             <label>{STATE_CONST['mrn']}</label>
-            <Input placeholder={STATE_CONST['mrn']} onChange={e=>  this.handleInputChange(e, 'mrn')}/>
+            <Input placeholder={STATE_CONST['mrn']} onChange={e=>  this.handleInputChange(e, 'mrn', 'patient')}/>
           </Form.Field>
         </Form>
       </Modal.Content>
@@ -165,10 +176,11 @@ class CreatePatientPopup extends Component{
       <Modal.Content>
         <Form id="create-user">
           <Header>New Admission Record</Header>
-          {this.renderFieldHelper(['typeofInjury'])}
+          {this.renderFieldHelper(['type_of_injury'], 'admission')}
           {this.renderRepeatDropDownForm()}
-          {this.renderDateHelper('admissionDate')}
-          {this.renderDateHelper('dischargeDate')}
+          {this.renderDateHelper('admission_date', 'admission')}
+          {this.renderDateHelper('discharge_date', 'admission')}
+          {this.renderNoteForm('comment', 'admission')}
         </Form>
       </Modal.Content>)
   }
@@ -179,35 +191,28 @@ class CreatePatientPopup extends Component{
         <Form id="create-user">
           <Header>Basic Information</Header>
 
-          {this.renderFieldHelper(['firstName', 'lastName'])}
-          {this.renderDateHelper('birthDate')}
-          {this.renderFieldHelper(['phoneNum', 'email', 'address'])}
+          {this.renderFieldHelper(['first_name', 'last_name', 'phone_number', 'email'], 'user')}
+          {this.renderFieldHelper(['address'], 'patient')}
+          {this.renderDateHelper('date_of_birth', 'patient')}
 
-          <Divider/>
-          <Header>Emergency Contacts</Header>
-          {this.renderFieldHelper(['emergencyContactName', 'emergencyContactPhoneNum'])}
-          <Divider/>
           <Header>Patient Information</Header>
 
           <Form.Group inline>
             <Form.Radio
               label='In Patient'
-              value='in'
-              checked={this.state.form.patientType === 'in'}
+              checked={this.state.form.patient.is_in_patient === true}
               onChange={
-                (e,data)=>this.handleSelectChange('patientType', data)}
+                (e,data)=>this.handleSelectChange('is_in_patient', data)}
             />
             <Form.Radio
               label='Out Patient'
-              value='out'
-              checked={this.state.form.patientType === 'out'}
+              checked={this.state.form.patient.is_in_patient === false}
               onChange={
-                (e,data)=>this.handleSelectChange('patientType', data)}
+                (e,data)=>this.handleSelectChange('is_in_patient', data)}
             />
           </Form.Group>
+          {this.renderFieldHelper(['patient_program'], 'patient')}
 
-          <Divider/>
-          {this.renderNoteForm()}
         </Form>
       </Modal.Content>
     );
@@ -231,10 +236,10 @@ class CreatePatientPopup extends Component{
     );
   }
 
-  renderDateHelper(field){
-    const date = this.state.form[field] === '' ? '': moment(this.state.form[field]).format('l');
+  renderDateHelper(field, formtype){
+    const date = this.state.form[formtype][field] === '' ? '': moment(this.state.form[formtype][field]).format('l');
     return(
-      <Form.Field className="user-field">
+      <Form.Field error={this.state.error[field]} className="user-field">
         <label>{STATE_CONST[field]}</label>
         <DateInput
         dateFormat="MM-DD-YYYY"
@@ -242,52 +247,49 @@ class CreatePatientPopup extends Component{
         value={date}
         iconPosition="left"
         onChange={
-          (e,data) => this.handleDateChange(field, data)
+          (e,data) => this.handleDateChange(field, data, formtype)
         }
         />
       </Form.Field>
     );
   }
 
-  renderFieldHelper(fields){
+  renderFieldHelper(fields, formtype){
     return(
       <Container>
       {fields.map(field=>(
         <Form.Field
+        className="user-field"
         key = {field}
-        //error={this.state.error[field]}
+        error={this.state.error[field]}
         >
-        <label>{STATE_CONST[field]}</label>
-        <Input placeholder={STATE_CONST[field]} onChange={e=> this.handleInputChange(e, field)}/>
+        <label>{field==="email" ? "Email (Optional)" : STATE_CONST[field]}</label>
+        <Input placeholder={STATE_CONST[field]} onChange={e=> this.handleInputChange(e, field, formtype)}/>
         </Form.Field>
         ))}
       </Container>
       );
   }
 
-  validateField(){
+  validateField(fields){
+    const form = this.state.form;
     const errorFields={};
-    Object.entries(this.state.form).map(entry => {
-      if(entry[1]===''){
-
-        errorFields[entry[0]]=true;
+    fields.map(field => {
+      if(form.user[field] === '' || form.patient[field] ==='' || form.admission[field] ===''){
+        errorFields[field]=true;
       }
     });
-    this.setState({error: errorFields});
-
+    this.setState({error: {
+        ...this.state.form.error,
+        ...errorFields
+      }});
     return (!Object.keys(errorFields).length);
-  }
-
-  validateForm(){
-
-    this.validateField();
-    // if(!this.validateUsername()) this.setState()
-
   }
 
   renderRepeatDropDownForm() {
     return(
       <Form.Field
+        defaultValue={'1'}
         className="user-field"
         control={ Select }
         options={ PATIENT_CAT }
@@ -296,7 +298,7 @@ class CreatePatientPopup extends Component{
         search
         searchInput={{ id: 'form-select-control-repeat' }}
         onChange={
-        (e,data)=>this.handleSelectChange('patientCategory', data)}
+        (e,data)=>this.handleSelectChange('patient_category', data)}
       />
     );
   }
@@ -319,7 +321,7 @@ class CreatePatientPopup extends Component{
             className="next-btn"
             floated="right"
             onClick={e => this.onNextClick(e)}>
-              {this.state.isCreated? "Done": "Create"}
+              Next
           </Button>
         </Grid.Column>
       </Grid>
@@ -364,7 +366,6 @@ class CreatePatientPopup extends Component{
     }
   }
 
-
   render() {
     const {isCreated} = this.state;
       return (
@@ -374,15 +375,14 @@ class CreatePatientPopup extends Component{
         </React.Fragment>
       )
     }
-
 }
 
 const mapDispatchToProps = dispatch => {
   return bindActionCreators(
     {
-      createUser: UserAction.addUser
-//      createAdmissionRecord: PatientAction.createAdmissionRecord
-//      getMrn: PatientAction.getPatient
+      createUser: UserAction.addUser,
+      createAdmissionRecord: PatientAction.createAdmissionRecord,
+      getPatient: PatientAction.getPatient
     },
     dispatch
   );
