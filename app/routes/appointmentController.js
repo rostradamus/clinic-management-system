@@ -68,10 +68,10 @@ routes.post("/", async (req, res) => {
       patient_category: admissionRecords[0].patient_category,
       type_of_therapy: "STUB",
       start_date: moment(start, "YYYY-MM-DDTHH:mm").format("YYYY-MM-DD"),
-      // end_date: new Date(end), // This is used with repetition commented out as it is not part of MVP
-      repetition: "none", // This is not part of mvp. Value is inside req.body
       start_time: moment(start, "YYYY-MM-DDTHH:mm").format("HH:mm:ss"),
       end_time: moment(end, "YYYY-MM-DDTHH:mm").format("HH:mm:ss"),
+      // end_date: new Date(end), // This is used with repetition commented out as it is not part of MVP
+      repetition: "none", // This is not part of mvp. Value is inside req.body
       is_cancelled: false
     };
 
