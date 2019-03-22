@@ -67,11 +67,11 @@ routes.post("/", async (req, res) => {
       record_id: admissionRecords[0].id,
       patient_category: admissionRecords[0].patient_category,
       type_of_therapy: "STUB",
-      start_date: moment(start).format("YYYY-MM-DD"),
+      start_date: moment(start, "YYYY-MM-DDTHH:mm").format("YYYY-MM-DD"),
       // end_date: new Date(end), // This is used with repetition commented out as it is not part of MVP
       repetition: "none", // This is not part of mvp. Value is inside req.body
-      start_time: moment(start).format("HH:mm:ss"),
-      end_time: moment(end).format("HH:mm:ss"),
+      start_time: moment(start, "YYYY-MM-DDTHH:mm").format("HH:mm:ss"),
+      end_time: moment(end, "YYYY-MM-DDTHH:mm").format("HH:mm:ss"),
       is_cancelled: false
     };
 
@@ -113,9 +113,9 @@ routes.put("/:appointment_id", async (req, res) => {
       record_id: admissionRecords[0].id,
       patient_category: admissionRecords[0].patient_category,
       type_of_therapy: "STUB", // TODO: this may also be updated depending on the change of user
-      start_date: moment(start).format("YYYY-MM-DD"),
-      start_time: moment(start).format("HH:mm:ss"),
-      end_time: moment(end).format("HH:mm:ss"),
+      start_date: moment(start, "YYYY-MM-DDTHH:mm").format("YYYY-MM-DD"),
+      start_time: moment(start, "YYYY-MM-DDTHH:mm").format("HH:mm:ss"),
+      end_time: moment(end, "YYYY-MM-DDTHH:mm").format("HH:mm:ss"),
       is_cancelled: false // TODO: this can also change in the front end.
     };
 
