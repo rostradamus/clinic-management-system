@@ -9,8 +9,6 @@ import { SearchInput } from 'components/containers/search';
 import * as moment from 'moment';
 import './CalendarPopup.css';
 
-
-
 // constants can be moved to constants dir
 const REPEAT_CONST = [
   { key: 'Never', text: 'Never', value: 'Never' },
@@ -138,7 +136,6 @@ class CalendarPopup extends Component {
   }
 
   _handleTimeChange(event, key, { value }) {
-    console.log("_handleTimeChange value", value);
     const hhmm = value.split(":");
     if (hhmm.length === 2) {
       const appointmentTime = moment(this.state[key])
@@ -146,7 +143,6 @@ class CalendarPopup extends Component {
         .minutes(parseInt(hhmm[1]))
         .toDate();
 
-      console.log("_handleTimeChange appointmentTime", appointmentTime);
       const timeError = this._validateTime(key, appointmentTime);
       if (timeError) {
         this.setState({
@@ -209,9 +205,6 @@ class CalendarPopup extends Component {
   }
 
   onSubmit(event) {
-    console.log("CalendarPopup start", this.state.start);
-    console.log("CalendarPopup end", this.state.end);
-
     event.preventDefault();
     const copiedState = Object.assign(
       {...this.state},
