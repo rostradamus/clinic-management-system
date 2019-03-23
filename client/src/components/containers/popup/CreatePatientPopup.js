@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Modal, Grid, Button, Select, Header, Input, Form, Container, Divider} from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import * as moment from 'moment';
-import { UserAction, PatientAction} from 'actions';
+import { UserAction, CreateUserAction} from 'actions';
 import { STATE_CONST } from './CreateUserPopup';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -17,28 +17,23 @@ const PATIENT_CAT = [
 class CreatePatientPopup extends Component{
   constructor(props) {
     super(props);
-    moment.locale('en');
-
-    this.state = {
-      slideIndex:1,
-      exists: false,
-      patientId:'',
+    this.initialState = {
       form: {
-        user: {
+        User: {
           first_name: '',
           last_name:'',
           phone_number:'',
           email:'',
           permission_level:''
         },
-        patient:{
+        Patient:{
           mrn:'',
           date_of_birth:'',
           address:'',
           is_in_patient:true,
           patient_program:''
         },
-        admission : {
+        Admission : {
           type_of_injury:'',
           admission_date:'',
           discharge_date:'',
@@ -60,6 +55,9 @@ class CreatePatientPopup extends Component{
         patient_category:false
       }
     };
+    moment.locale('en');
+    this.state = this.initialState;
+
     this.handleInputChange=this.handleInputChange.bind(this);
     this.handleDateChange=this.handleDateChange.bind(this);
     this.handleSelectChange=this.handleSelectChange.bind(this);
@@ -98,61 +96,50 @@ class CreatePatientPopup extends Component{
   }
 
   handleSelectChange(field, { value }) {
-    if(field === 'is_in_patient') value = !this.state.form.patient.is_in_patient;
+    if(field === 'is_in_patient') value = !this.state.form.Patient.is_in_patient;
     this.setState({form: {
       ...this.state.form,
-      patient:{
-        ...this.state.form.patient,
+      Patient:{
+        ...this.state.form.Patient,
       [field]: value}}
     })
   }
 
   handlemrnSubmit(){
-    const mrn = this.state.form.patient['mrn'];
-    const valid = this.validateField(['mrn']) && mrn.length == 7 && Number.isInteger(parseInt(mrn,10));
-    //  TODO: const exists = this.props.getPatient(mrn)//
-    const exists = true;
-    const {slideIndex} = this.state;
-      if(valid){
-        if(exists){
-        this.setState({
-          exists: true,
-          slideIndex: slideIndex + 2});
-      }
-        else {
-        this.setState({slideIndex: slideIndex + 1})
-      }
+    const mrn = this.state.form.Patient['mrn'];
+    const valid = this.validateField(['mrn']) && mrn.length === 4 && Number.isInteger(parseInt(mrn,10));
+    if(valid) {
+      this.props.getPatient(mrn);
     }
   }
 
    handleNewAdmissionSubmit(event){
     const admissionFields = ['type_of_injury','admission_date','patient_category'];
-    const {slideIndex, form} = this.state;
+    const {form} = this.state;
     event.preventDefault();
     if(this.validateField(admissionFields)){
       const copiedState = Object.assign({...this.state.form});
       if(this.state.exists){
         const admissionRecord = Object.assign(
-          {admissionRecord:{
-            ...this.state.form.admission,
-            patientId: this.state.patientId
+          {Admission:{
+            ...this.state.form.Admission,
+            patientId: this.props.patient[0].id
           }});
-       //TODO: this.props.createAdmissionRecord(admissionRecord);
+        this.props.createAdmissionRecord(admissionRecord);
       }else {
-        const { user, patient, admissionRecord } = this.state.form;
-       //TODO:  this.props.createUser({user, patient, admissionRecord})
+        const { User, Patient, Admission } = this.state.form;
+        this.props.createUser({User, Patient, Admission})
         this.setState({isCreated:true});
         //TODO: error message
       }
-      this.setState({slideIndex: slideIndex + 1});
+      this.props.nextSlide();
      }
   }
 
    handleNewAccountSubmit(){
     const fields = ['last_name', 'first_name', 'phone_number', 'mrn','date_of_birth','address','is_in_patient','patient_program'];
     if(this.validateField(fields)){
-      const {slideIndex} = this.state;
-        this.setState({slideIndex: slideIndex + 1});
+        this.props.nextSlide();
       }else{
         //TODO: error message
       }
@@ -164,7 +151,7 @@ class CreatePatientPopup extends Component{
         <Form>
           <Form.Field error= {this.state.error['mrn']}>
             <label>{STATE_CONST['mrn']}</label>
-            <Input placeholder={STATE_CONST['mrn']} onChange={e=>  this.handleInputChange(e, 'mrn', 'patient')}/>
+            <Input placeholder={STATE_CONST['mrn']} onChange={e=>  this.handleInputChange(e, 'mrn', 'Patient')}/>
           </Form.Field>
         </Form>
       </Modal.Content>
@@ -176,11 +163,11 @@ class CreatePatientPopup extends Component{
       <Modal.Content>
         <Form id="create-user">
           <Header>New Admission Record</Header>
-          {this.renderFieldHelper(['type_of_injury'], 'admission')}
+          {this.renderFieldHelper(['type_of_injury'], 'Admission')}
           {this.renderRepeatDropDownForm()}
-          {this.renderDateHelper('admission_date', 'admission')}
-          {this.renderDateHelper('discharge_date', 'admission')}
-          {this.renderNoteForm('comment', 'admission')}
+          {this.renderDateHelper('admission_date', 'Admission')}
+          {this.renderDateHelper('discharge_date', 'Admission')}
+          {this.renderNoteForm('comment', 'Admission')}
         </Form>
       </Modal.Content>)
   }
@@ -190,28 +177,27 @@ class CreatePatientPopup extends Component{
       <Modal.Content image scrolling>
         <Form id="create-user">
           <Header>Basic Information</Header>
-
-          {this.renderFieldHelper(['first_name', 'last_name', 'phone_number', 'email'], 'user')}
-          {this.renderFieldHelper(['address'], 'patient')}
-          {this.renderDateHelper('date_of_birth', 'patient')}
+          {this.renderFieldHelper(['first_name', 'last_name', 'phone_number', 'email'], 'User')}
+          {this.renderFieldHelper(['address'], 'Patient')}
+          {this.renderDateHelper('date_of_birth', 'Patient')}
 
           <Header>Patient Information</Header>
 
           <Form.Group inline>
             <Form.Radio
               label='In Patient'
-              checked={this.state.form.patient.is_in_patient === true}
+              checked={this.state.form.Patient.is_in_patient === true}
               onChange={
                 (e,data)=>this.handleSelectChange('is_in_patient', data)}
             />
             <Form.Radio
               label='Out Patient'
-              checked={this.state.form.patient.is_in_patient === false}
+              checked={this.state.form.Patient.is_in_patient === false}
               onChange={
                 (e,data)=>this.handleSelectChange('is_in_patient', data)}
             />
           </Form.Group>
-          {this.renderFieldHelper(['patient_program'], 'patient')}
+          {this.renderFieldHelper(['patient_program'], 'Patient')}
 
         </Form>
       </Modal.Content>
@@ -261,10 +247,12 @@ class CreatePatientPopup extends Component{
         <Form.Field
         className="user-field"
         key = {field}
+        data = "hi"
         error={this.state.error[field]}
         >
         <label>{field==="email" ? "Email (Optional)" : STATE_CONST[field]}</label>
-        <Input placeholder={STATE_CONST[field]} onChange={e=> this.handleInputChange(e, field, formtype)}/>
+        <Input value={this.state.form[formtype][field]}
+        placeholder={STATE_CONST[field]} onChange={e=> this.handleInputChange(e, field, formtype)}/>
         </Form.Field>
         ))}
       </Container>
@@ -275,7 +263,7 @@ class CreatePatientPopup extends Component{
     const form = this.state.form;
     const errorFields={};
     fields.map(field => {
-      if(form.user[field] === '' || form.patient[field] ==='' || form.admission[field] ===''){
+      if(form.User[field] === '' || form.Patient[field] ==='' || form.Admission[field] ===''){
         errorFields[field]=true;
       }
     });
@@ -307,7 +295,7 @@ class CreatePatientPopup extends Component{
     return (
       <Grid columns={2} className="modal-action">
         <Grid.Column>
-          {this.state.slideIndex!==4 &&
+          {this.props.slideIndex !== 4 &&
             <Button
               className="back-btn"
               floated="left"
@@ -329,17 +317,18 @@ class CreatePatientPopup extends Component{
   }
 
   onPrevClick = (e) => {
-    if(this.state.slideIndex===1){
+    if(this.props.slideIndex===1){
       this.props.onPrev();
-    }else if(this.state.slideIndex===3 && !this.state.exists){
-      this.setState({slideIndex:2});
-    } else {
-      this.setState({slideIndex:1});
+    }else {
+      if (this.props.slideIndex === 3 && this.props.patient.length > 0 || this.props.slideIndex === 2){
+      this.setState(this.initialState);
+      }
+      this.props.prevSlide();
     }
   }
 
   onNextClick(event){
-    const {slideIndex} = this.state;
+    const {slideIndex} = this.props;
     switch(slideIndex){
       case 1:
         return this.handlemrnSubmit();
@@ -353,7 +342,7 @@ class CreatePatientPopup extends Component{
   }
 
   renderPage(){
-    const {slideIndex} = this.state;
+    const {slideIndex} = this.props;
     switch(slideIndex){
       case 1:
         return this.rendermrnCheck();
@@ -373,19 +362,24 @@ class CreatePatientPopup extends Component{
           {this.renderPage()}
           <Modal.Actions children={this.renderModalActionButton()}/>
         </React.Fragment>
-      )
-    }
+  )}
 }
 
 const mapDispatchToProps = dispatch => {
   return bindActionCreators(
     {
       createUser: UserAction.addUser,
-      createAdmissionRecord: PatientAction.createAdmissionRecord,
-      getPatient: PatientAction.getPatient
+      createAdmissionRecord: CreateUserAction.createAdmissionRecord,
+      getPatient: CreateUserAction.getPatient,
+      prevSlide: CreateUserAction.prevSlide,
+      nextSlide: CreateUserAction.nextSlide
     },
     dispatch
   );
 }
 
-export default connect(null, mapDispatchToProps)(CreatePatientPopup);
+const mapStateToProps = state => (
+  { slideIndex: state.createUser.slideIndex,
+    patient: state.createUser.patient });
+
+export default connect(mapStateToProps, mapDispatchToProps)(CreatePatientPopup);

@@ -53,6 +53,4 @@ module.exports = {
     );
     return qm.makeQuery(stmt);
   },
-
-
 }

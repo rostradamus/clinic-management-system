@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { Button, Modal, Container} from "semantic-ui-react";
 import CreatePatientPopup from "./CreatePatientPopup";
 import CreateStaffPopup from "./CreateStaffPopup";
+import { connect } from "react-redux";
+import { CreateUserAction } from "actions";
 import './CreateUserPopup.css';
 
 export const STATE_CONST = {
@@ -24,17 +26,15 @@ export const STATE_CONST = {
 };
 
 
-export default class CreateUserPopup extends Component{
+class CreateUserPopup extends Component{
   constructor(props) {
     super(props);
-    this.defaultState = {
-      isOpen: true,
+    this.initialState = {
       typeUser:'',
       onNext:false,
-      slideIndex:1,
     };
 
-    this.state= this.defaultState;
+    this.state= this.initialState;
 
     this.onNextClick = this.onNextClick.bind(this);
     this.onPrevClick = this.onPrevClick.bind(this);
@@ -46,37 +46,29 @@ export default class CreateUserPopup extends Component{
 
   onNextClick(){
     if(this.state.typeUser !== '') {
-      this.setState({onNext: true, slideIndex: 2});
+      this.setState({onNext: true});
     }
   }
 
   onPrevClick(){
-    this.setState(this.defaultState);
+    this.setState(this.initialState);
   }
 
-  static getDerivedStateFromProps(props, state){
-    if(props.isOpen !== state.isOpen) {
-      return {
-        isOpen: true,
-        typeUser:'',
-        onNext:false,
-        slideIndex:1,
-      };
-    }
-    return null;
+  closePopup(){
+    this.props.dispatch(CreateUserAction.closePopup())
+    this.setState(this.initialState);
   }
 
   render() {
-    const { onClose, isOpen } = this.props;
-    const { typeUser, onNext, slideIndex } = this.state;
+    const { typeUser, onNext } = this.state;
     const labels = ['Admin', 'Staff', 'Patient'];
 
     return(
-      <Modal size="tiny" className="createUserPopupModal" closeIcon onClose={ onClose } open={ isOpen } >
+      <Modal size="tiny" className="createUserPopupModal" closeIcon onClose={ () => this.closePopup() } open={ this.props.popup }>
         <Modal.Header>
-          {this.state.slideIndex === 1 ? "New User" : "New " + this.state.typeUser}
+          {!this.state.onNext ? "New User" : "New " + this.state.typeUser}
         </Modal.Header>
-        {slideIndex === 1 &&
+        {!onNext &&
           <React.Fragment>
             <Modal.Content>
               <Container textAlign='center' className="select-user">
@@ -107,10 +99,13 @@ export default class CreateUserPopup extends Component{
             </Modal.Actions>
           </React.Fragment>
         }
-
-        {onNext && typeUser === 'Patient' && <CreatePatientPopup onClose={ onClose }onPrev = {this.onPrevClick}/>}
-        {onNext && typeUser !== 'Patient' && <CreateStaffPopup onClose={ onClose }onPrev= {this.onPrevClick} isStaff={this.state.typeUser==='Staff'}/>}
+        {onNext && typeUser === 'Patient' && <CreatePatientPopup onClose={ () => this.closePopup() } onPrev = {this.onPrevClick}/>}
+        {onNext && typeUser !== 'Patient' && <CreateStaffPopup onClose={ () => this.closePopup() } onPrev= {this.onPrevClick} isStaff={this.state.typeUser==='Staff'}/>}
       </Modal>
     );
   }
 }
+
+const mapStateToProps = state => ({popup: state.createUser.popup});
+
+export default connect(mapStateToProps)(CreateUserPopup)
