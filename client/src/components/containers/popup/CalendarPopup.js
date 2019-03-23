@@ -2,12 +2,13 @@ import React, {Component} from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { isEqual } from 'lodash';
-import { Button, Modal, Form, Input, Select } from 'semantic-ui-react';
+import { Button, Modal, Form, Select } from 'semantic-ui-react';
 import { DateInput, TimeInput } from 'semantic-ui-calendar-react';
 import { CalendarAction } from 'actions';
 import { SearchInput } from 'components/containers/search';
 import * as moment from 'moment';
 import './CalendarPopup.css';
+moment.locale('en');
 
 // constants can be moved to constants dir
 const REPEAT_CONST = [
@@ -17,15 +18,17 @@ const REPEAT_CONST = [
   { key: 'Monthly', text: 'Monthly', value: 'Monthly' }
 ];
 
+const USER_TYPE = {
+  patient: "Patient",
+  staff: "Staff"
+};
+
 const POPUP_STATE_CONST = {
   patient: "patient",
   staff: "staff",
-  appointmentDate: "appointmentDate",
   start: "start",
   end: "end",
-  repeat: "repeat",
-  location: "location",
-  notes: "notes"
+  repeat: "repeat"
 };
 
 const POPUP_ERROR_CONST = {
@@ -36,20 +39,19 @@ const POPUP_ERROR_CONST = {
 class CalendarPopup extends Component {
   constructor(props) {
     super(props);
-    moment.locale('en');
 
-    // TODO: requires refactor when database is connected
+    const { event, selectedUser } = props;
+    const { start, end, isUpdateAppointment, id, staff, patient } = event;
+
     this.state = {
-      selectedUser: {},
-      id: -1,
-      patient: {},
-      staff: {},
-      start: "",
-      end: "",
+      id: id || -1,
+      selectedUser,
+      patient: selectedUser && selectedUser.type === "Patient" ? selectedUser : (patient || {}),
+      staff: selectedUser && selectedUser.type === "Staff" ? selectedUser : (staff || {}),
+      start: start,
+      end: end,
       repeat: REPEAT_CONST[0].key,
-      location: "", // may delete if unnecessary
-      notes: "Add Note", // may delete if unnecessary
-      isUpdateAppointment: false,
+      isUpdateAppointment: isUpdateAppointment,
       // validation fields
       startTimeError: false,
       endTimeError: false
@@ -66,42 +68,11 @@ class CalendarPopup extends Component {
     this._updateTimeToCorrectDate = this._updateTimeToCorrectDate.bind(this);
     this._validateTime = this._validateTime.bind(this);
     this._getAppropriateUser = this._getAppropriateUser.bind(this);
+    this._isButtonDisabled = this._isButtonDisabled.bind(this);
 
     // API end point functions
     this.onSubmit = this.onSubmit.bind(this);
     this.onCancel = this.onCancel.bind(this);
-
-    // TODO: this is for repeat, implement or remove after MVP
-    // this._handleSelectChange = this._handleSelectChange.bind(this);
-  }
-
-  static getDerivedStateFromProps(nextProps, prevState) {
-    const { event, selectedUser } = nextProps;
-    const { start, end, isUpdateAppointment, id, staff, patient } = event;
-
-    if (event && !isUpdateAppointment && !prevState.start && !prevState.end) {
-      let resData = {
-        start: start,
-        end: end,
-        isUpdateAppointment: isUpdateAppointment,
-      };
-
-      if (selectedUser && selectedUser.type === "Patient") {
-        resData.selectedUser = selectedUser;
-        resData.patient = selectedUser;
-      } else if (selectedUser && selectedUser.type === "Staff") {
-        resData.selectedUser = selectedUser;
-        resData.staff = selectedUser;
-      }
-      return resData;
-    }
-
-    if (event && isUpdateAppointment && !prevState.start && !prevState.end &&
-      patient && staff && !isEqual(patient, {}) && !isEqual(staff, {})) {
-      return { id, patient, staff, start, end, isUpdateAppointment };
-    }
-
-    return {};
   }
 
   /**
@@ -110,9 +81,9 @@ class CalendarPopup extends Component {
    * @param  {String} type         [Enum: "Staff", "Patient"]
    */
   handleSearchInputSelect(selectedUser, type) {
-    if (type === "Staff") {
+    if (type === USER_TYPE.staff) {
       this.setState({ staff: selectedUser });
-    } else if (type === "Patient") {
+    } else if (type === USER_TYPE.patient) {
       this.setState({ patient: selectedUser });
     }
   }
@@ -132,12 +103,18 @@ class CalendarPopup extends Component {
   // }
 
   _handleDateChange(event, { value }) {
-    if (value === "Invalid Date") return;
     const chosenDate = moment(value, "MM-DD-YYYY");
     const updatedStartTime = this._updateTimeToCorrectDate(POPUP_STATE_CONST.start, chosenDate);
     const updatedEndTime = this._updateTimeToCorrectDate(POPUP_STATE_CONST.end, chosenDate);
+
+    if (!updatedStartTime.isBefore(updatedEndTime)) {
+      this.setState({
+        startTimeError: true,
+        endTimeError: true
+      });
+    }
+
     this.setState({
-      appointmentDate: chosenDate.toDate(),
       start: updatedStartTime,
       end: updatedEndTime
     });
@@ -146,15 +123,19 @@ class CalendarPopup extends Component {
   _handleTimeChange(event, key, { value }) {
     const hhmm = value.split(":");
     if (hhmm.length === 2) {
+      const openTime = moment(this.state[key], "hh:mm:ss").hours(7).minutes(59).seconds(59);
+      const closeTime = moment(this.state[key], "hh:mm:ss").hours(17).minutes(0).seconds(1);
       const appointmentTime = moment(this.state[key])
         .hours(parseInt(hhmm[0]))
         .minutes(parseInt(hhmm[1]))
-        .toDate();
+        .seconds(0);
 
-      const timeError = this._validateTime(key, appointmentTime);
+      if (!moment(appointmentTime, "hh:mm:ss").isBetween(openTime, closeTime)) return;
+
+      const timeError = this._validateTime(key, appointmentTime.toDate());
       if (timeError) {
         this.setState({
-          [key]: appointmentTime,
+          [key]: appointmentTime.toDate(),
           [POPUP_ERROR_CONST[key]]: timeError
         });
       } else {
@@ -174,11 +155,14 @@ class CalendarPopup extends Component {
    */
   _updateTimeToCorrectDate(key ,chosenDate) {
     if (key === POPUP_STATE_CONST.start || key === POPUP_STATE_CONST.end) {
+      const prevMoment = moment(this.state[key]);
+      if (!prevMoment.isValid()) {
+        return chosenDate;
+      }
       return moment(this.state[key])
         .year(chosenDate.year())
         .month(chosenDate.month())
-        .date(chosenDate.date())
-        .toDate();
+        .date(chosenDate.date());
     }
     // default error handling, may customize when necessary.
     return new Date();
@@ -204,12 +188,12 @@ class CalendarPopup extends Component {
    */
    _getAppropriateUser(formType) {
     //TODO: "Patient" and "Staff" move to Constant.
-    const {isUpdateAppointment, selectedUser, staff, patient} = this.state;
+    const {isUpdateAppointment, staff, patient, selectedUser} = this.state;
     if (isUpdateAppointment) {
-      return formType === "Patient" ? patient : staff;
+      return formType === USER_TYPE.patient ? patient : staff;
     }
 
-    return selectedUser && selectedUser.type === formType ? selectedUser : null;
+    return selectedUser.type === formType ? selectedUser : null;
   }
 
   /**
@@ -252,6 +236,13 @@ class CalendarPopup extends Component {
     );
   }
 
+  _isButtonDisabled() {
+    const { patient, staff, start, end, startTimeError, endTimeError } = this.state;
+    return !moment(start).isValid() || !moment(end).isValid()
+      || isEqual(patient, {}) || isEqual(staff, {}) ||
+      startTimeError || endTimeError;
+  }
+
   _renderModalActionButton() {
     const { isUpdateAppointment } = this.state;
     return(
@@ -264,6 +255,7 @@ class CalendarPopup extends Component {
         }
         <Button
           primary
+          disabled={ this._isButtonDisabled() }
           content={ isUpdateAppointment ? "Update" : "Create"}
           onClick={ this.onSubmit }
         />
@@ -272,30 +264,34 @@ class CalendarPopup extends Component {
   }
 
   _renderPatientForm() {
+    const { patient, selectedUser } = this.state;
     const patients = this.props.patientsStaffs;
     return(
-      <Form.Field >
+      <Form.Field error={ (isEqual(patient, {}) || !patient) }>
         <label>Patient *</label>
         <SearchInput
-          type="Patient"
+          formType="Patient"
           results={patients}
           handleSearchInputSelect={this.handleSearchInputSelect}
-          selectedUser={this._getAppropriateUser("Patient")}
+          selectedUser={this._getAppropriateUser(USER_TYPE.patient)}
+          isSelectedUser={ selectedUser && selectedUser.type === USER_TYPE.patient }
         />
       </Form.Field>
     );
   }
 
   _renderStaffForm() {
+    const { staff, selectedUser } = this.state;
     const staffs = this.props.patientsStaffs;
     return(
-      <Form.Field >
+      <Form.Field error={ (isEqual(staff, {}) || !staff) }>
         <label>Staff *</label>
         <SearchInput
-          type="Staff"
+          formType="Staff"
           results={staffs}
           handleSearchInputSelect={this.handleSearchInputSelect}
-          selectedUser={this._getAppropriateUser("Staff")}
+          selectedUser={this._getAppropriateUser(USER_TYPE.staff)}
+          isSelectedUser={ selectedUser && selectedUser.type === USER_TYPE.staff }
         />
       </Form.Field>
     );
@@ -303,26 +299,30 @@ class CalendarPopup extends Component {
 
   _renderDateTimeForm() {
     const {start, end, startTimeError, endTimeError} = this.state;
+    const mStart = moment(start);
+    const mEnd = moment(end);
+    const today = moment();
+
     return(
       <Form.Group widths='equal'>
-        <Form.Field >
+        <Form.Field error={ !mStart.isValid() || mStart.isBefore(today) }>
           <label>Date *</label>
           <DateInput
             dateFormat="MM-DD-YYYY"
             name="date"
             placeholder="Date"
-            value={ moment(start).format("l") }
+            value={ mStart.format("l") }
             iconPosition="left"
             onChange={ (e,data) => this._handleDateChange(e, data) }
           />
         </Form.Field>
 
-        <Form.Field error={ startTimeError } >
+        <Form.Field error={ !mStart.isValid() || startTimeError } >
           <label>Start Time *</label>
           <TimeInput
             name="start"
             placeholder="Start"
-            value={ moment(start).format("HH:mm") }
+            value={ mStart.format("HH:mm") }
             iconPosition="left"
             onChange={
               (e, data) => this._handleTimeChange(e, "start", data)
@@ -330,12 +330,12 @@ class CalendarPopup extends Component {
           />
         </Form.Field>
 
-        <Form.Field error={ endTimeError } >
+        <Form.Field error={ !mEnd.isValid() || endTimeError } >
           <label>End Time *</label>
           <TimeInput
             name="end"
             placeholder="End"
-            value={ moment(end).format("HH:mm") }
+            value={ mEnd.format("HH:mm") }
             iconPosition="left"
             onChange={
               (e, data) => this._handleTimeChange(e, "end", data)
@@ -361,38 +361,13 @@ class CalendarPopup extends Component {
     );
   }
 
-  _renderLocationForm() {
-    const placeholder = this.state.location ? this.state.location : "Add Location";
-    return(
-      <Form.Field>
-        <label>Location</label>
-        <Input placeholder= { placeholder }
-          onChange={e => this._handleInputChange(e, "location") }
-        />
-      </Form.Field>
-    );
-  }
-
-  _renderNoteForm() {
-    const placeholder = this.state.notes ? this.state.notes : "Add Note";
-    return(
-      <Form.TextArea label='Note' placeholder={ placeholder }
-        onChange={e => this._handleInputChange(e, "notes") }
-      />
-    );
-  }
-
   _renderModalContent() {
     return(
       <Form>
         { this._renderPatientForm() }
         { this._renderStaffForm() }
         { this._renderDateTimeForm() }
-        {/**
-          { this._renderRepeatDropDownForm() }
-          { this._renderLocationForm() }
-          { this._renderNoteForm() }
-         **/}
+        { /** this._renderRepeatDropDownForm() */}
       </Form>
     );
   }
