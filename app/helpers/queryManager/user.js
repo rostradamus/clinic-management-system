@@ -1,9 +1,25 @@
 const qm = require("@app/helpers/queryManager");
 const bcrypt = require("bcrypt");
+const appointmentManager = require("@app/helpers/queryManager/appointment");
 
 const BCRYPT_SALT_ROUNDS = 10;
 
 const AUTH_ONLY_COLUMNS = ["password"];
+const TABLE_NAME_INTERNAL = "User";
+
+const VISIBILE_COLUMNS_INTERNAL = ["id", "username", "email", "phone_number",
+    "first_name","last_name", "type", "permission_level"];
+
+
+let getActiveUserWithId = async function(id) {
+  try {
+    const query = qm.getWithIdBaseQuery(TABLE_NAME_INTERNAL, id, { columns: VISIBILE_COLUMNS_INTERNAL }) + " AND ACTIVE = 1";
+    const result = await qm.makeQuery(query);
+    return result[0];
+  } catch(err) {
+    return err;
+  }
+}
 
 module.exports = {
   TABLE_NAME: "User",
@@ -50,7 +66,30 @@ module.exports = {
     return qm.updateThenGetEntry(this.TABLE_NAME, id, data, { columns: this.VISIBILE_COLUMNS });
   },
 
-  softDeleteUserWithId: function(id) {
-    return qm.softDeleteEntry(this.TABLE_NAME, id, { active: false });
+  softDeleteUserWithId: async function(id) {
+    try {
+      const user = await getActiveUserWithId(id);
+      const userType = user.type;
+      const allUpcomingAppointmentsWithUserWithId = await appointmentManager.getUpcomingAppointmentsAccordingToUser(id, userType);
+      aCancelledAppointments = [];
+
+      for (index in allUpcomingAppointmentsWithUserWithId) {
+        const cancelledAppointment = await appointmentManager.softDeleteAppointmentWithId(allUpcomingAppointmentsWithUserWithId[index].id);
+        const updatedAppointment = await appointmentManager.getAppointmentFromId(allUpcomingAppointmentsWithUserWithId[index].id);
+        if (updatedAppointment.length === 1) {
+          aCancelledAppointments.push(updatedAppointment[0]);
+        }
+      }
+
+      const softDeleteEntry = await qm.softDeleteEntry(this.TABLE_NAME, id, { active: false });
+      if (softDeleteEntry.affectedRows === 1) {
+        return aCancelledAppointments;
+      } else {
+        throw new Error();
+      }
+
+    } catch(err) {
+      throw err;
+    }
   },
 }

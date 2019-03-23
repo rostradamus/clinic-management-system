@@ -1,5 +1,6 @@
 const qm = require("@app/helpers/queryManager");
 const mysql = require('mysql');
+const moment = require('moment');
 
 const TABLE_NAME = "Appointment";
 const VISIBLE_COLUMNS = ["id", "patient_id", "staff_id", "record_id",
@@ -10,6 +11,11 @@ const USER_VISIBLE_COLUMNS = ["id", "username", "email", "phone_number",
   "first_name","last_name", "type", "permission_level"];
 
 module.exports = {
+
+  getAppointmentFromId: function(id) {
+    const query = qm.getWithIdBaseQuery(TABLE_NAME, id, { columns: VISIBLE_COLUMNS });
+    return qm.makeQuery(query);
+  },
 
   createAppointment: function(data) {
     return qm.createThenGetEntry(TABLE_NAME, data, { columns: VISIBLE_COLUMNS });
@@ -55,5 +61,19 @@ module.exports = {
     const query = mysql.format(queryString, [USER_VISIBLE_COLUMNS, id]);
     const options = {sql: query, nestTables: true};
     return qm.getQueryWithOverlap(options);
+  },
+
+  getUpcomingAppointmentsAccordingToUser: function(id, type) {
+    let queryString = "";
+    if (type === "Staff") {
+      queryString = "SELECT * FROM Appointment " +
+                    "WHERE Appointment.staff_id = ? AND Appointment.start_date > ? AND is_cancelled=false";
+    } else if (type === "Patient") {
+      queryString = "SELECT * FROM Appointment " +
+                    "WHERE Appointment.patient_id = ? AND Appointment.start_date > ? AND is_cancelled=false"
+    }
+
+    const query = mysql.format(queryString, [id, moment().format("YYYY-MM-DD")]);
+    return qm.makeQuery(query);
   }
 }
