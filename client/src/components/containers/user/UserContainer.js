@@ -3,17 +3,13 @@ import {connect} from 'react-redux';
 import UserTable from "./UserTable";
 import { UserPopup, CreateUserPopup } from "components/containers/popup";
 import { Container, Button, Menu, Input } from "semantic-ui-react";
-import { UserAction } from "actions";
+import { UserAction, CreateUserAction } from "actions";
 
 
 class UserContainer extends Component {
   constructor(props) {
     super(props);
-
-    this.state={
-      isCreateUserModelOpen: false
-    };
-    this.handleCreateNewUserClick = this.handleCreateNewUserClick.bind(this);
+    this.state={};
   }
 
   componentWillUnmount() {
@@ -33,13 +29,6 @@ class UserContainer extends Component {
   _handleSearchInputChange = (e, { value }) => {
     this.props.dispatch(UserAction.setSearchText(value));
   };
-
-  handleCreateNewUserClick(){
-    this.setState({
-      isCreateUserModelOpen: !this.state.isCreateUserModelOpen
-    });
-  };
-
 
   render() {
     const { filter, searchText, filteredItems } = this.props.user;
@@ -72,8 +61,8 @@ class UserContainer extends Component {
         <Button
           primary
           style={{ margin:"1rem"}}
-          onClick={ this.handleCreateNewUserClick }>Create User</Button>
-        <CreateUserPopup isOpen={ this.state.isCreateUserModelOpen } onClose={ this.handleCreateNewUserClick }/>
+          onClick={ () => this.props.dispatch(CreateUserAction.openPopup()) }>Create User</Button>
+        <CreateUserPopup />
         <UserTable />
         <UserPopup />
       </Container>

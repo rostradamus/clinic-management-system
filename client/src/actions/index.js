@@ -3,7 +3,8 @@ import CalendarAction from "actions/CalendarAction";
 import UserAction from "actions/UserAction";
 import ReportAction from "actions/ReportAction";
 import PatientStaffSearchAction from "actions/PatientStaffSearchAction";
-import PatientAction from "actions/PatientAction";
+import CreateUserAction from "actions/CreateUserAction";
 
-export { AuthAction, CalendarAction, UserAction, ReportAction, PatientAction, PatientStaffSearchAction };
+export { AuthAction, CalendarAction, UserAction, ReportAction, CreateUserAction, PatientStaffSearchAction};
+
 
