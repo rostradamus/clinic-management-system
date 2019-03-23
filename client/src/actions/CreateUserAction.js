@@ -2,8 +2,8 @@ import { CREATE_USER_ACTION_TYPE } from "actions/ActionTypes";
 import axios from "axios";
 // new user // new admission record //
 export default class CreateUserAction {
+
   static getPatient(mrn) {
-    // result - patient data
     return async dispatch => {
       dispatch({
         type: CREATE_USER_ACTION_TYPE.FETCH_MRN_REQUEST,
@@ -26,6 +26,42 @@ export default class CreateUserAction {
       }
     };
   }
+
+  static createPatient(data) {
+    return async dispatch => {
+      try {
+        const res = await axios.post('/api/patients', data);
+        dispatch({
+          type: CREATE_USER_ACTION_TYPE.CREATE_PATIENT_SUCCESS,
+          payload: res.data
+        });
+      } catch (err) {
+        dispatch({
+          type: CREATE_USER_ACTION_TYPE.CREATE_PATIENT_FAILURE,
+          payload: data
+        })
+
+      }
+    }
+  };
+
+  static createAdmissionRecord(data) {
+    return async dispatch => {
+      try {
+        const res = await axios.post('/api/admission_records', data);
+        dispatch({
+          type: CREATE_USER_ACTION_TYPE.CREATE_ADMISSION_RECORD_SUCCESS,
+          payload: res.data
+        });
+      } catch (err) {
+        dispatch({
+          type: CREATE_USER_ACTION_TYPE.CREATE_ADMISSION_RECORD_FAILURE,
+          payload: data
+        })
+
+      }
+    }
+  };
 
   static nextSlide(){
     return ({
