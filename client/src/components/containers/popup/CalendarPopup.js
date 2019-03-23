@@ -55,17 +55,24 @@ class CalendarPopup extends Component {
       endTimeError: false
     };
 
+    // Handler functions
+    this.handleSearchInputSelect = this.handleSearchInputSelect.bind(this);
     this.handleSearchResult = this.handleSearchResult.bind(this);
     this._handleInputChange = this._handleInputChange.bind(this);
-    this._handleSelectChange = this._handleSelectChange.bind(this);
     this._handleTimeChange = this._handleTimeChange.bind(this);
     this._handleDateChange = this._handleDateChange.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
+
+    // Helper functions
     this._updateTimeToCorrectDate = this._updateTimeToCorrectDate.bind(this);
     this._validateTime = this._validateTime.bind(this);
-
-    this.handleSearchInputSelect = this.handleSearchInputSelect.bind(this);
     this._getAppropriateUser = this._getAppropriateUser.bind(this);
+
+    // API end point functions
+    this.onSubmit = this.onSubmit.bind(this);
+    this.onCancel = this.onCancel.bind(this);
+
+    // TODO: this is for repeat, implement or remove after MVP
+    // this._handleSelectChange = this._handleSelectChange.bind(this);
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
@@ -119,9 +126,10 @@ class CalendarPopup extends Component {
     this.setState({ [key]: value });
   }
 
-  _handleSelectChange(event, { value }) {
-    this.setState({ repeat: value });
-  }
+  // TODO: this is for repeat, implement or remove after MVP
+  // _handleSelectChange(event, { value }) {
+  //   this.setState({ repeat: value });
+  // }
 
   _handleDateChange(event, { value }) {
     if (value === "Invalid Date") return;
@@ -204,18 +212,34 @@ class CalendarPopup extends Component {
     return selectedUser && selectedUser.type === formType ? selectedUser : null;
   }
 
+  /**
+   * This function is only used to CREATE and UPDATE appointments excluding cancel
+   */
   onSubmit(event) {
     event.preventDefault();
     const copiedState = Object.assign(
       {...this.state},
-      {start: moment(this.state.start).format("YYYY-MM-DDTHH:mm")},
-      {end: moment(this.state.end).format("YYYY-MM-DDTHH:mm")}
+      { start: moment(this.state.start).format("YYYY-MM-DDTHH:mm") },
+      { end: moment(this.state.end).format("YYYY-MM-DDTHH:mm") },
+      { isCancelled: false }
     );
     if (this.state.isUpdateAppointment) {
       this.props.updateAppointment(copiedState);
     } else {
       this.props.createAppointment(copiedState);
     }
+    this.props.onClose();
+  }
+
+  /**
+   * This function is only used to CANCEL (soft Delete) exisiting appointments
+   */
+  onCancel(event) {
+    const { isUpdateAppointment, id } = this.state;
+    if (!isUpdateAppointment) return;
+
+    event.preventDefault();
+    this.props.deleteAppointment(id);
     this.props.onClose();
   }
 
@@ -231,10 +255,19 @@ class CalendarPopup extends Component {
   _renderModalActionButton() {
     const { isUpdateAppointment } = this.state;
     return(
-      <Button primary
-        content={ isUpdateAppointment ? "Update" : "Create"}
-        onClick={ this.onSubmit }
-      />
+      <div>
+        { isUpdateAppointment ?
+          <Button color='red' onClick={ this.onCancel }>
+            Cancel
+          </Button> :
+          null
+        }
+        <Button
+          primary
+          content={ isUpdateAppointment ? "Update" : "Create"}
+          onClick={ this.onSubmit }
+        />
+      </div>
     );
   }
 
@@ -380,7 +413,8 @@ const mapDispatchToProps = dispatch => {
   return bindActionCreators(
     {
       createAppointment: CalendarAction.createAppointment,
-      updateAppointment: CalendarAction.updateAppointment
+      updateAppointment: CalendarAction.updateAppointment,
+      deleteAppointment: CalendarAction.deleteAppointment
     },
     dispatch
   );

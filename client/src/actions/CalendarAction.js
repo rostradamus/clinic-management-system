@@ -62,7 +62,20 @@ export default class CalendarAction {
     }
   };
 
-  //TODO:
-  static deleteAppointment = data => {
+  static deleteAppointment = appointmentId => {
+    return async dispatch => {
+      try {
+        const res = await axios.delete(`/api/appointments/${appointmentId}`);
+        dispatch({
+          type: APPOINTMENT_ACTION_TYPE.DELETE_SUCCESS,
+          payload: {id: appointmentId}
+        });
+      } catch (err) {
+        dispatch({
+          type: APPOINTMENT_ACTION_TYPE.DELETE_FAILURE,
+          payload: { message: "Stub" }
+        });
+      }
+    }
   };
 }

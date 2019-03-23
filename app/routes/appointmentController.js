@@ -155,11 +155,18 @@ routes.put("/:appointment_id", async (req, res) => {
   }
 });
 
-// TODO: DELETE /api/appointments/{id}
-routes.delete("/:appointment_id", (req, res) => {
-  // TODO: need to send cancellation email.
-  res.status(200);
-  res.send({ msg: "STUB" });
+// DELETE /api/appointments/:appointment_id
+routes.delete("/:appointment_id", async (req, res) => {
+  const { appointment_id } = req.params;
+  try {
+    const cancelledAppointment = await appointmentManager.softDeleteAppointmentWithId(appointment_id);
+    if (cancelledAppointment.affectedRows !== 1) {
+      res.sendStatus(404);
+    }
+    res.sendStatus(204);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 module.exports = routes;

@@ -33,7 +33,9 @@ class Calendar extends Component {
 
   static getDerivedStateFromProps(nextProps, prevState) {
     const { events, selectedUser } = nextProps;
+
     if (!isEmpty(differenceWith(events, prevState.events, isEqual)) ||
+      events.length !== prevState.events.length ||
       !isEqual(selectedUser, prevState.selectedUser)) {
       // TODO: after auth is implemented include current user
       return { events: events, selectedUser: selectedUser };
