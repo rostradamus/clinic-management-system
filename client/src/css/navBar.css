@@ -14,6 +14,10 @@
   padding: 0 1.05714286em 0 0.7em;
 }
 
+.ui.borderless.navbar.menu {
+  margin-bottom: 2rem;
+}
+
 .ui.borderless.navbar.menu .navbar-logo-item:hover {
   background: #ffffff;
 }

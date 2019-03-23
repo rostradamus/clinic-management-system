@@ -4,21 +4,30 @@ import { Link, withRouter } from "react-router-dom";
 import { Menu, Dropdown, Icon } from "semantic-ui-react";
 import { ReactComponent as Logo } from "assets/logo.svg";
 import { AuthAction } from "actions";
+import { UserType, MenuTitle } from "../../enums";
 import '../../css/navBar.css';
 
-const MENU_TITLE_1 = "APPOINTMENTS";
-const MENU_TITLE_2 = "REPORTS";
-const MENU_TITLE_3 = "USERS";
+const menuItems = [
+  {
+    path: "/appointment",
+    name: MenuTitle.APPOINTMENTS,
+    position: "left"
+  }, {
+    path: "/report",
+    name: MenuTitle.REPORTS,
+    position: "left"
+  }, {
+    path: "/user",
+    name: MenuTitle.USERS,
+    position: "left"
+  }
+];
 
 class NavBar extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      activeItem: MENU_TITLE_1,
-      // TODO: [REMOVE] TEMP USER FOR POC
-      user: {
-        name: "Ro Lee"
-      }
+      activeItem: MenuTitle.APPOINTMENTS,
     };
   }
 
@@ -41,23 +50,28 @@ class NavBar extends Component {
     );
   }
 
+  // TODO: Should be done by permissions, rather than user type!
   _renderNavButtons() {
-    const menuItems = [
-      {
-        path: "/appointment",
-        name: MENU_TITLE_1,
-        position: "left"
-      }, {
-        path: "/report",
-        name: MENU_TITLE_2,
-        position: "left"
-      }, {
-        path: "/user",
-        name: MENU_TITLE_3,
-        position: "left"
-      }
-    ];
-    return menuItems.map(this._createNavButton.bind(this));
+    let type = this.props.auth.current_user.type;
+    let displayItems = [];
+
+    // TODO: Unnecessary, but UserType.valueOf(type) returns entire object.
+    // This code will likely get refactored anyway when permissions come into play.
+    switch (type) {
+      case UserType.PATIENT:
+        displayItems = menuItems.slice(0, 0);
+        break;
+      case UserType.STAFF:
+        displayItems = menuItems.slice(0, 2);
+        break;
+      case UserType.ADMIN:
+        displayItems = menuItems.slice(0, 3);
+        break;
+      default:
+        break;
+    }
+
+    return displayItems.map(this._createNavButton.bind(this));
   }
 
   _renderUserDropDown() {
@@ -91,18 +105,11 @@ class NavBar extends Component {
     )
   }
 
-  _renderUserLogin() {
-    return (
-      <Menu.Item
-        icon="sign in"
-        name='login'
-        as={Link}
-        to="/login"
-      />
-    );
+  _renderEmptyNavBar() {
+    return ('');
   }
 
-  render() {
+  _renderCustomNavBar() {
     return (
       <Menu
         className="navbar"
@@ -115,7 +122,7 @@ class NavBar extends Component {
             position="left"
             as={Link}
             to="/"
-            name={MENU_TITLE_1}
+            name={MenuTitle.APPOINTMENTS}
             onClick={this._handleItemClick.bind(this)}>
             <Logo className="mainLogo" />
           </Menu.Item>
@@ -124,8 +131,14 @@ class NavBar extends Component {
         <Menu.Menu
           position="right"
           className="navbar-right-group"
-          children={this.props.auth.hasLoggedIn ? this._renderUserDropDown() : this._renderUserLogin()} />
+          children={this._renderUserDropDown()} />
       </Menu>
+    );
+  }
+
+  render() {
+    return (
+      this.props.auth.hasLoggedIn ? this._renderCustomNavBar() : this._renderEmptyNavBar()
     );
   }
 }

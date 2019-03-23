@@ -13,8 +13,8 @@ const middlewares = process.env.NODE_ENV !== "production" ? [reduxThunk, logger]
 const store = createStore(reducers, {}, applyMiddleware(...middlewares));
 
 ReactDOM.render(
-  <Provider store={ store }>
-    <App />
+  <Provider store={store}>
+      <App />
   </Provider>,
   document.querySelector("#root")
 );
