@@ -2,12 +2,22 @@ const routes = require('express').Router();
 const appointmentManager = require("@app/helpers/queryManager/appointment");
 // TODO: Remove as moment will be added as global variable.
 const moment = require('moment');
+const emailManager = require("@app/helpers/emailManager");
 
 // Helper functions
 let isValidPostRequestBody = (body) => {
   const {patient, staff, start, end} = body;
   return patient && staff && start && end &&
     moment(start).isValid() && moment(end).isValid();
+}
+
+let processEmail = async function(resAppointment, isNewAppointment) {
+  const [patientUser, staffUser] = await Promise.all([
+    appointmentManager.getUserWithIdFromTable(resAppointment.patient_id),
+    appointmentManager.getUserWithIdFromTable(resAppointment.staff_id)
+  ]);
+
+  return emailManager.sendMailForAppointment(resAppointment, patientUser[0], staffUser[0], isNewAppointment) ? true : false
 }
 
 // GET /api/appointments/users/{user_id}/
@@ -88,8 +98,12 @@ routes.post("/", async (req, res) => {
     resAppointment.patient = patient;
     resAppointment.staff = staff;
 
-    res.status(200);
-    res.send(resAppointment);
+    if (processEmail(resAppointment, true)) {
+      res.status(200);
+      res.send(resAppointment);
+    } else {
+      // rollback database, hard delete the added appointment.
+    }
   } catch (err) {
     res.status(500).json(err);
   }
@@ -130,8 +144,12 @@ routes.put("/:appointment_id", async (req, res) => {
     resAppointment.patient = patient;
     resAppointment.staff = staff;
 
-    res.status(200);
-    res.send(resAppointment);
+    if (processEmail(resAppointment, false)) {
+      res.status(200);
+      res.send(resAppointment);
+    } else {
+      // rollback database, hard delete the added appointment.
+    }
   } catch (err) {
     res.status(500).json(err);
   }
@@ -139,6 +157,7 @@ routes.put("/:appointment_id", async (req, res) => {
 
 // TODO: DELETE /api/appointments/{id}
 routes.delete("/:appointment_id", (req, res) => {
+  // TODO: need to send cancellation email.
   res.status(200);
   res.send({ msg: "STUB" });
 });

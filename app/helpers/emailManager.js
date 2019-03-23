@@ -1,6 +1,8 @@
 const nodemailer = require("nodemailer");
 const ical = require('ical-generator');
 let transporter;
+// will remove later when moment become a global variable
+const moment = require('moment');
 
 let getTransporter = () => {
   if (!transporter) {
@@ -15,47 +17,71 @@ let getTransporter = () => {
   return transporter;
 }
 
-let generateMailOptions = function(bShouldCreateICalEvent) {
-  let event = "";
-  if (bShouldCreateICalEvent) {
-    event = iCalAttachmentGenerator();
-  }
-  // if icalEvent is empty string, it doesn't send a ics attachment
+let generateMailOptionsForNewAppointment = function(appointment, patientUser, staffUser) {
+  let event = iCalAttachmentGenerator(appointment, patientUser);
   return {
-    from: "gfstrongtest123@gmail.com",
-    to: "mikeyoon@hotmail.ca",
-    subject: "testing sending email",
-    text: "hello world",
+    from: process.env.NODE_MAILER_PASSWORD,
+    // to: staffUser.email,
+    to: "m.yoon@sap.com",
+    subject: `New appointment with ${patientUser.first_name} ${patientUser.last_name}`,
+    text: `You have an upcoming appointment with ${patientUser.first_name} ${patientUser.last_name} \n \n
+            To save this event in your calendar you must do this: \n 1. Open the ics attachment \n 2. Click 'Save & close'`,
     icalEvent: event
   }
 }
 
-let iCalAttachmentGenerator = function () {
+let generateMailOptionsForUpdateAppointment = function(appointment, patientUser, staffUser) {
+  let event = iCalAttachmentGenerator(appointment, patientUser);
+  return {
+    from: process.env.NODE_MAILER_PASSWORD,
+    // to: staffUser.email,
+    to: "m.yoon@sap.com",
+    subject: `Updated appointment with ${patientUser.first_name} ${patientUser.last_name}`,
+    text: `The appointment with ${patientUser.first_name} ${patientUser.last_name} has been changed. \n Please save this event to your calendar, and remove the previous appointment. \n To save this event in your calendar you must do this: \n 1. Open the ics attachment \n 2. Click 'Save & close'`,
+    icalEvent: event
+  }
+}
+
+let iCalAttachmentGenerator = function (appointment, patientUser) {
   const cal = ical();
+  const [startDateTime, endDateTime] = getDateTime(appointment.start_date, appointment.start_time, appointment.end_time);
+
   let event = cal.createEvent({
-    start: new Date(),
-    end: new Date(new Date().getTime() + 3600000),
-    summary: 'Example Event',
-    description: 'It works ;)',
-    // TODO: organizer will be the staff
-    organizer: 'Organizer\'s Name <organizer@example.com>'
+    start: startDateTime,
+    end: endDateTime,
+    summary: `${appointment.type_of_therapy} appointment with ${patientUser.first_name} ${patientUser.last_name}`,
+    description: ''
   });
-  // TODO: check if repeating is needed
-  event.repeating({
-    freq: 'WEEKLY',
-    // TODO: the real date will be in the appointment object
-    until: new Date('Apr 01 2019 00:00:00 UTC'),
-    exclude: [new Date('Dec 25 2013 00:00:00 UTC')] // TODO: will need to do something with moment to exclude bc holidays
-  });
-  console.log(cal.toString());
+  // no more repeats. keeping here if we decide to change requirements.
+
+  // if (repeatFrequency !== "none") {
+  //   event.repeating({
+  //     freq: repeatFrequency,
+  //     // TODO: the real date will be in the appointment object
+  //     until: new Date('Apr 01 2019 00:00:00 UTC'),
+  //     exclude: [new Date('Dec 25 2013 00:00:00 UTC')] // TODO: will need to do something with moment to exclude bc holidays
+  //   });
+  // }
   return cal.toString();
 }
 
+let getDateTime = function(date, startTime, endTime) {
+  let dateString = date.toString();
+  let startFullTime = moment(dateString + "T" + startTime.toString(), "YYYY-MM-DDTHH:mm:ss");
+  let endFullTime = moment(dateString + "T" + endTime.toString(), "YYYY-MM-DDTHH:mm:ss");
+
+  return [startFullTime.toDate(), endFullTime.toDate()];
+}
+
 module.exports = {
-  sendMail: function() {
+  sendMailForAppointment: function(appointment, patientUser, staffUser, isNewAppointment) {
     let transport = getTransporter();
-    // TODO: check here if we need an ics attachment
-    let mailOptions = generateMailOptions(true);
+    let mailOptions;
+    if(isNewAppointment) {
+      mailOptions = generateMailOptionsForNewAppointment(appointment, patientUser, staffUser);
+    } else {
+      mailOptions = generateMailOptionsForUpdateAppointment(appointment, patientUser, staffUser);
+    }
     transporter.sendMail(mailOptions, function (err, info) {
       if(err)
         return false;
