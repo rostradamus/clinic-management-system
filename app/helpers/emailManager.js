@@ -3,6 +3,7 @@ const ical = require('ical-generator');
 let transporter;
 // will remove later when moment become a global variable
 const moment = require('moment');
+require('moment-timezone');
 
 let getTransporter = () => {
   if (!transporter) {
@@ -24,8 +25,7 @@ let generateMailOptionsForNewAppointment = function(appointment, patientUser, st
     // to: staffUser.email,
     to: "m.yoon@sap.com",
     subject: `New appointment with ${patientUser.first_name} ${patientUser.last_name}`,
-    text: `You have an upcoming appointment with ${patientUser.first_name} ${patientUser.last_name} \n \n
-            To save this event in your calendar you must do this: \n 1. Open the ics attachment \n 2. Click 'Save & close'`,
+    text: `You have an upcoming appointment with ${patientUser.first_name} ${patientUser.last_name} \n To save this event in your calendar you must do this: \n 1. Open the ics attachment \n 2. Click 'Save & close'`,
     icalEvent: event
   }
 }
@@ -53,22 +53,13 @@ let iCalAttachmentGenerator = function (appointment, patientUser) {
     description: ''
   });
   // no more repeats. keeping here if we decide to change requirements.
-
-  // if (repeatFrequency !== "none") {
-  //   event.repeating({
-  //     freq: repeatFrequency,
-  //     // TODO: the real date will be in the appointment object
-  //     until: new Date('Apr 01 2019 00:00:00 UTC'),
-  //     exclude: [new Date('Dec 25 2013 00:00:00 UTC')] // TODO: will need to do something with moment to exclude bc holidays
-  //   });
-  // }
   return cal.toString();
 }
 
 let getDateTime = function(date, startTime, endTime) {
   let dateString = date.toString();
-  let startFullTime = moment(dateString + "T" + startTime.toString(), "YYYY-MM-DDTHH:mm:ss");
-  let endFullTime = moment(dateString + "T" + endTime.toString(), "YYYY-MM-DDTHH:mm:ss");
+  let startFullTime = moment.tz(dateString + "T" + startTime.toString(), "YYYY-MM-DDTHH:mm:ss", "America/Vancouver");
+  let endFullTime = moment.tz(dateString + "T" + endTime.toString(), "YYYY-MM-DDTHH:mm:ss", "America/Vancouver");
 
   return [startFullTime.toDate(), endFullTime.toDate()];
 }
