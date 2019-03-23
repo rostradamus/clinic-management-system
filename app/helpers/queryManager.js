@@ -51,8 +51,8 @@ module.exports = {
     return mysql.format("UPDATE ?? SET ? WHERE id = ?", [table, data, id]);
   },
 
-  softDeleteBaseQuery: function(table, id) {
-    return this.updateBaseQuery(table, id, { active: false});
+  softDeleteBaseQuery: function(table, id, data) {
+    return this.updateBaseQuery(table, id, data);
   },
 
   hardDeleteBaseQuery: function(table, id) {
@@ -109,8 +109,8 @@ module.exports = {
     return await this.makeQuery(selectQuery);
   },
 
-  softDeleteEntry: function(table, id, options = {}) {
-    const query = this.softDeleteBaseQuery(table, id);
+  softDeleteEntry: function(table, id, data, options = {}) {
+    const query = this.softDeleteBaseQuery(table, id, data);
     return this.makeQuery(query);
   },
 

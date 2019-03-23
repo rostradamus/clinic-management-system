@@ -19,8 +19,8 @@ module.exports = {
     return qm.updateThenGetEntry(TABLE_NAME, id, data, { columns: VISIBLE_COLUMNS });
   },
 
-  deleteAppointmentWithId: function(id) {
-    return qm.hardDeleteEntry(TABLE_NAME, id);
+  softDeleteAppointmentWithId: function(id) {
+    return qm.softDeleteEntry(TABLE_NAME, id, { is_cancelled: true });
   },
 
   // TODO: use AdmissionRecordManager to handle query after it has been implemented.
@@ -40,34 +40,15 @@ module.exports = {
       queryString = "SELECT * FROM Appointment " +
         "LEFT JOIN (SELECT ?? FROM User WHERE type = 'Patient' AND active = 1) " +
         "AS Patient ON Appointment.patient_id = Patient.id " +
-        "WHERE Appointment.staff_id = ?";
+        "WHERE Appointment.staff_id = ? AND Appointment.is_cancelled=false";
     } else {
       queryString = "SELECT * FROM Appointment " +
         "LEFT JOIN (SELECT ?? FROM User WHERE type = 'Staff' AND active = 1) " +
         "AS Staff ON Appointment.staff_id = Staff.id " +
-        "WHERE Appointment.patient_id = ?";
+        "WHERE Appointment.patient_id = ? AND Appointment.is_cancelled=false";
     }
     const query = mysql.format(queryString, [USER_VISIBLE_COLUMNS, id]);
     const options = {sql: query, nestTables: true};
     return qm.getQueryWithOverlap(options);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

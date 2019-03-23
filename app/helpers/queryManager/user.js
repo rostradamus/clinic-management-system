@@ -51,6 +51,6 @@ module.exports = {
   },
 
   softDeleteUserWithId: function(id) {
-    return qm.softDeleteEntry(this.TABLE_NAME, id);
+    return qm.softDeleteEntry(this.TABLE_NAME, id, { active: false });
   },
 }

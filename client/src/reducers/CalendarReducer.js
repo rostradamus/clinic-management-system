@@ -24,6 +24,13 @@ export default (state = initialState, action) => {
       );
     }
 
+    case APPOINTMENT_ACTION_TYPE.DELETE_SUCCESS: {
+      const filteredEvents = state.events.filter(event => event.id !== action.payload.id);
+      return Object.assign({...state},
+        { events: filteredEvents }
+      );
+    }
+
     case APPOINTMENT_ACTION_TYPE.FETCH_FAILURE:
     case APPOINTMENT_ACTION_TYPE.CREATE_FAILURE:
     case APPOINTMENT_ACTION_TYPE.UPDATE_FAILURE: {
