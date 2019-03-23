@@ -12,12 +12,29 @@ let isValidPostRequestBody = (body) => {
 }
 
 let processEmail = async function(resAppointment, isNewAppointment) {
-  const [patientUser, staffUser] = await Promise.all([
-    appointmentManager.getUserWithIdFromTable(resAppointment.patient_id),
-    appointmentManager.getUserWithIdFromTable(resAppointment.staff_id)
-  ]);
+  try {
+    const [patientUser, staffUser] = await Promise.all([
+      appointmentManager.getUserWithIdFromTable(resAppointment.patient_id),
+      appointmentManager.getUserWithIdFromTable(resAppointment.staff_id)
+    ]);
 
-  return emailManager.sendMailForAppointment(resAppointment, patientUser[0], staffUser[0], isNewAppointment) ? true : false
+    return emailManager.sendMailForAppointment(resAppointment, patientUser[0], staffUser[0], isNewAppointment) ? true : false;
+  } catch(err) {
+    return false;
+  }
+}
+
+let processCancellationEmail = async function(resAppointment) {
+  try {
+    const [patientUser, staffUser] = await Promise.all([
+      appointmentManager.getUserWithIdFromTable(resAppointment.patient_id),
+      appointmentManager.getUserWithIdFromTable(resAppointment.staff_id)
+    ]);
+
+    return emailManager.sendMailForCancellation(resAppointment, patientUser[0], staffUser[0]) ? true : false;
+  } catch(err) {
+    return false;
+  }
 }
 
 // GET /api/appointments/users/{user_id}/
@@ -160,10 +177,15 @@ routes.delete("/:appointment_id", async (req, res) => {
   const { appointment_id } = req.params;
   try {
     const cancelledAppointment = await appointmentManager.softDeleteAppointmentWithId(appointment_id);
+    const cancelledAppointmentDetails = await appointmentManager.getAppointmentWithId(appointment_id);
     if (cancelledAppointment.affectedRows !== 1) {
       res.sendStatus(404);
     }
-    res.sendStatus(204);
+    if (processCancellationEmail(cancelledAppointmentDetails[0])) {
+      res.sendStatus(204);
+    } else {
+      // rollback cancellation
+    }
   } catch (err) {
     res.status(500).json(err);
   }

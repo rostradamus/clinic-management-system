@@ -21,11 +21,11 @@ let getTransporter = () => {
 let generateMailOptionsForNewAppointment = function(appointment, patientUser, staffUser) {
   let event = iCalAttachmentGenerator(appointment, patientUser);
   return {
-    from: process.env.NODE_MAILER_PASSWORD,
+    from: process.env.NODE_MAILER_USER,
     // to: staffUser.email,
     to: "m.yoon@sap.com",
     subject: `New appointment with ${patientUser.first_name} ${patientUser.last_name}`,
-    text: `You have an upcoming appointment with ${patientUser.first_name} ${patientUser.last_name} \n To save this event in your calendar you must do this: \n 1. Open the ics attachment \n 2. Click 'Save & close'`,
+    text: `You have an upcoming appointment with ${patientUser.first_name} ${patientUser.last_name}. \n To save this event in your calendar you must do this: \n 1. Open the ics attachment \n 2. Click 'Save & close'`,
     icalEvent: event
   }
 }
@@ -33,12 +33,21 @@ let generateMailOptionsForNewAppointment = function(appointment, patientUser, st
 let generateMailOptionsForUpdateAppointment = function(appointment, patientUser, staffUser) {
   let event = iCalAttachmentGenerator(appointment, patientUser);
   return {
-    from: process.env.NODE_MAILER_PASSWORD,
+    from: process.env.NODE_MAILER_USER,
     // to: staffUser.email,
     to: "m.yoon@sap.com",
     subject: `Updated appointment with ${patientUser.first_name} ${patientUser.last_name}`,
     text: `The appointment with ${patientUser.first_name} ${patientUser.last_name} has been changed. \n Please save this event to your calendar, and remove the previous appointment. \n To save this event in your calendar you must do this: \n 1. Open the ics attachment \n 2. Click 'Save & close'`,
     icalEvent: event
+  }
+}
+
+let generateMailOptionsForCancellation = function(appointment, patientUser, staffUser) {
+  return {
+    from: process.env.NODE_MAILER_USER,
+    to: "m.yoon@sap.com",
+    subject: `Appointment with ${patientUser.first_name} ${patientUser.last_name} CANCELLED`,
+    text: `The appointment with ${patientUser.first_name} ${patientUser.last_name} on ${appointment.start_date} ${appointment.start_time} to ${appointment.end_time} has been cancelled. \n Please remove the event from your calendar.`
   }
 }
 
@@ -79,5 +88,18 @@ module.exports = {
       else
         return true;
    });
+  },
+
+  sendMailForCancellation: function(appointment, patientUser, staffUser) {
+    let transport = getTransporter();
+    let mailOptions = generateMailOptionsForCancellation(appointment, patientUser, staffUser);
+
+    transport.sendMail(mailOptions, function(err, info) {
+      if (err) {
+        return false;
+      } else {
+        return true;
+      }
+    });
   }
 }

@@ -23,6 +23,11 @@ module.exports = {
     return qm.softDeleteEntry(TABLE_NAME, id, { is_cancelled: true });
   },
 
+  getAppointmentWithId: function(id) {
+    const query = qm.getWithIdBaseQuery(TABLE_NAME, id);
+    return qm.makeQuery(query);
+  },
+
   // TODO: use AdmissionRecordManager to handle query after it has been implemented.
   getPatientAdmissionRecord: function(patient) {
     const query = mysql.format("SELECT * FROM Admission_record WHERE patient_id = ?", [patient.id]);
