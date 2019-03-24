@@ -96,9 +96,76 @@ export default class UserAction {
     };
   }
 
-  static deleteUser(id) {
-
+  static deleteUser(data) {
+    return async dispatch => {
+      dispatch({
+        type: USER_ACTION_TYPE.DELETE_REQUEST,
+        payload: {}
+      });
+      try {
+        const res = await axios.delete(`/api/users/${data.id}`);
+        dispatch({
+          type: USER_ACTION_TYPE.DELETE_SUCCESS,
+          payload: res.data
+        });
+      } catch (err) {
+        dispatch({
+          type: USER_ACTION_TYPE.DELETE_FAILURE,
+          payload: {
+            err: err
+          }
+        });
+      }
+    };
   }
+
+  static deletePatient(data) {
+    return async dispatch => {
+      dispatch({
+        type: USER_ACTION_TYPE.PATIENT_DELETE_REQUEST,
+        payload: {}
+      });
+      try {
+        const res = await axios.delete(`/api/patients/${data.id}`);
+        dispatch({
+          type: USER_ACTION_TYPE.PATIENT_DELETE_SUCCESS,
+          payload: res.data
+        });
+      } catch (err) {
+        dispatch({
+          type: USER_ACTION_TYPE.PATIENT_DELETE_FAILURE,
+          payload: {
+            err: err
+          }
+        });
+      }
+    };
+  }
+
+  static deleteAdmin(data) {
+    console.log(data.id);
+    return async dispatch => {
+      dispatch({
+        type: USER_ACTION_TYPE.ADMIN_DELETE_REQUEST,
+        payload: {}
+      });
+      try {
+        const res = await axios.delete(`/api/admins/${data.id}`, data);
+        dispatch({
+          type: USER_ACTION_TYPE.ADMIN_DELETE_SUCCESS,
+          payload: res.data
+        });
+      } catch (err) {
+        dispatch({
+          type: USER_ACTION_TYPE.ADMIN_DELETE_FAILURE,
+          payload: {
+            err: err
+          }
+        });
+      }
+    };
+  }
+
 
   static setFilter(filter) {
     return {

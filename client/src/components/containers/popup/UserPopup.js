@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { UserAction } from "actions";
-import { Modal, Button, Icon, Form } from "semantic-ui-react";
+import { Confirm, Grid, Modal, Button, Icon, Form } from "semantic-ui-react";
 
 class UserPopup extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      deleteOpen: false,
       first_name: "",
       last_name: "",
       email: "",
@@ -17,7 +18,7 @@ class UserPopup extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    if (props.user && props.user.id !== state.id) {
+    if (props.user && props.user.id!== state.id) {
       return {
         ...props.user
       };
@@ -25,20 +26,45 @@ class UserPopup extends Component {
     return {};
   }
 
-  _handleInputChange(e, {name, value}) {
+   _handleInputChange(e, {name, value}) {
     this.setState({[name]: value});
   }
 
-  _saveUser(data) {
-    this.props.dispatch(UserAction.editUser(data))
+  _saveUser() {
+    const {deleteOpen, ...user} = this.state
+    this.props.dispatch(UserAction.editUser(user))
       .then(() => this.props.dispatch(UserAction.closeUserPopup()))
-      // TODO: [REMOVE] SHOULD REPLACE THIS WITH BETTER SOLUTION
       .catch(() => alert("Fatal: This should never happen"));
+
+  }
+
+  _deleteUser(data) {
+    var deleteAction;
+    const {deleteOpen, ...user} = this.state;
+    const {type} = this.state;
+    console.log(type);
+    if(type ==='Patient'){
+      deleteAction = this.props.dispatch(UserAction.deletePatient(user))
+    }else if (type === 'Admin') {
+      deleteAction = this.props.dispatch(UserAction.deleteAdmin(user));
+    }else {
+      deleteAction = this.props.dispatch(UserAction.deleteUser(user));
+      //change to deleteStaff once endpoint created.
+    }
+    deleteAction
+      .then(() => this.props.dispatch(UserAction.closeUserPopup()))
+      .catch(() => alert("Fatal: This should never happen"));
+  }
+
+  _deleteOpen = () => {
+    const {deleteOpen} = this.state;
+    this.setState({ deleteOpen: !deleteOpen })
   }
 
   render() {
     const { first_name, last_name, email,
       phone_number, type, permission_level } = this.state;
+      console.log(this.props.user);
 
     return (
       <Modal
@@ -83,18 +109,24 @@ class UserPopup extends Component {
                 onChange={ this._handleInputChange.bind(this) } />
             </Form.Group>
           </Form>
+
         </Modal.Content>
-        <Modal.Actions>
-          <Button positive
-            onClick={ () => this._saveUser(this.state) }>
-            <Icon name="save" />
-            Save
-          </Button>
-          <Button
-            onClick={ () => this.props.dispatch(UserAction.closeUserPopup()) }>
-            <Icon name="close" />
-            Close
-          </Button>
+          <Modal.Actions>
+            <Grid columns={2} className="modal-action">
+            <Grid.Column>
+              <Button floated="left"onClick={this._deleteOpen}><Icon name="delete"/>Delete</Button>
+              <Confirm open={this.state.deleteOpen} onCancel={this._deleteOpen} onConfirm={() => this._deleteUser(this.state) }/>
+            </Grid.Column>
+            <Grid.Column>
+              <Button
+              positive
+              onClick={ () => this._saveUser() }>
+              <Icon name="save" />
+              Save
+            </Button>
+            </Grid.Column>
+          </Grid>
+
         </Modal.Actions>
       </Modal>
     );

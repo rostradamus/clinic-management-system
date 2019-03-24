@@ -1,8 +1,8 @@
 import React, { Component } from "react";
-import { Modal, Grid, Button, Select, Header, Input, Form, Container } from "semantic-ui-react";
+import { Label, Modal, Grid, Button, Select, Header, Input, Form, Container } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import * as moment from 'moment';
-import { UserAction, CreateUserAction} from 'actions';
+import { CreateUserAction} from 'actions';
 import { STATE_CONST } from './CreateUserPopup';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -25,7 +25,7 @@ class CreatePatientPopup extends Component{
           last_name:'',
           phone_number:'',
           email:'',
-          permission_level:''
+          permission_level:'Low'
         },
         Patient:{
           mrn:'',
@@ -95,6 +95,8 @@ class CreatePatientPopup extends Component{
       }})
     }
 
+
+
   handleSelectChange(field, { value }, formtype) {
     if(field === 'is_in_patient') value = !this.state.form.Patient.is_in_patient;
     this.setState({form: {
@@ -105,16 +107,20 @@ class CreatePatientPopup extends Component{
     })
   }
 
-  handlemrnSubmit(){
+  handlemrnSubmit( ){
     const mrn = this.state.form.Patient['mrn'];
-    const valid = this.validateField(['mrn']) && mrn.length === 4 && Number.isInteger(parseInt(mrn,10));
-    if(valid) {
+    if(mrn.length === 7 && Number.isInteger(parseInt(mrn,10))){
       this.props.getPatient(mrn);
+    }else{
+      this.setState({error: {
+        ...this.state.form.error,
+        mrn: true
+      }});
     }
   }
 
    handleNewAdmissionSubmit(event){
-    const admissionFields = ['type_of_injury','admission_date','patient_category'];
+    const admissionFields = ['type_of_injury','discharge_date', 'admission_date','patient_category'];
     event.preventDefault();
     if(this.validateField(admissionFields)){
       if(this.props.exists){
@@ -134,6 +140,7 @@ class CreatePatientPopup extends Component{
 
    handleNewAccountSubmit(){
     const fields = ['last_name', 'first_name', 'phone_number', 'mrn','date_of_birth','address','is_in_patient','patient_program'];
+    // this.validateField(fields);
     if(this.validateField(fields)){
         this.props.nextSlide();
       }else{
@@ -158,7 +165,7 @@ class CreatePatientPopup extends Component{
     return(
       <Modal.Content>
         <Form id="create-user">
-          <Header>New Admission Record</Header>
+          <Header>Admission Record</Header>
           {this.renderFieldHelper(['type_of_injury'], 'Admission_record')}
           {this.renderRepeatDropDownForm()}
           {this.renderDateHelper('admission_date', 'Admission_record')}
@@ -194,8 +201,8 @@ class CreatePatientPopup extends Component{
             />
           </Form.Group>
           {this.renderFieldHelper(['patient_program'], 'Patient')}
-
         </Form>
+
       </Modal.Content>
     );
   }
@@ -232,8 +239,18 @@ class CreatePatientPopup extends Component{
           (e,data) => this.handleDateChange(field, data, formtype)
         }
         />
+        {!this.checkValidDate(field) && <Label basic color = 'red' pointing> Invalid Date </Label> }
       </Form.Field>
     );
+  }
+
+  checkValidDate(field){
+    if(field !== 'date_of_birth' && field !== 'discharge_date') return true;
+    const { date_of_birth } = this.state.form.Patient;
+    const {admission_date, discharge_date} = this.state.form.Admission_record;
+    if(admission_date !== null && discharge_date !== null && moment(admission_date).isAfter(discharge_date, 'day')) return false;
+    if(date_of_birth !== null && moment(date_of_birth).isAfter(moment(), 'day')) return false;
+    return true;
   }
 
   renderFieldHelper(fields, formtype){
@@ -243,7 +260,6 @@ class CreatePatientPopup extends Component{
         <Form.Field
         className="user-field"
         key = {field}
-        data = "hi"
         error={this.state.error[field]}
         >
         <label>{field==="email" ? "Email (Optional)" : STATE_CONST[field]}</label>
@@ -256,14 +272,18 @@ class CreatePatientPopup extends Component{
   }
 
   validateField(fields){
-    const form = this.state.form;
+    const {User, Patient, Admission_record} = this.state.form;
     const errorFields={};
     fields.map(field => {
-      if(form.User[field] === '' || form.Patient[field] ==='' || form.Admission_record[field] ==='' || form.Admission_record[field] ===null){
+      if(field !== 'discharge_date') {
+        if(User[field] === '' || Patient[field] ==='' || Admission_record[field] ==='' || Admission_record[field] === null || Patient[field] === null){
         errorFields[field]=true;
+        }
       }
+      if(!this.checkValidDate(field)) errorFields[field] = true;
     });
-    this.setState({error: {
+    this.setState({
+      error: {
         ...this.state.form.error,
         ...errorFields
       }});

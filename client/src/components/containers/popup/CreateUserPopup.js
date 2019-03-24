@@ -20,8 +20,8 @@ export const STATE_CONST = {
   discharge_date:"Discharge Date",
   patient_program:"Patient Program",
   patient_category:"Patient Category",
-  permission_level:"Permission Level",
   therapist_type:"Therapist Type",
+  permission_level: "Permission Level",
   comment:"Notes",
 };
 
@@ -100,7 +100,7 @@ class CreateUserPopup extends Component{
           </React.Fragment>
         }
         {onNext && typeUser === 'Patient' && <CreatePatientPopup onClose={ () => this.closePopup() } onPrev = {this.onPrevClick}/>}
-        {onNext && typeUser !== 'Patient' && <CreateStaffPopup onClose={ () => this.closePopup() } onPrev= {this.onPrevClick} isStaff={this.state.typeUser==='Staff'}/>}
+        {onNext && typeUser !== 'Patient' && <CreateStaffPopup onClose={ () => this.closePopup() } onPrev= {this.onPrevClick} typeUser={this.state.typeUser}/>}
       </Modal>
     );
   }

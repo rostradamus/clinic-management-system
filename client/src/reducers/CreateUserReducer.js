@@ -6,12 +6,14 @@ const initialState = {
   patient:{},
   isExisting: false,
   popup: false,
+  created:false,
   error:{}
 };
 
 export default (state = initialState, action) => {
   const {slideIndex, patient, isExisting} = state;
   switch (action.type) {
+    case CREATE_USER_ACTION_TYPE.ADMIN_CREATE_REQUEST:
     case CREATE_USER_ACTION_TYPE.FETCH_MRN_REQUEST: {
       return Object.assign({...state}, {isFetching: true});
     }
@@ -37,14 +39,16 @@ export default (state = initialState, action) => {
     case CREATE_USER_ACTION_TYPE.OPEN_POPUP: {
       return Object.assign({...state}, {popup: true});
     }
-    case CREATE_USER_ACTION_TYPE.CREATE_PATIENT_FAILURE:
+    case CREATE_USER_ACTION_TYPE.ADMIN_CREATE_FAILURE:
+    case CREATE_USER_ACTION_TYPE.PATIENT_CREATE_FAILURE:
     case CREATE_USER_ACTION_TYPE.CREATE_ADMISSION_RECORD_FAILURE:{
       return Object.assign({...state},
         { error: action.payload})
     }
+    case CREATE_USER_ACTION_TYPE.ADMIN_CREATE_SUCCESS:
     case CREATE_USER_ACTION_TYPE.CREATE_ADMISSION_RECORD_SUCCESS:
-    case CREATE_USER_ACTION_TYPE.CREATE_PATIENT_SUCCESS: {
-      return Object.assign({...state},{slideIndex: 4});
+    case CREATE_USER_ACTION_TYPE.PATIENT_CREATE_SUCCESS: {
+      return Object.assign({...state},{created: true, slideIndex: 4});
     }
     default:
       return state;
