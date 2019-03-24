@@ -65,7 +65,7 @@ module.exports = {
   updateUserWithId: function(id, data) {
     return qm.updateThenGetEntry(this.TABLE_NAME, id, data, { columns: this.VISIBILE_COLUMNS });
   },
-
+  
   softDeleteUserWithId: async function(id) {
     try {
       const user = await getActiveUserWithId(id);
@@ -101,5 +101,5 @@ module.exports = {
     } catch(err) {
       throw err;
     }
-  },
+  }
 }

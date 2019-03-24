@@ -3,6 +3,7 @@ import * as Layouts from "components/layouts";
 import * as Containers from "components/containers";
 import { Container } from "semantic-ui-react";
 import { connect } from "react-redux";
+import { AuthAction } from 'actions';
 import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
 
 const PrivateRoute = ({ component: Component, hasLoggedIn, ...rest }) => {
@@ -18,6 +19,18 @@ const PrivateRoute = ({ component: Component, hasLoggedIn, ...rest }) => {
 }
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    // This is to avoid warning message
+    this.state = {};
+  }
+  static getDerivedStateFromProps(props, state) {
+    if (!props.auth.isFetching && !props.auth.hasLoggedIn) {
+      props.dispatch(AuthAction.checkUser());
+    }
+    return null;
+  }
+
   render() {
     return (
       <Router>
@@ -43,5 +56,5 @@ class App extends Component {
 const mapStateToProps = state => {
   const { auth } = state;
   return { auth };
-}
+};
 export default connect(mapStateToProps)(App);

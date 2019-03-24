@@ -52,5 +52,5 @@ module.exports = {
       [TABLE_NAME, { discharge_date: moment().format("YYYY-MM-DD") }, patient_id, moment().format("YYYY-MM-DD")]
     );
     return qm.makeQuery(stmt);
-  },
+  }
 }
