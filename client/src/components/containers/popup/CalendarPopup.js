@@ -37,6 +37,8 @@ const POPUP_ERROR_CONST = {
 };
 
 class CalendarPopup extends Component {
+  _isMounted = false;
+
   constructor(props) {
     super(props);
 
@@ -73,6 +75,14 @@ class CalendarPopup extends Component {
     // API end point functions
     this.onSubmit = this.onSubmit.bind(this);
     this.onCancel = this.onCancel.bind(this);
+  }
+
+  componentDidMount() {
+    this._isMounted = true;
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
   }
 
   /**

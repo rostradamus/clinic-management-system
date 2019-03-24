@@ -1,16 +1,14 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import BigCalendar from 'react-big-calendar';
 import moment from 'moment';
-import { differenceWith, isEqual, isEmpty } from 'lodash';
-import { Grid, Header, Label, Icon, Segment } from "semantic-ui-react";
-import { PatientStaffSearchAction } from 'actions';
+import { Grid, Header, Label, Icon, Segment, Message } from "semantic-ui-react";
 import { CalendarPopup } from 'components/containers/popup';
 import { ReactComponent as PlaceholderImg } from "assets/calendarPlaceholder.svg";
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import "./Calendar.css";
 
 moment.locale('en');
+const localizer = BigCalendar.momentLocalizer(moment);
 const MAIN_CALENDAR_COL_WIDTH = 13;
 const appointmentStartTime = moment().hours(8).minute(0).second(0).toDate();
 const appointmentEndTime = moment().hours(17).minute(0).second(0).toDate();
@@ -20,32 +18,13 @@ class Calendar extends Component {
     super(props);
 
     this.state = {
-      events: [],
-      showPopup: false,
-      isAddModalOpen: false,
+      isCalendarPopupOpen: false,
       selectedEvent: {},
-      selectedUser: {}
     };
 
+    this.handleErrorDismiss = this.handleErrorDismiss.bind(this);
     this.toggleAddModal = this.toggleAddModal.bind(this);
     this.parseEventsToCalendarEvents = this.parseEventsToCalendarEvents.bind(this);
-  }
-
-  static getDerivedStateFromProps(nextProps, prevState) {
-    const { events, selectedUser } = nextProps;
-
-    if (!isEmpty(differenceWith(events, prevState.events, isEqual)) ||
-      events.length !== prevState.events.length ||
-      !isEqual(selectedUser, prevState.selectedUser)) {
-      // TODO: after auth is implemented include current user
-      return { events: events, selectedUser: selectedUser };
-    }
-    return {};
-  }
-
-  componentDidMount() {
-    this.props.dispatch(PatientStaffSearchAction.getPatientAndStaff());
-    // TODO: if current.type !== "Administrator" fetchAppointment with current user
   }
 
   // TODO: requires refactor when database is connected
@@ -58,12 +37,11 @@ class Calendar extends Component {
 
     this.setState({
       selectedEvent: selectedEvent,
-      isAddModalOpen: !this.state.isAddModalOpen,
+      isCalendarPopupOpen: !this.state.isCalendarPopupOpen,
     });
   };
 
-  parseEventsToCalendarEvents() {
-    const { events } = this.state;
+  parseEventsToCalendarEvents(events) {
     const calendarEvents = events.map(event => {
       return Object.assign(
         { ...event },
@@ -109,19 +87,10 @@ class Calendar extends Component {
    * Give back the proper icon name according to selected user type.
    * @param {String} t
    * @return {String} Name of appropriate icon.
+   * TODO: this is a code smell, could be better if we had universal enums to store all these.
    */
   _getUserTypeIconName(t) {
-    let iconTypeName;
-
-    // TODO: this is a code smell, could be better if we had
-    // universal enums to store all these.
-    if (t === 'Patient') {
-      iconTypeName = 'user';
-    } else if (t === 'Staff') {
-      iconTypeName = 'user md';
-    }
-
-    return iconTypeName;
+    return t === "Patient" ? "user": (t === "Staff" ? "user md" : null);
   }
 
   _isEmptyUserObj(user) {
@@ -132,12 +101,26 @@ class Calendar extends Component {
     return `${user.first_name} ${user.last_name}`;
   }
 
+  handleErrorDismiss() {
+    this.props.closeErrorMessage();
+  }
+
+  renderErrorMessage(errorMessage) {
+    return (
+      <Message
+        negative
+        onDismiss={this.handleErrorDismiss}>
+        <Message.Header>There was some errors with your submission</Message.Header>
+        <p>{ errorMessage.message }</p>
+      </Message>
+    )
+  }
+
   render() {
     const today = moment().toDate();
-    const localizer = BigCalendar.momentLocalizer(moment);
-    const { selectedUser } = this.state;
+    const { isCalendarPopupOpen } = this.state;
+    const { errorMessage, events, selectedUser, patientsStaffs} = this.props;
 
-    // If selectedUser has no fields (basically, empty), show placeholder.
     if (this._isEmptyUserObj(selectedUser)) {
       return (
         <Grid.Column width={MAIN_CALENDAR_COL_WIDTH}>
@@ -150,11 +133,10 @@ class Calendar extends Component {
         </Grid.Column>
       );
     }
-
     // If selected user exists with expected fields, show calendar.
     return (
       <Grid.Column width={MAIN_CALENDAR_COL_WIDTH}>
-
+        { errorMessage.status ? this.renderErrorMessage(errorMessage) : null }
         <Grid.Row>
           <Header className="calendarUser userName"> {this._getSelectedUserName(selectedUser)} </Header>
         </Grid.Row>
@@ -169,12 +151,12 @@ class Calendar extends Component {
           <BigCalendar
             className="appointmentCalendar"
             selectable
-            popup={true}
-            localizer={localizer} // used to convert string to time vice versa
-            events={this.parseEventsToCalendarEvents()}
+            popup={ true }
+            localizer={ localizer }
+            events={ this.parseEventsToCalendarEvents(events) }
             defaultView={BigCalendar.Views.WORK_WEEK}
-            defaultDate={today}
-            views={[BigCalendar.Views.DAY, BigCalendar.Views.WORK_WEEK, BigCalendar.Views.MONTH]}
+            defaultDate={ today }
+            views={ [BigCalendar.Views.DAY, BigCalendar.Views.WORK_WEEK, BigCalendar.Views.MONTH] }
             min={ appointmentStartTime }
             max={ appointmentEndTime }
             onSelectEvent={(e) => this.toggleAddModal(e, true)}
@@ -182,13 +164,13 @@ class Calendar extends Component {
           />
         </Grid.Row>
 
-        {this.state.isAddModalOpen ?
+        {isCalendarPopupOpen ?
           <CalendarPopup
-            isOpen={this.state.isAddModalOpen}
-            onClose={this.toggleAddModal}
-            event={this.state.selectedEvent}
-            patientsStaffs={this.props.patientsStaffs}
-            selectedUser={this.state.selectedUser}
+            isOpen={ isCalendarPopupOpen }
+            onClose={ this.toggleAddModal }
+            event={ this.state.selectedEvent }
+            patientsStaffs={ patientsStaffs }
+            selectedUser={ selectedUser }
           />
           : null
         }
@@ -197,12 +179,5 @@ class Calendar extends Component {
   }
 }
 
-const mapStateToProps = state => {
-  // TODO: when auth is connected integrate currentUser from auth
-  return {
-    ...state.calendar,
-    patientsStaffs: state.patientStaffSearch
-  };
-}
 
-export default connect(mapStateToProps)(Calendar);
+export default Calendar;

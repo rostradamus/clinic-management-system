@@ -28,8 +28,7 @@ class SearchInput extends Component {
 
   handleResultSelect(e, { result }) {
     if (result) {
-      const { formType, selectedUser } = this.state;
-      // isSelectedUser is a boolean object that is true if selectedUser is the current user's view otherwise false
+      const { formType } = this.state;
       const { isSelectedUser } = this.props;
 
       if (!isSelectedUser) {
@@ -43,8 +42,7 @@ class SearchInput extends Component {
   }
 
   handleSearchChange(e, { value }) {
-    const { formType, selectedUser } = this.state;
-    // isSelectedUser is a boolean object that is true if selectedUser is the current user's view otherwise false
+    const { formType } = this.state;
     const { isSelectedUser } = this.props;
 
     if (!isSelectedUser) {

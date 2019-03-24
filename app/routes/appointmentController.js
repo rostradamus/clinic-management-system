@@ -1,5 +1,6 @@
 const routes = require('express').Router();
 const appointmentManager = require("@app/helpers/queryManager/appointment");
+const admissionRecordManager = require("@app/helpers/queryManager/admissionRecord");
 // TODO: Remove as moment will be added as global variable.
 const moment = require('moment');
 const emailManager = require("@app/helpers/emailManager");
@@ -11,7 +12,7 @@ let isValidPostRequestBody = (body) => {
     moment(start).isValid() && moment(end).isValid();
 }
 
-let processEmail = async function(resAppointment, isNewAppointment) {
+let processEmail = async (resAppointment, isNewAppointment) => {
   try {
     const [patientUser, staffUser] = await Promise.all([
       appointmentManager.getUserWithIdFromTable(resAppointment.patient_id),
@@ -24,7 +25,34 @@ let processEmail = async function(resAppointment, isNewAppointment) {
   }
 }
 
-let processCancellationEmail = async function(resAppointment) {
+let generateTimeConflictErrorMessage = (staff, patient, isStaffConflict, isPatientConflict) => {
+  if (isStaffConflict && isPatientConflict) {
+    return `Staff: ${staff.first_name} ${staff.last_name} and
+      Patient: ${patient.first_name} ${patient.last_name} have another appointment at that time`;
+  } else if (isStaffConflict) {
+    return `Staff: ${staff.first_name} ${staff.last_name} has another appointment at that time`;
+  } else {
+    return `Patient: ${patient.first_name} ${patient.last_name} has another appointment at that time`;
+  }
+}
+
+let generateDataErrorMessage = (staff, patient, type) => {
+  return `We were unable to ${type} an appointment with Staff: ${staff.first_name} ${staff.last_name}
+  and Patient: ${patient.first_name} ${patient.last_name}`
+}
+
+let generateAdmissionRecordErrorMessage = (patient) => {
+  return `We were not able to find an Admission Record for Patient: ${patient.first_name} ${patient.last_name}`;
+}
+
+let formatAppointment = (appointment, patient, staff) => {
+  appointment.start_date = moment(appointment.start_date).format("YYYY-MM-DD");
+  appointment.patient = patient;
+  appointment.staff = staff;
+  return appointment;
+}
+
+let processCancellationEmail = async (resAppointment) => {
   try {
     const [patientUser, staffUser] = await Promise.all([
       appointmentManager.getUserWithIdFromTable(resAppointment.patient_id),
@@ -42,52 +70,58 @@ routes.get("/", async (req, res) => {
   try {
     const { user_id } = req.query;
     const users = await appointmentManager.getUserWithIdFromTable(user_id);
-    if (users.length === 0)
-      res.status(404).json({ message: `User with id = ${user_id} does NOT exist`});
+    if (users.length === 0) {
+      return res.status(400).json({
+        errorMessage: {
+          status: true,
+          message: `User with id = ${user_id} does NOT exist`
+        }
+      });
+    }
 
-    const { id, type } = users[0];
+    const { id, type, first_name, last_name } = users[0];
     const appointments = await appointmentManager.getAppointmentAccordingToUser(id, type);
-    if (appointments.length === 0)
-      res.status(404).json({ message: `No appointment exist for user with id = ${user_id}`});
+    if (appointments.length === 0) {
+      return res.status(400).json({
+        errorMessage: {
+          status: true,
+          message: `No appointments exist for ${type} named ${first_name} ${last_name}`
+        }
+      });
+    }
 
-    const resAppointments = appointments.map(row => {
-      let appointment = row.Appointment;
-      appointment.start_date = moment(appointment.start_date).format("YYYY-MM-DD");
-
-      if (type === "Patient") {
-        //Row contains a Staff object
-        const staff = row.Staff;
-        appointment.patient = users[0];
-        appointment.staff = staff;
-      } else {
-        //Row contains a Patient object
-        const patient = row.Patient;
-        appointment.staff = users[0];
-        appointment.patient = patient;
-      }
-      return appointment;
-    });
+    const resAppointments = appointments.map(row => type === "Patient" ?
+        formatAppointment(row.Appointment, users[0], row.Staff) :
+        formatAppointment(row.Appointment, row.Patient, users[0])
+    );
 
     res.status(200);
     res.send(resAppointments);
   } catch (err) {
-    res.status(500).json(err)
+    res.status(500).json({
+      errorMessage: {
+        status: true,
+        message: "Internal Server Error"
+      }
+    });
   }
 });
 
-// TODO: Backend validation of fields
 // POST /api/appointments
 routes.post("/", async (req, res) => {
-  // TODO: add a more informative error message
-  if (!isValidPostRequestBody(req.body)) throw new Error();
-  const {patient, staff, start, end} = req.body;
-
-  // Need to go through all admissionRecord to find one active admission record
-  const admissionRecords = await appointmentManager.getPatientAdmissionRecord(patient);
-  // TODO: after MessageUtils is merged in add more detailed information of error messages.
-  if (admissionRecords.length === 0) throw new Error();
+  const {patient, staff, start, end, isCancelled} = req.body;
 
   try {
+    const admissionRecords = await admissionRecordManager.getCurrentAdmissionRecords({patient_id : patient.id});
+    if (admissionRecords.length === 0) {
+      return res.status(400).json({
+        errorMessage: {
+          status: true,
+          message: generateAdmissionRecordErrorMessage(patient)
+        }
+      });
+    }
+
     const data = {
       patient_id: patient.id,
       staff_id: staff.id,
@@ -102,18 +136,30 @@ routes.post("/", async (req, res) => {
       is_cancelled: false
     };
 
+    const existingStaffAppointments = await appointmentManager.getTimeConflictAppointmentCreate(staff.id, "Staff", data);
+    const existingPatientAppointments = await appointmentManager.getTimeConflictAppointmentCreate(patient.id, "Patient", data);
+    if (existingStaffAppointments.length !== 0 || existingPatientAppointments.length !== 0) {
+      return res.status(400).json({
+        errorMessage: {
+          status: true,
+          message: generateTimeConflictErrorMessage(
+            staff, patient, existingStaffAppointments.length !== 0, existingPatientAppointments.length !== 0
+          )
+        }
+      });
+    }
+
     const appointments = await appointmentManager.createAppointment(data);
     if (appointments.length === 0) {
-      // TODO: after MessageUtils is merged in add more detailed information of error messages.
-      throw new Error();
+      return res.status(404).json({
+        errorMessage: {
+          status: true,
+          message: generateDataErrorMessage(staff, patient, "create")
+        }
+      });
     }
     const { patient_id, staff_id} = appointments[0];
-
-    let resAppointment = appointments[0];
-    resAppointment.start_date = moment(resAppointment.start_date).format("YYYY-MM-DD");
-
-    resAppointment.patient = patient;
-    resAppointment.staff = staff;
+    const resAppointment = formatAppointment(appointments[0], patient, staff);
 
     if (processEmail(resAppointment, true)) {
       res.status(200);
@@ -122,21 +168,31 @@ routes.post("/", async (req, res) => {
       // rollback database, hard delete the added appointment.
     }
   } catch (err) {
-    res.status(500).json(err);
+    console.log(err);
+    res.status(500).json({
+      errorMessage: {
+        status: true,
+        message: "Internal Server Error"
+      }
+    });
   }
 });
 
-// TODO: Backend validation of fields
 // PUT /api/appointments/:appointment_id
 routes.put("/:appointment_id", async (req, res) => {
-  const {patient, staff, start, end} = req.body;
+  const {patient, staff, start, end, isCancelled} = req.body;
   const { appointment_id } = req.params;
 
   try {
-    // This is used since patients can also change.
-    const admissionRecords = await appointmentManager.getPatientAdmissionRecord(patient);
-    // TODO: after MessageUtils is merged in add more detailed information of error messages.
-    if (admissionRecords.length === 0) throw new Error();
+    const admissionRecords = await admissionRecordManager.getCurrentAdmissionRecords({patient_id : patient.id});
+    if (admissionRecords.length === 0) {
+      return res.status(400).json({
+        errorMessage: {
+          status: true,
+          message: generateAdmissionRecordErrorMessage(patient)
+        }
+      });
+    }
 
     const data = {
       patient_id: patient.id,
@@ -147,19 +203,33 @@ routes.put("/:appointment_id", async (req, res) => {
       start_date: moment(start, "YYYY-MM-DDTHH:mm").format("YYYY-MM-DD"),
       start_time: moment(start, "YYYY-MM-DDTHH:mm").format("HH:mm:ss"),
       end_time: moment(end, "YYYY-MM-DDTHH:mm").format("HH:mm:ss"),
-      is_cancelled: false // TODO: this can also change in the front end.
+      is_cancelled: false
     };
+
+    const existingStaffAppointments = await appointmentManager.getTimeConflictAppointmentUpdate(staff.id, "Staff", data, appointment_id);
+    const existingPatientAppointments = await appointmentManager.getTimeConflictAppointmentUpdate(patient.id, "Patient", data, appointment_id);
+
+    if (existingStaffAppointments.length !== 0 || existingPatientAppointments.length !== 0) {
+      return res.status(400).json({
+        errorMessage: {
+          status: true,
+          message: generateTimeConflictErrorMessage(
+            staff, patient, existingStaffAppointments.length !== 0, existingPatientAppointments.length !== 0
+          )
+        }
+      });
+    }
 
     const updatedAppointment = await appointmentManager.updateAppointmentWithId(appointment_id, data);
     if (updatedAppointment.length === 0) {
-      // TODO: after MessageUtils is merged in add more detailed information of error messages.
-      throw new Error();
+      return res.status(404).json({
+        errorMessage: {
+          status: true,
+          message: generateDataErrorMessage(staff, patient, "update")
+        }
+      });
     }
-
-    let resAppointment = updatedAppointment[0];
-    resAppointment.start_date = moment(resAppointment.start_date).format("YYYY-MM-DD");
-    resAppointment.patient = patient;
-    resAppointment.staff = staff;
+    const resAppointment = formatAppointment(updatedAppointment[0], patient, staff);
 
     if (processEmail(resAppointment, false)) {
       res.status(200);
@@ -168,7 +238,12 @@ routes.put("/:appointment_id", async (req, res) => {
       // rollback database, hard delete the added appointment.
     }
   } catch (err) {
-    res.status(500).json(err);
+    res.status(500).json({
+      errorMessage: {
+        status: true,
+        message: "Internal Server Error"
+      }
+    });
   }
 });
 
@@ -179,15 +254,26 @@ routes.delete("/:appointment_id", async (req, res) => {
     const cancelledAppointment = await appointmentManager.softDeleteAppointmentWithId(appointment_id);
     const cancelledAppointmentDetails = await appointmentManager.getAppointmentWithId(appointment_id);
     if (cancelledAppointment.affectedRows !== 1) {
-      res.sendStatus(404);
+      return res.status(404).json({
+        errorMessage: {
+          status: true,
+          message: generateDataErrorMessage(staff, patient, "delete")
+        }
+      });
     }
+
     if (processCancellationEmail(cancelledAppointmentDetails[0])) {
       res.sendStatus(204);
     } else {
       // rollback cancellation
     }
   } catch (err) {
-    res.status(500).json(err);
+    res.status(500).json({
+      errorMessage: {
+        status: true,
+        message: "Internal Server Error"
+      }
+    });
   }
 });
 

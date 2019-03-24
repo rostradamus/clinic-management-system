@@ -39,7 +39,7 @@ export default class CalendarAction {
       } catch (err) {
         dispatch({
           type: APPOINTMENT_ACTION_TYPE.CREATE_FAILURE,
-          payload: data
+          payload: err.response.data
         });
       }
     }
@@ -56,7 +56,7 @@ export default class CalendarAction {
       } catch (err) {
         dispatch({
           type: APPOINTMENT_ACTION_TYPE.UPDATE_FAILURE,
-          payload: data
+          payload: err.response.data
         });
       }
     }
@@ -65,7 +65,7 @@ export default class CalendarAction {
   static deleteAppointment = appointmentId => {
     return async dispatch => {
       try {
-        const res = await axios.delete(`/api/appointments/${appointmentId}`);
+        await axios.delete(`/api/appointments/${appointmentId}`);
         dispatch({
           type: APPOINTMENT_ACTION_TYPE.DELETE_SUCCESS,
           payload: {id: appointmentId}
@@ -73,9 +73,13 @@ export default class CalendarAction {
       } catch (err) {
         dispatch({
           type: APPOINTMENT_ACTION_TYPE.DELETE_FAILURE,
-          payload: { message: "Stub" }
+          payload: err.response.data
         });
       }
     }
   };
+
+  static resetErrorMessage = () => {
+      return { type: APPOINTMENT_ACTION_TYPE.ERROR_MESSAGE_RESET };
+  }
 }
