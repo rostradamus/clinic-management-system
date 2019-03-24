@@ -65,7 +65,7 @@ module.exports = {
   updateUserWithId: function(id, data) {
     return qm.updateThenGetEntry(this.TABLE_NAME, id, data, { columns: this.VISIBILE_COLUMNS });
   },
-  
+
   softDeleteUserWithId: async function(id) {
     try {
       const user = await getActiveUserWithId(id);
@@ -88,7 +88,7 @@ module.exports = {
         } else {
           throw new Error();
         }
-      } else if (userType === "Administrator") {
+      } else if (userType === "Administrator" || userType === "Admin") {
         const softDeleteEntry = await qm.softDeleteEntry(this.TABLE_NAME, id, { active: false });
         if (softDeleteEntry.affectedRows === 1) {
           return [];
