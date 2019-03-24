@@ -45,7 +45,7 @@ routes.put("/:user_id", (req, res) => {
 routes.delete("/:user_id", async (req, res) => {
   try {
     const aCancelledAppointments = await userManager.softDeleteUserWithId(req.params.user_id);
-    res.status(200);
+    res.status(204);
     res.send(aCancelledAppointments);
   } catch (err) {
     // console.log(err);
