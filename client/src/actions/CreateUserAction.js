@@ -32,12 +32,12 @@ export default class CreateUserAction {
       try {
         const res = await axios.post('/api/patients', data);
         dispatch({
-          type: CREATE_USER_ACTION_TYPE.CREATE_PATIENT_SUCCESS,
+          type: CREATE_USER_ACTION_TYPE.PATIENT_CREATE_SUCCESS,
           payload: res.data
         });
       } catch (err) {
         dispatch({
-          type: CREATE_USER_ACTION_TYPE.CREATE_PATIENT_FAILURE,
+          type: CREATE_USER_ACTION_TYPE.PATIENT_CREATE_FAILURE,
           payload: data
         })
 
@@ -58,10 +58,30 @@ export default class CreateUserAction {
           type: CREATE_USER_ACTION_TYPE.CREATE_ADMISSION_RECORD_FAILURE,
           payload: data
         })
-
       }
     }
   };
+
+  static createAdmin(data) {
+    return async dispatch => {
+      dispatch({
+        type: CREATE_USER_ACTION_TYPE.ADMIN_CREATE_REQUEST,
+        payload: {}
+      });
+      try {
+        const res = await axios.post("/api/admins/", data);
+        dispatch({
+          type: CREATE_USER_ACTION_TYPE.ADMIN_CREATE_SUCCESS,
+          payload: res.data
+        });
+      } catch (err) {
+        dispatch({
+          type: CREATE_USER_ACTION_TYPE.ADMIN_CREATE_FAILURE,
+          payload: { err }
+        });
+      }
+    }
+  }
 
   static nextSlide(){
     return ({
