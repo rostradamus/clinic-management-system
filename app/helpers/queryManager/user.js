@@ -70,24 +70,34 @@ module.exports = {
     try {
       const user = await getActiveUserWithId(id);
       const userType = user.type;
-      const allUpcomingAppointmentsWithUserWithId = await appointmentManager.getUpcomingAppointmentsAccordingToUser(id, userType);
-      aCancelledAppointments = [];
+      if (userType === "Staff" || userType === "Patient") {
+        const allUpcomingAppointmentsWithUserWithId = await appointmentManager.getUpcomingAppointmentsAccordingToUser(id, userType);
+        aCancelledAppointments = [];
 
-      for (index in allUpcomingAppointmentsWithUserWithId) {
-        const cancelledAppointment = await appointmentManager.softDeleteAppointmentWithId(allUpcomingAppointmentsWithUserWithId[index].id);
-        const updatedAppointment = await appointmentManager.getAppointmentFromId(allUpcomingAppointmentsWithUserWithId[index].id);
-        if (updatedAppointment.length === 1) {
-          aCancelledAppointments.push(updatedAppointment[0]);
+        for (index in allUpcomingAppointmentsWithUserWithId) {
+          const cancelledAppointment = await appointmentManager.softDeleteAppointmentWithId(allUpcomingAppointmentsWithUserWithId[index].id);
+          const updatedAppointment = await appointmentManager.getAppointmentFromId(allUpcomingAppointmentsWithUserWithId[index].id);
+          if (updatedAppointment.length === 1) {
+            aCancelledAppointments.push(updatedAppointment[0]);
+          }
         }
-      }
 
-      const softDeleteEntry = await qm.softDeleteEntry(this.TABLE_NAME, id, { active: false });
-      if (softDeleteEntry.affectedRows === 1) {
-        return aCancelledAppointments;
+        const softDeleteEntry = await qm.softDeleteEntry(this.TABLE_NAME, id, { active: false });
+        if (softDeleteEntry.affectedRows === 1) {
+          return aCancelledAppointments;
+        } else {
+          throw new Error();
+        }
+      } else if (userType === "Administrator") {
+        const softDeleteEntry = await qm.softDeleteEntry(this.TABLE_NAME, id, { active: false });
+        if (softDeleteEntry.affectedRows === 1) {
+          return [];
+        } else {
+          throw new Error();
+        }
       } else {
-        throw new Error();
+        throw new Error("user type doesn't exist");
       }
-
     } catch(err) {
       throw err;
     }
