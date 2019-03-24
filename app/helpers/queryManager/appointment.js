@@ -34,12 +34,6 @@ module.exports = {
     return qm.makeQuery(query);
   },
 
-  // TODO: use AdmissionRecordManager to handle query after it has been implemented.
-  getPatientAdmissionRecord: function(patient) {
-    const query = mysql.format("SELECT * FROM Admission_record WHERE patient_id = ?", [patient.id]);
-    return qm.makeQuery(query);
-  },
-
   getUserWithIdFromTable: function(id) {
     const query = qm.getWithIdBaseQuery(USER_TABLE_NAME, id, { columns: USER_VISIBLE_COLUMNS });
     return qm.makeQuery(query);
@@ -63,17 +57,65 @@ module.exports = {
     return qm.getQueryWithOverlap(options);
   },
 
-  getUpcomingAppointmentsAccordingToUser: function(id, type) {
+  getTimeConflictAppointmentCreate: function(userId, type, data) {
+    const {start_time, start_date, end_time} = data;
+    let queryString = "";
+    if (type === "Staff") {
+      queryString = "SELECT id FROM Appointment " +
+        "WHERE staff_id = ? AND start_date = ? AND is_cancelled = false " +
+        "AND (TIME(?) BETWEEN ADDTIME(start_time, 000001) AND SUBTIME(end_time, 000001) " +
+        "OR TIME(?) BETWEEN ADDTIME(start_time, 000001) AND SUBTIME(end_time, 000001) " +
+        "OR TIME(start_time) BETWEEN ADDTIME(?, 000001) AND SUBTIME(?, 000001) " +
+        "OR TIME(end_time) BETWEEN ADDTIME(?, 000001) AND SUBTIME(?, 000001))";
+    } else if (type === "Patient") {
+      queryString = "SELECT id FROM Appointment " +
+        "WHERE patient_id = ? AND start_date = ?  AND is_cancelled = false " +
+        "AND (TIME(?) BETWEEN ADDTIME(start_time, 000001) AND SUBTIME(end_time, 000001) " +
+        "OR TIME(?) BETWEEN ADDTIME(start_time, 000001) AND SUBTIME(end_time, 000001) " +
+        "OR TIME(start_time) BETWEEN ADDTIME(?, 000001) AND SUBTIME(?, 000001) " +
+        "OR TIME(end_time) BETWEEN ADDTIME(?, 000001) AND SUBTIME(?, 000001))";
+    }
+    const query = mysql.format(queryString,
+      [userId, start_date, start_time, end_time, start_time, end_time, start_time, end_time]
+    );
+    return qm.makeQuery(query);
+  },
+
+  getTimeConflictAppointmentUpdate: function(userId, type, data, id) {
+    const {start_time, start_date, end_time} = data;
+    let queryString = "";
+    if (type === "Staff") {
+      queryString = "SELECT id FROM Appointment " +
+        "WHERE id <> ? AND staff_id = ? AND start_date = ? AND is_cancelled = false " +
+        "AND (TIME(?) BETWEEN ADDTIME(start_time, 000001) AND SUBTIME(end_time, 000001) " +
+        "OR TIME(?) BETWEEN ADDTIME(start_time, 000001) AND SUBTIME(end_time, 000001) " +
+        "OR TIME(start_time) BETWEEN ADDTIME(?, 000001) AND SUBTIME(?, 000001) " +
+        "OR TIME(end_time) BETWEEN ADDTIME(?, 000001) AND SUBTIME(?, 000001))";
+    } else if (type === "Patient") {
+      queryString = "SELECT id FROM Appointment " +
+        "WHERE id <> ? AND patient_id = ? AND start_date = ?  AND is_cancelled = false " +
+        "AND (TIME(?) BETWEEN ADDTIME(start_time, 000001) AND SUBTIME(end_time, 000001) " +
+        "OR TIME(?) BETWEEN ADDTIME(start_time, 000001) AND SUBTIME(end_time, 000001) " +
+        "OR TIME(start_time) BETWEEN ADDTIME(?, 000001) AND SUBTIME(?, 000001) " +
+        "OR TIME(end_time) BETWEEN ADDTIME(?, 000001) AND SUBTIME(?, 000001))";
+    }
+    const query = mysql.format(queryString,
+      [id, userId, start_date, start_time, end_time, start_time, end_time, start_time, end_time]
+    );
+    return qm.makeQuery(query);
+  },
+
+  getUpcomingAppointmentsAccordingToUser: function(userId, type) {
     let queryString = "";
     if (type === "Staff") {
       queryString = "SELECT * FROM Appointment " +
-                    "WHERE Appointment.staff_id = ? AND Appointment.start_date > ? AND is_cancelled=false";
+        "WHERE staff_id = ? AND start_date > ? AND is_cancelled=false";
     } else if (type === "Patient") {
       queryString = "SELECT * FROM Appointment " +
-                    "WHERE Appointment.patient_id = ? AND Appointment.start_date > ? AND is_cancelled=false"
+        "WHERE patient_id = ? AND start_date > ? AND is_cancelled=false"
     }
 
-    const query = mysql.format(queryString, [id, moment().format("YYYY-MM-DD")]);
+    const query = mysql.format(queryString, [userId, moment().format("YYYY-MM-DD")]);
     return qm.makeQuery(query);
   }
 }
