@@ -2,6 +2,33 @@ import { AUTH_ACTION_TYPE } from "actions/ActionTypes";
 import axios from "axios";
 
 export default class AuthAction {
+  static checkUser = () => {
+    return async dispatch => {
+      dispatch({
+        type: AUTH_ACTION_TYPE.LOGIN_REQUEST,
+        payload: { isFetching: true }
+      });
+      let res;
+      try {
+        res = await axios.get("/api/user/session");
+        dispatch({
+          type: AUTH_ACTION_TYPE.LOGIN_SUCCESS,
+          payload: {
+            current_user: res.data,
+            isFetching: false,
+            hasLoggedIn: true
+          }
+        });
+      } catch(err) {
+        dispatch({
+          type: AUTH_ACTION_TYPE.LOGIN_FAILURE,
+          payload: { err }
+        });
+        throw err;
+      }
+    }
+  };
+
   static loginUser = ({username, password}) => {
     return async dispatch => {
       dispatch({
@@ -14,7 +41,6 @@ export default class AuthAction {
           username: username,
           password: password
         });
-        console.log(res);
         dispatch({
           type: AUTH_ACTION_TYPE.LOGIN_SUCCESS,
           payload: {

@@ -18,6 +18,15 @@ class LoginForm extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
+  static getDerivedStateFromProps(props, state) {
+    if (!props.isFetching && props.hasLoggedIn) {
+      const from = props.location && props.location.state && props.location.state.from.pathname
+      from === "/login" ?
+        props.history.push("/") : props.history.push(from);
+    }
+    return null;
+  }
+
   handleInputChange(e) {
     const name = e.target.name;
     const value = e.target.value;
