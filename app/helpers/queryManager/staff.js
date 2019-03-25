@@ -4,7 +4,7 @@ const parent = require("@app/helpers/queryManager/user");
 
 const TABLE_NAME = "Staff";
 const PARENT_TABLE_NAME = parent.TABLE_NAME;
-const VISIBILE_COLUMNS = ["therapist_code", "therapist_type"];
+const VISIBILE_COLUMNS = ["therapist_type"];
 const PARENT_VISIBLE_COLUMNS = parent.VISIBILE_COLUMNS;
 
 module.exports = {
