@@ -83,6 +83,51 @@ export default class CreateUserAction {
     }
   }
 
+   static createStaff(data) {
+    return async dispatch => {
+      dispatch({
+        type: CREATE_USER_ACTION_TYPE.STAFF_CREATE_REQUEST,
+        payload: {}
+      });
+      try {
+        const res = await axios.post("/api/staffs/", data);
+        dispatch({
+          type: CREATE_USER_ACTION_TYPE.STAFF_CREATE_SUCCESS,
+          payload: res.data
+        });
+      } catch (err) {
+        dispatch({
+          type: CREATE_USER_ACTION_TYPE.STAFF_CREATE_FAILURE,
+          payload: { err }
+        });
+      }
+    }
+  }
+
+  static getUserByEmail(email) {
+    return async dispatch => {
+      dispatch({
+        type: CREATE_USER_ACTION_TYPE.EMAIL_FETCH_REQUEST,
+        payload: {}
+      });
+      try {
+        const res = await axios.get('/api/users', {params: { email: email }});
+        dispatch({
+          type: CREATE_USER_ACTION_TYPE.EMAIL_FETCH_SUCCESS,
+          payload:
+             res.data
+        });
+      } catch (err) {
+        dispatch({
+          type: CREATE_USER_ACTION_TYPE.EMAIL_FETCH_FAILURE,
+          payload: {
+            err: err
+          }
+        });
+      }
+    }
+  }
+
   static nextSlide(){
     return ({
       type: CREATE_USER_ACTION_TYPE.NEXT_SLIDE,

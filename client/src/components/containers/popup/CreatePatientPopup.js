@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Label, Modal, Grid, Button, Select, Header, Input, Form, Container } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import * as moment from 'moment';
-import { CreateUserAction} from 'actions';
+import { UserAction, CreateUserAction} from 'actions';
 import { STATE_CONST } from './CreateUserPopup';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -129,11 +129,12 @@ class CreatePatientPopup extends Component{
             ...this.state.form.Admission_record,
             patient_id: this.props.patient[0].User.id
           }});
-        this.props.createAdmissionRecord(admissionRecord);
+        this.props.createAdmissionRecord(admissionRecord)
       }else {
         const { User, Patient, Admission_record } = this.state.form;
-        this.props.createPatient({User, Patient, Admission_record});
-        //TODO: error message
+        this.props.createPatient({User, Patient, Admission_record})
+          .then(() => this.props.getUsers())
+          .catch(() => alert("Fatal: This should never happen"));
       }
     }
   }
@@ -388,7 +389,8 @@ const mapDispatchToProps = dispatch => {
       createAdmissionRecord: CreateUserAction.createAdmissionRecord,
       getPatient: CreateUserAction.getPatient,
       prevSlide: CreateUserAction.prevSlide,
-      nextSlide: CreateUserAction.nextSlide
+      nextSlide: CreateUserAction.nextSlide,
+      getUsers: UserAction.getUsers
     },
     dispatch
   );
@@ -397,6 +399,6 @@ const mapDispatchToProps = dispatch => {
 const mapStateToProps = state => (
   { slideIndex: state.createUser.slideIndex,
     exists: state.createUser.isExisting,
-    patient: state.createUser.patient });
+    patient: state.createUser.user });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreatePatientPopup);

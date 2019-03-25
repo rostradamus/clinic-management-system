@@ -59,8 +59,30 @@ class UserPopup extends Component {
     }else if (type === 'Admin') {
       deleteAction = this.props.dispatch(UserAction.deleteAdmin(user));
     }else {
+      deleteAction = this.props.dispatch(UserAction.deleteStaff(user));
+    }
+    deleteAction
+     // .then(() => this.props.dispatch(UserAction.getUsers()))
+      .then(() => this.props.dispatch(UserAction.closeUserPopup()))
+      .catch(() => alert("Fatal: This should never happen"));
+  }
+
+  _deleteOpen = () => {
+    const {deleteOpen} = this.state;
+    this.setState({ deleteOpen: !deleteOpen })
+  }
+
+  _deleteUser(data) {
+    var deleteAction;
+    const {deleteOpen, ...user} = this.state;
+    const {type} = this.state;
+    console.log(type);
+    if(type ==='Patient'){
+      deleteAction = this.props.dispatch(UserAction.deletePatient(user))
+    }else if (type === 'Admin') {
+      deleteAction = this.props.dispatch(UserAction.deleteAdmin(user));
+    }else {
       deleteAction = this.props.dispatch(UserAction.deleteUser(user));
-      //change to deleteStaff once endpoint created.
     }
     deleteAction
       .then(() => this.props.dispatch(UserAction.closeUserPopup()))

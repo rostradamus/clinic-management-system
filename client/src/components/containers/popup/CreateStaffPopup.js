@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Modal, Grid, Button, Select, Header, Input, Form, Container, Divider} from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import * as moment from 'moment';
-import { CreateUserAction } from 'actions';
+import { UserAction, CreateUserAction } from 'actions';
 import { STATE_CONST } from './CreateUserPopup';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -57,7 +57,6 @@ class CreateStaffPopup extends Component{
     this.handleInputChange=this.handleInputChange.bind(this);
     this.handleDateChange=this.handleDateChange.bind(this);
     this.handleSelectChange=this.handleSelectChange.bind(this);
-    this.handleCreate=this.handleCreate.bind(this);
   }
 
   handleInputChange(event, key) {
@@ -82,19 +81,39 @@ class CreateStaffPopup extends Component{
       [field]: value}});
   }
 
- handleCreate(event){
+  handleFinalValidation(event) {
     event.preventDefault();
-    if(this.validateForm()){
-      const {therapist_type, ...User} = this.state.form;
-      if(this.props.typeUser === 'Staff'){
-        const staff = Object.assign({
+    var createAction;
+    if(!this.validateForm()) return;
+
+    this.props.getUserByEmail(this.state.form.email)
+     .then(()=> {
+      if(this.props.user.length === 0){
+          if(this.props.typeUser === 'Admin'){
+              this.handleCreateAdmin();
+            }else this.handleCreateStaff();
+      }else{
+       alert("Email exists")
+       //TODO: error handle
+      }})
+     .catch(() => alert("Fatal: This should never happen"));
+  }
+
+  handleCreateStaff() {
+    const {therapist_type, ... User} = this.state.form;
+    const staff = Object.assign({
           Staff:{therapist_type:therapist_type},
           User});
-        this.props.createUser(staff);
-      }else{
-        this.props.createAdmin({User});
-      }
-    }
+    this.props.createStaff(staff)
+      .then(() => this.props.getUsers())
+      .catch(() => alert("Fatal: This should never happen"));
+  }
+
+  handleCreateAdmin() {
+    const {therapist_type, ... User} = this.state.form;
+    this.props.createAdmin({User})
+      .then(() => this.props.getUsers())
+      .catch(() => alert("Fatal: This should never happen"));
   }
 
   validateForm() {
@@ -222,12 +241,11 @@ class CreateStaffPopup extends Component{
     if(this.props.created){
       this.props.onClose();
     }else{
-      this.handleCreate(event);
+      this.handleFinalValidation(event);
     }
   }
 
   render() {
-    console.log(this.props.created);
     return (
       <React.Fragment>
         {!this.props.created && this.renderForm()}
@@ -242,13 +260,17 @@ const mapDispatchToProps = dispatch => {
   return bindActionCreators(
     {
       createUser: CreateUserAction.addUser,
-      createAdmin: CreateUserAction.createAdmin
+      createAdmin: CreateUserAction.createAdmin,
+      createStaff: CreateUserAction.createStaff,
+      getUsers: UserAction.getUsers,
+      getUserByEmail: CreateUserAction.getUserByEmail
     },
     dispatch
   );
 }
 
 const mapStateToProps = state => (
-  { created: state.createUser.created});
+  { user: state.createUser.user,
+    created: state.createUser.created});
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateStaffPopup);
