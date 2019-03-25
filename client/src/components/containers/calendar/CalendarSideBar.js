@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 // import {connect} from 'react-redux';
+import { isEmpty } from "lodash";
 import { Grid, Button, Icon } from "semantic-ui-react";
 import { PatientStaffSearch } from 'components/containers/popup';
 import { CalendarPopup } from 'components/containers/popup';
@@ -48,11 +49,15 @@ class CalendarSideBar extends Component {
     this.setState({ isCalendarPopupOpen: !this.state.isCalendarPopupOpen });
   }
 
+  handlePrintCalendar() {
+
+  }
+
   render() {
     const { isCalendarPopupOpen, isSearchOpen } = this.state;
     const { selectedUser, patientsStaffs, currentUser} = this.props;
     return(
-      <Grid.Column width={2} textAlign="center" style={gridColumnStyle}>
+      <Grid.Column className="non-printable" width={2} textAlign="center" style={gridColumnStyle}>
         { currentUser && currentUser.type === "Administrator" ?
           <Grid.Row style={gridRowStyle}>
             <Button
@@ -87,6 +92,7 @@ class CalendarSideBar extends Component {
           <Button
             size='medium'
             style={buttonStyle}
+            disabled={ isEmpty(selectedUser) }
             // TODO: TD-70 implement our onw print functionality
             onClick= {window.print.bind(window)}>
             Print
