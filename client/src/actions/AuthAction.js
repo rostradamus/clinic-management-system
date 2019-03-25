@@ -22,7 +22,7 @@ export default class AuthAction {
       } catch(err) {
         dispatch({
           type: AUTH_ACTION_TYPE.LOGIN_FAILURE,
-          payload: { err }
+          payload: { err, isFetching: false }
         });
         throw err;
       }
@@ -52,9 +52,11 @@ export default class AuthAction {
       } catch(err) {
         dispatch({
           type: AUTH_ACTION_TYPE.LOGIN_FAILURE,
-          payload: { err }
+          payload: {
+            err: err.response.data,
+            isFetching: false
+          }
         });
-        throw err;
       }
     }
   };
@@ -79,8 +81,8 @@ export default class AuthAction {
       } catch(err) {
         dispatch({
           type: AUTH_ACTION_TYPE.LOGOUT_FAILURE,
-          payload: { err }
-        })
+          payload: { err, isFetching: false }
+        });
       }
     }
   };
