@@ -41,13 +41,13 @@ module.exports = {
     return qm.makeQuery(query);
   },
 
-  getAllActiveUsers: function() {
+  getAllActiveUsers: function(query = {}) {
     const options = {
       columns: this.VISIBILE_COLUMNS,
-      where: { active: true }
+      where: Object.assign({...query}, { active: true })
     };
-    const query = qm.getBaseQuery(this.TABLE_NAME, options);
-    return qm.makeQuery(query);
+    const stmt = qm.getBaseQuery(this.TABLE_NAME, options);
+    return qm.makeQuery(stmt);
   },
 
   createUser: async function(data) {
@@ -65,7 +65,7 @@ module.exports = {
   updateUserWithId: function(id, data) {
     return qm.updateThenGetEntry(this.TABLE_NAME, id, data, { columns: this.VISIBILE_COLUMNS });
   },
-
+  
   softDeleteUserWithId: async function(id) {
     try {
       const user = await getActiveUserWithId(id);
