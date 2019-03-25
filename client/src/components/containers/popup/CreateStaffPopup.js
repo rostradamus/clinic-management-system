@@ -26,7 +26,7 @@ const PERMISSION_TYPE = [
 ];
 
 const defaultPermission = {
-  Admin: 'High',
+  Administrator: 'High',
   Staff: 'Medium',
   Patient: 'Low'
 }
@@ -89,7 +89,7 @@ class CreateStaffPopup extends Component{
     this.props.getUserByEmail(this.state.form.email)
      .then(()=> {
       if(this.props.user.length === 0){
-          if(this.props.typeUser === 'Admin'){
+          if(this.props.typeUser === 'Administrator'){
               this.handleCreateAdmin();
             }else this.handleCreateStaff();
       }else{
@@ -259,7 +259,6 @@ class CreateStaffPopup extends Component{
 const mapDispatchToProps = dispatch => {
   return bindActionCreators(
     {
-      createUser: CreateUserAction.addUser,
       createAdmin: CreateUserAction.createAdmin,
       createStaff: CreateUserAction.createStaff,
       getUsers: UserAction.getUsers,
