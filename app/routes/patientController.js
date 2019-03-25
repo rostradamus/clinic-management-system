@@ -66,10 +66,8 @@ routes.post("/", async (req, res) => {
     const user = await userManager.createUser(userData);
     const patientData = Object.assign({...req.body.Patient}, { id: user[0].id });
     const admissionRecordData = Object.assign({...req.body.Admission_record}, { patient_id: user[0].id });
-    const [patient, admissionRecord] = await Promise.all([
-      patientManager.createPatient(patientData),
-      admissionRecordManager.createAdmissionRecord(admissionRecordData)
-    ]);
+    const patient = await patientManager.createPatient(patientData);
+    const admissionRecord = await admissionRecordManager.createAdmissionRecord(admissionRecordData);
     await db.commit();
     res.status(200);
     res.send({
@@ -88,11 +86,9 @@ routes.put("/:patient_id", async (req, res) => {
   await db.beginTransaction();
   try {
     const userData = Object.assign({...req.body.User}, { username: req.body.Patient.mrn });
-    const [user, patient, admissionRecord] = await Promise.all([
-      userManager.updateUserWithId(patient_id, userData),
-      patientManager.updatePatientWithId(patient_id, req.body.Patient),
-      admissionRecordManager.updateAdmissionRecord(req.body.Admission_record)
-    ]);
+    const user = await userManager.updateUserWithId(patient_id, userData);
+    const patient = await patientManager.updatePatientWithId(patient_id, req.body.Patient);
+    const admissionRecord = await admissionRecordManager.updateAdmissionRecord(req.body.Admission_record);
     await db.commit();
     res.status(200);
     res.send({
@@ -110,10 +106,8 @@ routes.delete("/:patient_id", async (req, res) => {
   const { patient_id } = req.params;
   await db.beginTransaction();
   try {
-    await Promise.all([
-      admissionRecordManager.dischargeAdmissionRecordWithPatientId(patient_id),
-      userManager.softDeleteUserWithId(patient_id)
-    ]);
+    await admissionRecordManager.dischargeAdmissionRecordWithPatientId(patient_id);
+    await userManager.softDeleteUserWithId(patient_id);
     await db.commit();
     res.sendStatus(204);
   } catch(e) {

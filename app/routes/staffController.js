@@ -60,10 +60,8 @@ routes.put("/:staff_id", async (req, res) => {
   await db.beginTransaction();
   try {
     const userData = Object.assign({...req.body.User}, { username: req.body.User.email });
-    const [user, staff] = await Promise.all([
-      userManager.updateUserWithId(staff_id, userData),
-      staffManager.updateStaffWithId(staff_id, req.body.Staff)
-    ]);
+    const user = await userManager.updateUserWithId(staff_id, userData);
+    const staff = await staffManager.updateStaffWithId(staff_id, req.body.Staff);
     await db.commit();
     res.status(200);
     res.send({
