@@ -119,7 +119,7 @@ class Calendar extends Component {
   render() {
     const today = moment().toDate();
     const { isCalendarPopupOpen } = this.state;
-    const { errorMessage, events, selectedUser, patientsStaffs} = this.props;
+    const { errorMessage, events, selectedUser, patientsStaffs, currentUser} = this.props;
 
     if (this._isEmptyUserObj(selectedUser)) {
       return (
@@ -164,7 +164,7 @@ class Calendar extends Component {
           />
         </Grid.Row>
 
-        {isCalendarPopupOpen ?
+        {currentUser && currentUser.type === "Administrator" && isCalendarPopupOpen ?
           <CalendarPopup
             isOpen={ isCalendarPopupOpen }
             onClose={ this.toggleAddModal }
