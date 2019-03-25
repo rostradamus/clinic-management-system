@@ -87,7 +87,9 @@ class CalendarSideBar extends Component {
         <Grid.Row>
           <Button
             size='medium'
-            style={buttonStyle}>
+            style={buttonStyle}
+            // TODO: TD-70 implement our onw print functionality
+            onClick= {window.print.bind(window)}>
             Print
           </Button>
         </Grid.Row>
