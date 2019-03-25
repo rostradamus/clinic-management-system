@@ -7,15 +7,6 @@ import ReportReducer from "./ReportReducer";
 import CreateUserReducer from "./CreateUserReducer";
 import PatientStaffSearchReducer from "./PatientStaffSearchReducer";
 
-// export default combineReducers({
-//   auth: AuthReducer,
-//   calendar: CalendarReducer,
-//   user: UserReducer,
-//   report: ReportReducer,
-//   createUser: CreateUserReducer,
-//   patientStaffSearch: PatientStaffSearchReducer
-// });
-
 const appReducer = combineReducers({
   auth: AuthReducer,
   calendar: CalendarReducer,
