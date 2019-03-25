@@ -143,7 +143,6 @@ export default class UserAction {
   }
 
   static deleteAdmin(data) {
-    console.log(data.id);
     return async dispatch => {
       dispatch({
         type: USER_ACTION_TYPE.ADMIN_DELETE_REQUEST,
@@ -158,6 +157,29 @@ export default class UserAction {
       } catch (err) {
         dispatch({
           type: USER_ACTION_TYPE.ADMIN_DELETE_FAILURE,
+          payload: {
+            err: err
+          }
+        });
+      }
+    };
+  }
+
+  static deleteStaff(data) {
+    return async dispatch => {
+      dispatch({
+        type: USER_ACTION_TYPE.STAFF_DELETE_REQUEST,
+        payload: {}
+      });
+      try {
+        const res = await axios.delete(`/api/staffs/${data.id}`, data);
+        dispatch({
+          type: USER_ACTION_TYPE.STAFF_DELETE_SUCCESS,
+          payload: res.data
+        });
+      } catch (err) {
+        dispatch({
+          type: USER_ACTION_TYPE.STAFF_DELETE_FAILURE,
           payload: {
             err: err
           }
