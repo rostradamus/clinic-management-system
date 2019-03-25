@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const BCRYPT_SALT_ROUNDS = 10;
 
 routes.get("/", (req, res) => {
-  userManager.getAllActiveUsers()
+  userManager.getAllActiveUsers(req.query)
     .then(result => {
       res.status(200);
       res.send(result);
