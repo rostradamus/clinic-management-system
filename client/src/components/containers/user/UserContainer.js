@@ -64,7 +64,6 @@ class UserContainer extends Component {
           onClick={ () => this.props.dispatch(CreateUserAction.openPopup()) }>Create User</Button>
         <CreateUserPopup />
         <UserTable />
-        <UserPopup />
       </Container>
     );
   }

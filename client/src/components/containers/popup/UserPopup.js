@@ -26,6 +26,18 @@ class UserPopup extends Component {
     return {};
   }
 
+  _renderDeleteButton() {
+    const isOwnUser = this.props.user && this.props.user.id === this.props.current_user.id;
+    if (isOwnUser) 
+      return (<Grid.Column />);
+    return (
+      <Grid.Column>
+        <Button floated="left"onClick={this._deleteOpen}><Icon name="delete"/>Delete</Button>
+        <Confirm open={this.state.deleteOpen} onCancel={this._deleteOpen} onConfirm={() => this._deleteUser(this.state) }/>
+      </Grid.Column>
+    );
+  }
+
    _handleInputChange(e, {name, value}) {
     this.setState({[name]: value});
   }
@@ -42,7 +54,6 @@ class UserPopup extends Component {
     var deleteAction;
     const {deleteOpen, ...user} = this.state;
     const {type} = this.state;
-    console.log(type);
     if(type ==='Patient'){
       deleteAction = this.props.dispatch(UserAction.deletePatient(user))
     }else if (type === 'Admin') {
@@ -64,7 +75,6 @@ class UserPopup extends Component {
   render() {
     const { first_name, last_name, email,
       phone_number, type, permission_level } = this.state;
-      console.log(this.props.user);
 
     return (
       <Modal
@@ -113,10 +123,7 @@ class UserPopup extends Component {
         </Modal.Content>
           <Modal.Actions>
             <Grid columns={2} className="modal-action">
-            <Grid.Column>
-              <Button floated="left"onClick={this._deleteOpen}><Icon name="delete"/>Delete</Button>
-              <Confirm open={this.state.deleteOpen} onCancel={this._deleteOpen} onConfirm={() => this._deleteUser(this.state) }/>
-            </Grid.Column>
+            { this._renderDeleteButton() }
             <Grid.Column>
               <Button
               positive
@@ -133,6 +140,6 @@ class UserPopup extends Component {
   }
 }
 
-const mapStateToProps = state => ({ user: state.user.popupUser });
+const mapStateToProps = state => ({ user: state.user.popupUser, current_user: state.auth.current_user });
 
-export default connect(mapStateToProps)(UserPopup)
+export default connect(mapStateToProps)(UserPopup);

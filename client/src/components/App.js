@@ -4,6 +4,7 @@ import * as Containers from "components/containers";
 import { Container } from "semantic-ui-react";
 import { connect } from "react-redux";
 import { AuthAction } from 'actions';
+import { UserPopup } from "components/containers/popup";
 import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
 
 const PrivateRoute = ({ component: Component, hasLoggedIn, ...rest }) => {
@@ -46,6 +47,7 @@ class App extends Component {
               <PrivateRoute key="user" path="/user" component={Containers.UserContainer} hasLoggedIn={this.props.auth.hasLoggedIn} />
               <Route key="page404" path="/*" component={Layouts.Page404} />
             </Switch>
+            <UserPopup />
           </Container>
         </div>
       </Router>
