@@ -61,7 +61,7 @@ class CreateUserPopup extends Component{
 
   render() {
     const { typeUser, onNext } = this.state;
-    const labels = ['Admin', 'Staff', 'Patient'];
+    const labels = [ {key:'Admin', value:'Administrator'}, {key:'Staff', value:'Staff'}, {key:'Patient', value:'Patient'}];
 
     return(
       <Modal size="tiny" className="createUserPopupModal" closeIcon onClose={ () => this.closePopup() } open={ this.props.popup }>
@@ -73,15 +73,15 @@ class CreateUserPopup extends Component{
             <Modal.Content>
               <Container textAlign='center' className="select-user">
                 {labels.map(label=>(
-                  <div key={label}>
+                  <div key={label['key']}>
                     <Button
                       size='big'
                       className="select-btn"
-                      toggle active = {this.state.isUserSelected && ({label} === this.typeUser)}
+                      toggle active = {this.state.isUserSelected && (label['value'] === this.typeUser)}
                       onClick={this._handleSelectUserClick}
-                      id={label}
+                      id={label['value']}
                     >
-                    {label}
+                    {label['key']}
                     </Button>
                   </div>
                 ))}
