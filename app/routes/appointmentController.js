@@ -132,7 +132,7 @@ routes.post("/", async (req, res) => {
       // end_date: new Date(end), // This is used with repetition commented out as it is not part of MVP
       repetition: "none", // This is not part of mvp. Value is inside req.body
       is_cancelled: false,
-      is_attend: isAttend,
+      is_attend: true,
     };
 
     const existingStaffAppointments = await appointmentManager.getTimeConflictAppointmentCreate(staff.id, "Staff", data);
