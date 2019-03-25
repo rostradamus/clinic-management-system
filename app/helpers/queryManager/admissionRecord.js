@@ -1,6 +1,7 @@
 const qm = require("@app/helpers/queryManager");
 const mysql = require('mysql');
 const db = require("@config/db/connection").connectDatabase();
+const userManager = require("@app/helpers/queryManager/User");
 
 const TABLE_NAME = "Admission_record";
 
@@ -33,6 +34,9 @@ module.exports = {
     await db.beginTransaction();
     try {
       const dischargeResult = await this.dischargeAdmissionRecordWithPatientId(data.patient_id);
+      if (!data.discharge_date || moment(data.discharge_date).isAfter(moment())) {
+        await userManager.updateUserWithId(data.patient_id, { active: true });
+      }
       result = await qm.createThenGetEntry(TABLE_NAME, data);
       await db.commit();
     } catch(e) {
