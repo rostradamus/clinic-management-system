@@ -44,6 +44,9 @@ function groupByPatient(appointmentList) {
             appointment.startDate = item.start_date;
             appointment.endDate = item.end_date;
             appointment.duration = item.duration;
+            appointment.therapyType = item.type_of_therapy;
+            appointment.isAttend = item.is_attend;
+            appointment.isCancelled = item.is_cancelled;
             appointments.push(appointment);
         } 
     });
