@@ -40,9 +40,9 @@ class UserContainer extends Component {
             active={ filter === "all" }
             onClick={ this._handleMenuItemClick }>All</Menu.Item>
           <Menu.Item
-            name="admin"
-            active={ filter === "admin" }
-            onClick={ this._handleMenuItemClick }>Admins</Menu.Item>
+            name="administrator"
+            active={ filter === "administrator" }
+            onClick={ this._handleMenuItemClick }>Administrators</Menu.Item>
           <Menu.Item
             name="staff"
             active={ filter === "staff" }

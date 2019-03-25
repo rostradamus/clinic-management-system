@@ -4,6 +4,7 @@ import * as Containers from "components/containers";
 import { Container } from "semantic-ui-react";
 import { connect } from "react-redux";
 import { AuthAction } from 'actions';
+import { isEmpty } from "lodash";
 import { UserPopup } from "components/containers/popup";
 import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
 
@@ -26,7 +27,7 @@ class App extends Component {
     this.state = {};
   }
   static getDerivedStateFromProps(props, state) {
-    if (!props.auth.isFetching && !props.auth.hasLoggedIn) {
+    if (!props.auth.isFetching && isEmpty(props.auth.err) && !props.auth.hasLoggedIn) {
       props.dispatch(AuthAction.checkUser());
     }
     return null;

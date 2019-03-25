@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from "react-router-dom";
 import { AuthAction } from 'actions';
+import { isEmpty } from "lodash";
 import { bindActionCreators } from 'redux';
-import { Form, Button, Segment } from "semantic-ui-react";
+import { Form, Button, Segment, Label } from "semantic-ui-react";
 import { ReactComponent as Logo } from "assets/logo.svg";
 import "./LoginForm.css";
 
@@ -46,6 +47,16 @@ class LoginForm extends Component {
     e.preventDefault();
   }
 
+  handleLoginError(field) {
+    if (isEmpty(this.props.err) || field !== this.props.err.field)
+      return null;
+    return (
+      <Label basic color='red' pointing>
+        { this.props.err.message }
+      </Label>
+    );
+  }
+
   // validateForm() {
   //   return this.state.username.length > 0 && this.state.password.length > 0;
   // }
@@ -66,7 +77,9 @@ class LoginForm extends Component {
                   value={this.state.username}
                   onChange={this.handleInputChange}
                   style={{ border: "none", padding: "0", height: "50px" }} />
+                { this.handleLoginError("username") }
               </Form.Field>
+
               <Form.Field className="loginField">
                 <input
                   type="password"
@@ -76,6 +89,7 @@ class LoginForm extends Component {
                   value={this.state.password}
                   onChange={this.handleInputChange}
                   style={{ border: "none", padding: "0", height: "50px" }} />
+                { this.handleLoginError("password") }
               </Form.Field>
               <Button primary fluid type="submit" className="loginButton">LOGIN</Button>
             </Form>
