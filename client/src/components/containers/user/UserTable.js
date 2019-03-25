@@ -61,7 +61,7 @@ class UserTable extends Component {
         <Table.Body
           children={ processedUsers.map(this._renderTableRow.bind(this)) } />
 
-        <Table.Footer>
+        {/*<Table.Footer>
           <Table.Row textAlign="center">
             <Table.HeaderCell colSpan="4">
               <Menu pagination>
@@ -78,7 +78,7 @@ class UserTable extends Component {
               </Menu>
             </Table.HeaderCell>
           </Table.Row>
-        </Table.Footer>
+        </Table.Footer>*/}
       </Table>
     );
   }
