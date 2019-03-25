@@ -26,10 +26,6 @@ const menuItems = [
 class NavBar extends Component {
   constructor(props) {
     super(props);
-    const activeItem = menuItems.find(item => item.path === props.location.pathname);
-    // this.state = {
-    //   activeItem: (activeItem && activeItem.name) || MenuTitle.APPOINTMENTS
-    // };
   }
 
   static getDerivedStateFromProps(props, state) {
