@@ -30,14 +30,14 @@ let generateMailOptionsForNewAppointment = function(appointment, patientUser, st
   }
 }
 
-let generateMailOptionsForUpdateAppointment = function(appointment, patientUser, staffUser) {
+let generateMailOptionsForUpdateAppointment = function(appointment, currentAppointment, patientUser, staffUser) {
   let event = iCalAttachmentGenerator(appointment, patientUser);
   return {
     from: process.env.NODE_MAILER_USER,
     // to: staffUser.email,
     to: "gfstrongteststaff@gmail.com",
     subject: `Updated appointment with ${patientUser.first_name} ${patientUser.last_name}`,
-    text: `The appointment with ${patientUser.first_name} ${patientUser.last_name} has been changed. \n Please save this event to your calendar, and remove the previous appointment. \n To save this event in your calendar you must do this: \n 1. Open the ics attachment \n 2. Click 'Save & close'`,
+    text: `The appointment with ${patientUser.first_name} ${patientUser.last_name} on ${currentAppointment.start_date} ${currentAppointment.start_time} to ${currentAppointment.end_time} has been changed. \n Please save this event to your calendar, and remove the previous appointment. \n To save this event in your calendar you must do this: \n 1. Open the ics attachment \n 2. Click 'Save & close'`,
     icalEvent: event
   }
 }
@@ -75,13 +75,13 @@ let getDateTime = function(date, startTime, endTime) {
 }
 
 module.exports = {
-  sendMailForAppointment: function(appointment, patientUser, staffUser, isNewAppointment) {
+  sendMailForAppointment: function(appointment, patientUser, staffUser, isNewAppointment, currentAppointment = {}) {
     let transport = getTransporter();
     let mailOptions;
     if(isNewAppointment) {
       mailOptions = generateMailOptionsForNewAppointment(appointment, patientUser, staffUser);
     } else {
-      mailOptions = generateMailOptionsForUpdateAppointment(appointment, patientUser, staffUser);
+      mailOptions = generateMailOptionsForUpdateAppointment(appointment, currentAppointment, patientUser, staffUser);
     }
     transporter.sendMail(mailOptions, function (err, info) {
       if(err)

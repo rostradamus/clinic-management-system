@@ -29,6 +29,10 @@ module.exports = {
     return qm.softDeleteEntry(TABLE_NAME, id, { is_cancelled: true });
   },
 
+  revertSoftDeleteAppointmentWithId: function(id) {
+    return qm.softDeleteEntry(TABLE_NAME, id, { is_cancelled: false });
+  },
+
   getAppointmentWithId: function(id) {
     const query = qm.getWithIdBaseQuery(TABLE_NAME, id);
     return qm.makeQuery(query);

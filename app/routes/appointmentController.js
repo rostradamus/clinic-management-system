@@ -12,14 +12,13 @@ let isValidPostRequestBody = (body) => {
     moment(start).isValid() && moment(end).isValid();
 }
 
-let processEmail = async (resAppointment, isNewAppointment) => {
+let processEmail = async function(resAppointment, isNewAppointment, currentAppointment = {}) {
   try {
     const [patientUser, staffUser] = await Promise.all([
       appointmentManager.getUserWithIdFromTable(resAppointment.patient_id),
       appointmentManager.getUserWithIdFromTable(resAppointment.staff_id)
     ]);
-
-    return emailManager.sendMailForAppointment(resAppointment, patientUser[0], staffUser[0], isNewAppointment) ? true : false;
+    return emailManager.sendMailForAppointment(resAppointment, patientUser[0], staffUser[0], isNewAppointment, currentAppointment) ? true : false;
   } catch(err) {
     return false;
   }
@@ -165,10 +164,15 @@ routes.post("/", async (req, res) => {
       res.status(200);
       res.send(resAppointment);
     } else {
-      // rollback database, hard delete the added appointment.
+      appointmentManager.softDeleteAppointmentWithId(resAppointment.id);
+      res.status(500).json({
+        errorMessage: {
+          status: true,
+          message: "Internal Server Error"
+        }
+      });
     }
   } catch (err) {
-    console.log(err);
     res.status(500).json({
       errorMessage: {
         status: true,
@@ -184,6 +188,7 @@ routes.put("/:appointment_id", async (req, res) => {
   const { appointment_id } = req.params;
 
   try {
+    const currentAppointment = await appointmentManager.getAppointmentWithId(appointment_id);
     const admissionRecords = await admissionRecordManager.getCurrentAdmissionRecords({patient_id : patient.id});
     if (admissionRecords.length === 0) {
       return res.status(400).json({
@@ -232,11 +237,32 @@ routes.put("/:appointment_id", async (req, res) => {
     }
     const resAppointment = formatAppointment(updatedAppointment[0], patient, staff);
 
-    if (processEmail(resAppointment, false)) {
+    if (processEmail(resAppointment, false, currentAppointment[0])) {
       res.status(200);
       res.send(resAppointment);
     } else {
-      // rollback database, hard delete the added appointment.
+      const previousData = {
+        patient_id: currentAppointment[0].patient_id,
+        staff_id: currentAppointment[0].staff_id,
+        record_id: currentAppointment[0].record_id,
+        patient_category: currentAppointment[0].patient_category,
+        type_of_therapy: currentAppointment[0].type_of_therapy,
+        start_date: currentAppointment[0].start_date,
+        start_time: currentAppointment[0].start_time,
+        end_time: currentAppointment[0].end_date,
+        is_cancelled: currentAppointment[0].is_cancelled,
+      }
+      const revertedAppointment = await appointmentManager.updateAppointmentWithId(appointment_id, previousData);
+      if (revertedAppointment.length === 0) {
+        // TODO: after MessageUtils is merged in add more detailed information of error messages.
+        throw new Error();
+      }
+      res.status(500).json({
+        errorMessage: {
+          status: true,
+          message: "Internal Server Error"
+        }
+      });
     }
   } catch (err) {
     res.status(500).json({
@@ -266,7 +292,13 @@ routes.delete("/:appointment_id", async (req, res) => {
     if (processCancellationEmail(cancelledAppointmentDetails[0])) {
       res.sendStatus(204);
     } else {
-      // rollback cancellation
+      const revertedAppointment = await appointmentManager.revertSoftDeleteAppointmentWithId(appointment_id);
+      res.status(500).json({
+        errorMessage: {
+          status: true,
+          message: "Internal Server Error"
+        }
+      });
     }
   } catch (err) {
     res.status(500).json({
