@@ -4,7 +4,7 @@ const moment = require('moment');
 
 const TABLE_NAME = "Appointment";
 const VISIBLE_COLUMNS = ["id", "patient_id", "staff_id", "record_id",
-  "type_of_therapy", "start_date", "end_date", "repetition", "start_time", "end_time"];
+  "type_of_therapy", "start_date", "end_date", "repetition", "start_time", "end_time", "is_attend"];
 
 const USER_TABLE_NAME = "User";
 const USER_VISIBLE_COLUMNS = ["id", "username", "email", "phone_number",

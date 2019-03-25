@@ -19,8 +19,8 @@ class CalendarContainer extends Component {
 
   componentDidMount() {
     const { currentUser } = this.props;
-    if (currentUser.type === "Administrator") {
-      // TODO: if current.type !== "Administrator" fetchAppointment with current user
+    if (currentUser && currentUser.type !== "Administrator") {
+      this.props.dispatch(CalendarAction.fetchAppointments(currentUser));
     }
     this.props.dispatch(PatientStaffSearchAction.getPatientAndStaff());
   }
@@ -33,7 +33,11 @@ class CalendarContainer extends Component {
     const { errorMessage, events, selectedUser, patientsStaffs, currentUser} = this.props;
     return (
       <Grid className="calendarContainer" style={gridStyle}>
-        <CalendarSideBar />
+        <CalendarSideBar
+          selectedUser={ selectedUser }
+          patientsStaffs={ patientsStaffs }
+          currentUser = { currentUser }
+        />
         <Calendar
           errorMessage={ errorMessage }
           events={ events }

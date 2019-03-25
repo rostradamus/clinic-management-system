@@ -30,7 +30,7 @@ exports.up = function(db, callback) {
       active: { type: "boolean", notNull: true, defaultValue: true }
     }),
     db.createTable.bind(db, "Administrator", {
-      id: { 
+      id: {
         type: "int",
         primaryKey: true,
         notNull: true,
@@ -46,7 +46,7 @@ exports.up = function(db, callback) {
       }
     }),
     db.createTable.bind(db, "Staff", {
-      id: { 
+      id: {
         type: "int",
         primaryKey: true,
         notNull: true,
@@ -64,7 +64,7 @@ exports.up = function(db, callback) {
       therapist_type: { type: "string", length: 255, notNull: true }
     }),
     db.createTable.bind(db, "Patient", {
-      id: { 
+      id: {
         type: "int",
         primaryKey: true,
         notNull: true,
@@ -154,7 +154,7 @@ exports.up = function(db, callback) {
       is_cancelled: { type: "boolean", notNull: true }
     })
   ], callback);
-  
+
 };
 
 exports.down = function(db, callback) {

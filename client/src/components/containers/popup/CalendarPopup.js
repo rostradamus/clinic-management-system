@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { isEqual } from 'lodash';
-import { Button, Modal, Form, Select } from 'semantic-ui-react';
+import { Button, Modal, Form, Select, Radio, Dropdown } from 'semantic-ui-react';
 import { DateInput, TimeInput } from 'semantic-ui-calendar-react';
 import { CalendarAction } from 'actions';
 import { SearchInput } from 'components/containers/search';
@@ -16,6 +16,12 @@ const REPEAT_CONST = [
   { key: 'Daily', text: 'Daily', value: 'Daily' },
   { key: 'Weekly', text: 'Weekly', value: 'Weekly' },
   { key: 'Monthly', text: 'Monthly', value: 'Monthly' }
+];
+
+const THERAPY_TYPE_CONST = [
+  { key: "type1", text: "Type 1", value: "type1" },
+  { key: "type2", text: "Type 2", value: "type2" },
+  { key: "type3", text: "Type 3", value: "type3" }
 ];
 
 const USER_TYPE = {
@@ -41,10 +47,9 @@ class CalendarPopup extends Component {
 
   constructor(props) {
     super(props);
-
+    console.log(props);
     const { event, selectedUser } = props;
-    const { start, end, isUpdateAppointment, id, staff, patient } = event;
-
+    const { start, end, isUpdateAppointment, id, staff, patient, is_attend, type_of_therapy } = event;
     this.state = {
       id: id || -1,
       selectedUser,
@@ -53,7 +58,9 @@ class CalendarPopup extends Component {
       start: start,
       end: end,
       repeat: REPEAT_CONST[0].key,
+      therapyType: type_of_therapy || "",
       isUpdateAppointment: isUpdateAppointment,
+      isAttend: !!is_attend,
       // validation fields
       startTimeError: false,
       endTimeError: false
@@ -65,6 +72,8 @@ class CalendarPopup extends Component {
     this._handleInputChange = this._handleInputChange.bind(this);
     this._handleTimeChange = this._handleTimeChange.bind(this);
     this._handleDateChange = this._handleDateChange.bind(this);
+    this._handleAttendanceChange = this._handleAttendanceChange.bind(this);
+    this._handleTherapyTypeChange = this._handleTherapyTypeChange.bind(this);
 
     // Helper functions
     this._updateTimeToCorrectDate = this._updateTimeToCorrectDate.bind(this);
@@ -158,6 +167,18 @@ class CalendarPopup extends Component {
     }
   }
 
+  _handleAttendanceChange() {
+    this.setState({ isAttend: !this.state.isAttend });
+  }
+
+  _handleTherapyTypeChange(event, { value }) {
+    if(THERAPY_TYPE_CONST.some(element => element.value === value)) {
+      this.setState({ therapyType: value });
+    } else {
+      this.setState({ therapyType: "" })
+    }
+  }
+
   /**
    * @param  {[String]} key [Will be either "start" or "end"]
    * @param  {[Moment Obj]} chosenDate [Moment obj with date format MM-DD-YYYY]
@@ -246,11 +267,16 @@ class CalendarPopup extends Component {
     );
   }
 
+  /**
+   * Will disable button if necessary fields are not filled out. If selected date is before today it will allow
+   * creation and update, but will highlight the date input to notify user.
+   * @return {Boolean}
+   */
   _isButtonDisabled() {
-    const { patient, staff, start, end, startTimeError, endTimeError } = this.state;
+    const { patient, staff, start, end, startTimeError, endTimeError, therapyType } = this.state;
     return !moment(start).isValid() || !moment(end).isValid()
       || isEqual(patient, {}) || isEqual(staff, {}) ||
-      startTimeError || endTimeError;
+      startTimeError || endTimeError || therapyType === "";
   }
 
   _renderModalActionButton() {
@@ -371,12 +397,48 @@ class CalendarPopup extends Component {
     );
   }
 
+  _renderAttendanceForm() {
+    const {isAttend} = this.state;
+    return(
+      <Form.Field>
+        <Radio
+          toggle
+          label={ isAttend ? "Patient attended" : "Patient did not attend" }
+          onChange={ this._handleAttendanceChange }
+          checked={ isAttend }
+        />
+      </Form.Field>
+    )
+  }
+  _getTherapyTypePlaceholder(value) {
+    const therapy = THERAPY_TYPE_CONST.find(elem => elem.value === value);
+    return therapy ? therapy.text : "Select a Therapy Type";
+  }
+  _renderTypeOfTherapy() {
+    const { therapyType } = this.state;
+    return(
+      <Form.Field
+        error = { therapyType === "" }
+        control={ Select }
+        placeholder={ this._getTherapyTypePlaceholder(therapyType) }
+        label=" Therapy Type *"
+        onChange={ this._handleTherapyTypeChange }
+        options={ THERAPY_TYPE_CONST }
+      />
+    );
+  }
+
   _renderModalContent() {
+    const { start, isUpdateAppointment } = this.state;
     return(
       <Form>
         { this._renderPatientForm() }
         { this._renderStaffForm() }
         { this._renderDateTimeForm() }
+        { this._renderTypeOfTherapy() }
+        { moment(start).isBefore(moment()) && isUpdateAppointment ?
+          this._renderAttendanceForm() : null
+        }
         { /** this._renderRepeatDropDownForm() */}
       </Form>
     );

@@ -109,8 +109,7 @@ routes.get("/", async (req, res) => {
 
 // POST /api/appointments
 routes.post("/", async (req, res) => {
-  const {patient, staff, start, end, isCancelled} = req.body;
-
+  const {patient, staff, start, end, isCancelled, therapyType, isAttend} = req.body;
   try {
     const admissionRecords = await admissionRecordManager.getCurrentAdmissionRecords({patient_id : patient.id});
     if (admissionRecords.length === 0) {
@@ -127,13 +126,14 @@ routes.post("/", async (req, res) => {
       staff_id: staff.id,
       record_id: admissionRecords[0].id,
       patient_category: admissionRecords[0].patient_category,
-      type_of_therapy: "STUB",
+      type_of_therapy: therapyType,
       start_date: moment(start, "YYYY-MM-DDTHH:mm").format("YYYY-MM-DD"),
       start_time: moment(start, "YYYY-MM-DDTHH:mm").format("HH:mm:ss"),
       end_time: moment(end, "YYYY-MM-DDTHH:mm").format("HH:mm:ss"),
       // end_date: new Date(end), // This is used with repetition commented out as it is not part of MVP
       repetition: "none", // This is not part of mvp. Value is inside req.body
-      is_cancelled: false
+      is_cancelled: false,
+      is_attend: isAttend,
     };
 
     const existingStaffAppointments = await appointmentManager.getTimeConflictAppointmentCreate(staff.id, "Staff", data);
@@ -180,7 +180,7 @@ routes.post("/", async (req, res) => {
 
 // PUT /api/appointments/:appointment_id
 routes.put("/:appointment_id", async (req, res) => {
-  const {patient, staff, start, end, isCancelled} = req.body;
+  const {patient, staff, start, end, isCancelled, therapyType, isAttend} = req.body;
   const { appointment_id } = req.params;
 
   try {
@@ -199,11 +199,12 @@ routes.put("/:appointment_id", async (req, res) => {
       staff_id: staff.id,
       record_id: admissionRecords[0].id,
       patient_category: admissionRecords[0].patient_category,
-      type_of_therapy: "STUB", // TODO: this may also be updated depending on the change of user
+      type_of_therapy: therapyType,
       start_date: moment(start, "YYYY-MM-DDTHH:mm").format("YYYY-MM-DD"),
       start_time: moment(start, "YYYY-MM-DDTHH:mm").format("HH:mm:ss"),
       end_time: moment(end, "YYYY-MM-DDTHH:mm").format("HH:mm:ss"),
-      is_cancelled: false
+      is_cancelled: false,
+      is_attend: isAttend,
     };
 
     const existingStaffAppointments = await appointmentManager.getTimeConflictAppointmentUpdate(staff.id, "Staff", data, appointment_id);
