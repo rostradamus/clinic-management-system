@@ -6,9 +6,9 @@ module.exports = {
   getAllAppointmentsWithPatientAndAdmissionRecordInfo: function() {
     const query = "SELECT A.id AS appointment_id, A.patient_id , A.record_id, CONCAT(U.first_name, ' ', U.last_name) AS patient_name, " +
                   "P.mrn, A.start_date, A.end_date, (TIME_TO_SEC(A.end_time) - TIME_TO_SEC(A.start_time))/60 DIV 1 as duration, " +
-                  "AR.admission_date, AR.discharge_date, AR.patient_category, AR.type_of_injury FROM appointment AS A " +
+                  "A.type_of_therapy, AR.admission_date, AR.discharge_date, AR.patient_category, AR.type_of_injury FROM appointment AS A " +
                   "LEFT JOIN admission_record AS AR ON A.record_id = AR.id LEFT JOIN user AS U ON A.patient_id = U.id " +
-                  "LEFT JOIN patient AS P on A.patient_id = P.id ORDER BY AR.admission_date DESC";
+                  "LEFT JOIN patient AS P on A.patient_id = P.id WHERE A.is_attend = true AND A.is_cancelled = false ORDER BY AR.admission_date DESC";
 
     return qm.makeQuery(query);
   },
