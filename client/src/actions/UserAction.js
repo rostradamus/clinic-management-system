@@ -129,7 +129,7 @@ export default class UserAction {
         const res = await axios.delete(`/api/patients/${data.id}`);
         dispatch({
           type: USER_ACTION_TYPE.PATIENT_DELETE_SUCCESS,
-          payload: res.data
+          payload: data.id
         });
       } catch (err) {
         dispatch({
@@ -152,7 +152,7 @@ export default class UserAction {
         const res = await axios.delete(`/api/admins/${data.id}`, data);
         dispatch({
           type: USER_ACTION_TYPE.ADMIN_DELETE_SUCCESS,
-          payload: res.data
+          payload: data.id
         });
       } catch (err) {
         dispatch({
@@ -175,7 +175,7 @@ export default class UserAction {
         const res = await axios.delete(`/api/staffs/${data.id}`, data);
         dispatch({
           type: USER_ACTION_TYPE.STAFF_DELETE_SUCCESS,
-          payload: res.data
+          payload: data.id
         });
       } catch (err) {
         dispatch({
