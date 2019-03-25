@@ -95,8 +95,6 @@ class CreatePatientPopup extends Component{
       }})
     }
 
-
-
   handleSelectChange(field, { value }, formtype) {
     if(field === 'is_in_patient') value = !this.state.form.Patient.is_in_patient;
     this.setState({form: {

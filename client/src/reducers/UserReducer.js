@@ -1,4 +1,4 @@
-import { USER_ACTION_TYPE } from "actions/ActionTypes";
+import { CREATE_USER_ACTION_TYPE, USER_ACTION_TYPE } from "actions/ActionTypes";
 
 const initialState = {
   isFetching: false,
@@ -18,19 +18,22 @@ export default (state = initialState, action) => {
     case USER_ACTION_TYPE.STAFF_DELETE_REQUEST:
     case USER_ACTION_TYPE.ADMIN_DELETE_REQUEST:
     case USER_ACTION_TYPE.FETCH_REQUEST:
-    case USER_ACTION_TYPE.PATIENT_DELETE_REQUEST:
-    case USER_ACTION_TYPE.DELETE_REQUEST: {
+    case USER_ACTION_TYPE.PATIENT_DELETE_REQUEST:{
       return Object.assign({...state}, {isFetching: true}, action.payload);
     }
     case USER_ACTION_TYPE.FETCH_SUCCESS:
     case USER_ACTION_TYPE.FETCH_FAILURE:
-    case USER_ACTION_TYPE.ADMIN_DELETE_SUCCESS:
     case USER_ACTION_TYPE.ADMIN_DELETE_FAILURE:
-    case USER_ACTION_TYPE.DELETE_SUCCESS:
-    case USER_ACTION_TYPE.DELETE_FAILURE:
-    case USER_ACTION_TYPE.PATIENT_DELETE_SUCCESS:
     case USER_ACTION_TYPE.PATIENT_DELETE_FAILURE: {
       return Object.assign({...state}, {isFetching: false}, action.payload);
+    }
+    case USER_ACTION_TYPE.ADMIN_DELETE_SUCCESS:
+    case USER_ACTION_TYPE.PATIENT_DELETE_SUCCESS:
+    case USER_ACTION_TYPE.STAFF_DELETE_SUCCESS:{
+      var deleted = state.items.filter(user =>{
+          return user.id !== action.payload}
+      )
+      return Object.assign({...state}, {isFetching: false, items: deleted});
     }
     case USER_ACTION_TYPE.ADD_SUCCESS: {
       return Object.assign({...state}, { items: state.items.push(action.payload) });

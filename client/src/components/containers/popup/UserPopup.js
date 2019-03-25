@@ -28,7 +28,7 @@ class UserPopup extends Component {
 
   _renderDeleteButton() {
     const isOwnUser = this.props.user && this.props.user.id === this.props.current_user.id;
-    if (isOwnUser) 
+    if (isOwnUser)
       return (<Grid.Column />);
     return (
       <Grid.Column>
@@ -60,29 +60,6 @@ class UserPopup extends Component {
       deleteAction = this.props.dispatch(UserAction.deleteAdmin(user));
     }else {
       deleteAction = this.props.dispatch(UserAction.deleteStaff(user));
-    }
-    deleteAction
-     // .then(() => this.props.dispatch(UserAction.getUsers()))
-      .then(() => this.props.dispatch(UserAction.closeUserPopup()))
-      .catch(() => alert("Fatal: This should never happen"));
-  }
-
-  _deleteOpen = () => {
-    const {deleteOpen} = this.state;
-    this.setState({ deleteOpen: !deleteOpen })
-  }
-
-  _deleteUser(data) {
-    var deleteAction;
-    const {deleteOpen, ...user} = this.state;
-    const {type} = this.state;
-    console.log(type);
-    if(type ==='Patient'){
-      deleteAction = this.props.dispatch(UserAction.deletePatient(user))
-    }else if (type === 'Admin') {
-      deleteAction = this.props.dispatch(UserAction.deleteAdmin(user));
-    }else {
-      deleteAction = this.props.dispatch(UserAction.deleteUser(user));
     }
     deleteAction
       .then(() => this.props.dispatch(UserAction.closeUserPopup()))
