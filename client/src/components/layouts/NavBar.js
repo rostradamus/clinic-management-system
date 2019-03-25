@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { Link, withRouter } from "react-router-dom";
 import { Menu, Dropdown, Icon } from "semantic-ui-react";
 import { ReactComponent as Logo } from "assets/logo.svg";
-import { AuthAction } from "actions";
+import { AuthAction, UserAction } from "actions";
 import { UserType, MenuTitle } from "../../enums";
 import '../../css/navBar.css';
 
@@ -93,8 +93,7 @@ class NavBar extends Component {
             key="profile"
             icon="setting"
             text="My Profile"
-            as={Link}
-            to="/profile" />
+            onClick={this.props.dispatch.bind(this, UserAction.openUserPopup(this.props.auth.current_user))} />
           <Dropdown.Item
             key="logout"
             icon="log out"
