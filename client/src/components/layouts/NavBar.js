@@ -26,8 +26,9 @@ const menuItems = [
 class NavBar extends Component {
   constructor(props) {
     super(props);
+    const activeItem = menuItems.find(item => item.path === props.location.pathname);
     this.state = {
-      activeItem: MenuTitle.APPOINTMENTS,
+      activeItem: (activeItem && activeItem.name) || MenuTitle.APPOINTMENTS
     };
   }
 
