@@ -36,3 +36,9 @@
   font-size: 16px;
   text-align: center;
 }
+
+@media print {
+  .non-printable {
+    display: none !important;
+  }
+}
