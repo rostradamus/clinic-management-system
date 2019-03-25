@@ -56,7 +56,7 @@ class UserPopup extends Component {
     const {type} = this.state;
     if(type ==='Patient'){
       deleteAction = this.props.dispatch(UserAction.deletePatient(user))
-    }else if (type === 'Admin') {
+    }else if (type === 'Administrator') {
       deleteAction = this.props.dispatch(UserAction.deleteAdmin(user));
     }else {
       deleteAction = this.props.dispatch(UserAction.deleteStaff(user));

@@ -119,7 +119,7 @@ class NavBar extends Component {
   _renderCustomNavBar() {
     return (
       <Menu
-        className="navbar"
+        className="navbar non-printable"
         borderless>
         <Menu.Menu
           position="left"
