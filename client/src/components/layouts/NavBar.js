@@ -27,7 +27,14 @@ class NavBar extends Component {
   constructor(props) {
     super(props);
     const activeItem = menuItems.find(item => item.path === props.location.pathname);
-    this.state = {
+    // this.state = {
+    //   activeItem: (activeItem && activeItem.name) || MenuTitle.APPOINTMENTS
+    // };
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    const activeItem = menuItems.find(item => item.path === props.location.pathname);
+    return {
       activeItem: (activeItem && activeItem.name) || MenuTitle.APPOINTMENTS
     };
   }
