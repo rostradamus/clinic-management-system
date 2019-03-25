@@ -19,9 +19,12 @@ const REPEAT_CONST = [
 ];
 
 const THERAPY_TYPE_CONST = [
-  { key: "type1", text: "Type 1", value: "type1" },
-  { key: "type2", text: "Type 2", value: "type2" },
-  { key: "type3", text: "Type 3", value: "type3" }
+  { key: "PT", text: "PT", value: "PT" },
+  { key: "PTRA", text: "PTRA", value: "PTRA" },
+  { key: "OT", text: "OT", value: "OT" },
+  { key: "OTRA", text: "OTRA", value: "OTRA" },
+  { key: "SLP", text: "SLP", value: "SLP" },
+  { key: "SLPA", text: "SLPA", value: "SLPA" }
 ];
 
 const USER_TYPE = {
