@@ -51,7 +51,6 @@ class CalendarSideBar extends Component {
   render() {
     const { isCalendarPopupOpen, isSearchOpen } = this.state;
     const { selectedUser, patientsStaffs, currentUser} = this.props;
-    console.log("currentUser",currentUser);
     return(
       <Grid.Column width={2} textAlign="center" style={gridColumnStyle}>
         { currentUser && currentUser.type === "Administrator" ?

@@ -80,15 +80,6 @@ routes.get("/", async (req, res) => {
 
     const { id, type, first_name, last_name } = users[0];
     const appointments = await appointmentManager.getAppointmentAccordingToUser(id, type);
-    if (appointments.length === 0) {
-      return res.status(400).json({
-        errorMessage: {
-          status: true,
-          message: `No appointments exist for ${type} named ${first_name} ${last_name}`
-        }
-      });
-    }
-
     const resAppointments = appointments.map(row => type === "Patient" ?
         formatAppointment(row.Appointment, users[0], row.Staff) :
         formatAppointment(row.Appointment, row.Patient, users[0])
