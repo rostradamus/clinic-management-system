@@ -106,6 +106,7 @@ class CalendarSideBar extends Component {
         }
         { currentUser && currentUser.type === "Administrator" && isCalendarPopupOpen ?
           <CalendarPopup
+            isSidebarCreate={ true }
             isOpen={ isCalendarPopupOpen }
             onClose={ this.toggleCalendarModal }
             event={ event }

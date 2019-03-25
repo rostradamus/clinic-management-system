@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { isEqual } from 'lodash';
-import { Button, Modal, Form, Select, Radio, Dropdown } from 'semantic-ui-react';
+import { Button, Modal, Form, Select, Radio, Confirm } from 'semantic-ui-react';
 import { DateInput, TimeInput } from 'semantic-ui-calendar-react';
 import { CalendarAction } from 'actions';
 import { SearchInput } from 'components/containers/search';
@@ -50,8 +50,8 @@ class CalendarPopup extends Component {
 
   constructor(props) {
     super(props);
-    console.log(props);
-    const { event, selectedUser } = props;
+
+    const { event, selectedUser, isSidebarCreate } = props;
     const { start, end, isUpdateAppointment, id, staff, patient, is_attend, type_of_therapy } = event;
     this.state = {
       id: id || -1,
@@ -63,15 +63,18 @@ class CalendarPopup extends Component {
       repeat: REPEAT_CONST[0].key,
       therapyType: type_of_therapy || "",
       isUpdateAppointment: isUpdateAppointment,
-      isAttend: !!is_attend,
+      isAttend: isUpdateAppointment ? !!is_attend : true,
+      // non submission fields
+      showCancellationPopup: false,
       // validation fields
-      startTimeError: false,
-      endTimeError: false
+      startTimeError: isSidebarCreate ? isSidebarCreate : false,
+      endTimeError: isSidebarCreate ? isSidebarCreate : false,
     };
 
     // Handler functions
     this.handleSearchInputSelect = this.handleSearchInputSelect.bind(this);
     this.handleSearchResult = this.handleSearchResult.bind(this);
+    this.handleCancellationPopup = this.handleCancellationPopup.bind(this);
     this._handleInputChange = this._handleInputChange.bind(this);
     this._handleTimeChange = this._handleTimeChange.bind(this);
     this._handleDateChange = this._handleDateChange.bind(this);
@@ -145,15 +148,14 @@ class CalendarPopup extends Component {
   _handleTimeChange(event, key, { value }) {
     const hhmm = value.split(":");
     if (hhmm.length === 2) {
-      const openTime = moment(this.state[key], "hh:mm:ss").hours(7).minutes(59).seconds(59);
-      const closeTime = moment(this.state[key], "hh:mm:ss").hours(17).minutes(0).seconds(1);
+      // const openTime = moment(this.state[key], "hh:mm:ss").hours(7).minutes(59).seconds(59);
+      // const closeTime = moment(this.state[key], "hh:mm:ss").hours(17).minutes(0).seconds(1);
       const appointmentTime = moment(this.state[key])
         .hours(parseInt(hhmm[0]))
         .minutes(parseInt(hhmm[1]))
         .seconds(0);
 
-      if (!moment(appointmentTime, "hh:mm:ss").isBetween(openTime, closeTime)) return;
-
+      // if (!moment(appointmentTime, "hh:mm:ss").isBetween(openTime, closeTime)) return;
       const timeError = this._validateTime(key, appointmentTime.toDate());
       if (timeError) {
         this.setState({
@@ -255,8 +257,9 @@ class CalendarPopup extends Component {
   onCancel(event) {
     const { isUpdateAppointment, id } = this.state;
     if (!isUpdateAppointment) return;
-
     event.preventDefault();
+
+    this.setState({ showCancellationPopup: false });
     this.props.deleteAppointment(id);
     this.props.onClose();
   }
@@ -282,12 +285,16 @@ class CalendarPopup extends Component {
       startTimeError || endTimeError || therapyType === "";
   }
 
+  handleCancellationPopup() {
+    this.setState({ showCancellationPopup: !this.state.showCancellationPopup });
+  }
+
   _renderModalActionButton() {
     const { isUpdateAppointment } = this.state;
     return(
       <div>
         { isUpdateAppointment ?
-          <Button color='red' onClick={ this.onCancel }>
+          <Button color='red' onClick={ this.handleCancellationPopup }>
             Cancel
           </Button> :
           null
@@ -297,6 +304,11 @@ class CalendarPopup extends Component {
           disabled={ this._isButtonDisabled() }
           content={ isUpdateAppointment ? "Update" : "Create"}
           onClick={ this.onSubmit }
+        />
+        <Confirm
+          open={ this.state.showCancellationPopup }
+          onCancel={ this.handleCancellationPopup }
+          onConfirm={ this.onCancel }
         />
       </div>
     );
@@ -385,7 +397,7 @@ class CalendarPopup extends Component {
     );
   }
 
-  _renderRepeatDropDownForm() {
+  _renderRepeatHeaderForm() {
     const placeholder = this.state.repeat ? this.state.repeat : "Never";
     return(
       <Form.Field
@@ -442,7 +454,7 @@ class CalendarPopup extends Component {
         { moment(start).isBefore(moment()) && isUpdateAppointment ?
           this._renderAttendanceForm() : null
         }
-        { /** this._renderRepeatDropDownForm() */}
+        { /** this._renderRepeatHeaderForm() */}
       </Form>
     );
   }
