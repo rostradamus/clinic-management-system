@@ -4,8 +4,8 @@ import { DateInput } from "semantic-ui-calendar-react";
 import { connect } from "react-redux";
 import { bindActionCreators } from 'redux';
 import { ReportAction } from "actions";
-import { helper } from "../report/helper";
-import IndividualReportStatistics from "../report/IndividualReportStatistics";
+import { helper } from "components/containers/report/helper";
+import IndividualReportStatistics from "components/containers/report/IndividualReportStatistics";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import moment from "moment";
@@ -141,8 +141,8 @@ class ReportPopup extends Component {
             dateFormat="YYYY-MM-DD"
             name="date"
             placeholder="Date"
-            minDate={ moment(admissionDate, "YYYY-MM-DD").format("L") }
-            value={ moment(filterStartDate, "YYYY-MM-DD").format("L") }
+            minDate={ moment(admissionDate, "YYYY-MM-DD").format("YYYY-MM-DD") }
+            value={ moment(filterStartDate, "YYYY-MM-DD").format("YYYY-MM-DD") }
             onChange={(e, data) => this._handleFilterDateChange(e, data, "filterStartDate") }
           />
         </div>
@@ -154,7 +154,7 @@ class ReportPopup extends Component {
             dateFormat="YYYY-MM-DD"
             name="date"
             placeholder="Date"
-            value={ moment(filterEndDate).format("L") }
+            value={ moment(filterEndDate, "YYYY-MM-DD").format("YYYY-MM-DD") }
             onChange={(e, data) => this._handleFilterDateChange(e, data) }
           />
         </div>

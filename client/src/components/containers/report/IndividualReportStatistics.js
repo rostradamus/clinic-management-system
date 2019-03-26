@@ -1,5 +1,5 @@
-import * as moment from "moment";
-import { TherapyType } from "../../../enums.js";
+import moment from "moment";
+import { TherapyType } from "enums";
 
 const DATE_FORMAT = "YYYY-MM-DD";
 
