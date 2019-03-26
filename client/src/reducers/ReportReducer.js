@@ -16,7 +16,7 @@ export default (state = initialState, action) => {
     }
 
     case REPORT_ACTION_TYPE.FETCH_PATIENTS_SUCCESS:
-      return Object.assign({...state}, { isFetching: false, patients: action.payload });
+      return Object.assign({...state}, { searchText: "", isFetching: false, patients: action.payload });
 
     case REPORT_ACTION_TYPE.FETCH_PATIENTS_FAILURE:
       return Object.assign({...state}, { isFetching: false, err: action.payload });

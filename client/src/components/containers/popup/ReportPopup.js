@@ -99,12 +99,6 @@ class ReportPopup extends Component {
     return recordData[category];
   }
 
-  // TODO: actually do not konw how popupInfo can be undefiend
-  _returnStats(type) {
-    const { popupInfo } = this.props;
-    return !helper._checkUndefined(popupInfo.totalIntensity) ? popupInfo.totalIntensity[0][type] : "Not Identified";
-  }
-
   _renderStastics(stats) {
     return(
       <Container centered="true" className="statContainer">

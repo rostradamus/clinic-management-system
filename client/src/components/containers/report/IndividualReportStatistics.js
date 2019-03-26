@@ -35,7 +35,7 @@ class IndividualReportStatistics {
 
   getStatisticsObject() {
     return {
-      totalAverage: this.totalAverage,
+      totalAverage: this.totalAverage.toFixed(2),
       totalMedian: this.totalMedian,
       totalMinimum: this.totalMinimum,
       totalMaximum: this.totalMaximum,
