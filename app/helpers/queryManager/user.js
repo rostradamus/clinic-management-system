@@ -62,10 +62,14 @@ module.exports = {
     return qm.createThenGetEntry(this.TABLE_NAME, user, { columns: this.VISIBILE_COLUMNS });
   },
 
-  updateUserWithId: function(id, data) {
-    return qm.updateThenGetEntry(this.TABLE_NAME, id, data, { columns: this.VISIBILE_COLUMNS });
+  updateUserWithId: async function(id, data) {
+    if (data.password && process.env.NODE_ENV === "production") {
+      const encryptedPassword = await bcrypt.hash(data.password, BCRYPT_SALT_ROUNDS);
+      data["password"] = encryptedPassword;
+    }
+    return await qm.updateThenGetEntry(this.TABLE_NAME, id, data, { columns: this.VISIBILE_COLUMNS });
   },
-  
+
   softDeleteUserWithId: async function(id) {
     try {
       const user = await getActiveUserWithId(id);
@@ -102,4 +106,4 @@ module.exports = {
       throw err;
     }
   }
-}
+};

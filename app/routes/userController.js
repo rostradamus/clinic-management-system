@@ -1,8 +1,5 @@
 const routes = require('express').Router();
 const userManager = require("@app/helpers/queryManager/user");
-const bcrypt = require("bcrypt");
-
-const BCRYPT_SALT_ROUNDS = 10;
 
 routes.get("/", (req, res) => {
   userManager.getAllActiveUsers(req.query)

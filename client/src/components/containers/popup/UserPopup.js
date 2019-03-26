@@ -1,26 +1,34 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import { isEmpty } from "lodash";
 import { UserAction } from "actions";
-import { Confirm, Grid, Modal, Button, Icon, Form } from "semantic-ui-react";
+import { Confirm, Grid, Modal, Button, Icon, Form, Label } from "semantic-ui-react";
+
+const INITIAL_STATE = {
+  deleteOpen: false,
+  user: {
+    first_name: "",
+    last_name: "",
+    email: "",
+    password: "",
+    cPassword: "",
+    phone_number: "",
+    type: "",
+    permission_level: "",
+  },
+  error: {}
+};
 
 class UserPopup extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      deleteOpen: false,
-      first_name: "",
-      last_name: "",
-      email: "",
-      phone_number: "",
-      type: "",
-      permission_level: ""
-    };
+    this.state = INITIAL_STATE;
   }
 
   static getDerivedStateFromProps(props, state) {
-    if (props.user && props.user.id!== state.id) {
+    if (props.user && props.user.id !== state.user.id) {
       return {
-        ...props.user
+        user: Object.assign({...state.user}, props.user)
       };
     }
     return {};
@@ -38,22 +46,29 @@ class UserPopup extends Component {
     );
   }
 
-   _handleInputChange(e, {name, value}) {
-    this.setState({[name]: value});
+  _handleInputChange(e, {name, value}) {
+    const user = Object.assign({...this.state.user}, {[name]: value});
+    this.setState({user});
   }
 
   _saveUser() {
-    const {deleteOpen, ...user} = this.state
-    this.props.dispatch(UserAction.editUser(user))
-      .then(() => this.props.dispatch(UserAction.closeUserPopup()))
-      .catch(() => alert("Fatal: This should never happen"));
+    const {user} = this.state;
+    if (!this._validatePassword())
+      return;
+    delete user["cPassword"];
+    if (user.password === ""){
+      delete user["password"];
+    }
 
+    this.props.dispatch(UserAction.editUser(user))
+      .then(this._closePopup)
+      .catch(() => alert("Fatal: This should never happen"));
   }
 
   _deleteUser(data) {
     var deleteAction;
-    const {deleteOpen, ...user} = this.state;
-    const {type} = this.state;
+    const {user} = this.state;
+    const {type} = this.state.user;
     if(type ==='Patient'){
       deleteAction = this.props.dispatch(UserAction.deletePatient(user))
     }else if (type === 'Administrator') {
@@ -62,24 +77,59 @@ class UserPopup extends Component {
       deleteAction = this.props.dispatch(UserAction.deleteStaff(user));
     }
     deleteAction
-      .then(() => this.props.dispatch(UserAction.closeUserPopup()))
+      .then(this._closePopup)
       .catch(() => alert("Fatal: This should never happen"));
   }
+
+  _validatePassword() {
+    const { password, cPassword } = this.state.user;
+    // Password and Confirm Password match
+    if (password !== cPassword) {
+      this.setState({
+        error: {
+          field: "password",
+          message: "Password does NOT match."
+        }
+      });
+      return false;
+    }
+    // Empty password field
+    if (password === "") {
+      return true;
+    }
+    // TODO: Validate password more firmly
+    return true;
+  }
+
+  _handleInputError(field) {
+    if (isEmpty(this.state.error) || field !== this.state.error.field)
+      return null;
+    return (
+      <Label basic color='red' pointing>
+        { this.state.error.message }
+      </Label>
+    );
+  }
+
+  _closePopup = () => {
+    this.setState(INITIAL_STATE);
+    this.props.dispatch(UserAction.closeUserPopup())
+  };
 
   _deleteOpen = () => {
     const {deleteOpen} = this.state;
     this.setState({ deleteOpen: !deleteOpen })
-  }
+  };
 
   render() {
-    const { first_name, last_name, email,
-      phone_number, type, permission_level } = this.state;
+    const { first_name, last_name, email, password, cPassword,
+      phone_number, type, permission_level } = this.state.user;
 
     return (
       <Modal
         size="small"
         open={ this.props.user && true }
-        onClose={ () => this.props.dispatch(UserAction.closeUserPopup()) }>
+        onClose={ this._closePopup }>
         <Modal.Header>User Profile</Modal.Header>
         <Modal.Content>
           <Form>
@@ -100,6 +150,24 @@ class UserPopup extends Component {
               name="email"
               value={ email }
               onChange={ this._handleInputChange.bind(this) } />
+            <Form.Group widths="equal">
+            <Form.Input fluid
+              type="password"
+              label="New Password"
+              name="password"
+              autoComplete="new-password"
+              value={ password }
+              onChange={ this._handleInputChange.bind(this) } />
+            <Form.Field>
+            <Form.Input fluid
+              type="password"
+              label="Confirm New Password"
+              name="cPassword"
+              value={ cPassword }
+              onChange={ this._handleInputChange.bind(this) } />
+            </Form.Field>
+            </Form.Group>
+            { this._handleInputError("password") }
             <Form.Input fluid
               label="Phone Number"
               name="phone_number"
