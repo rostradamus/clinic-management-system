@@ -4,7 +4,6 @@ const initialState = {
   isFetching: false,
   patients: [],
   err: null,
-  searchText: "",
   popupInfo: {},
   openPopup: false
 };
@@ -19,9 +18,6 @@ export default (state = initialState, action) => {
 
     case REPORT_ACTION_TYPE.FETCH_PATIENTS_FAILURE:
       return Object.assign({}, state, { isFetching: false, err: action.payload });
-
-    case REPORT_ACTION_TYPE.SET_SEARCH_FIELD:
-      return Object.assign({}, state, { searchText: action.payload });
 
     case REPORT_ACTION_TYPE.SET_INFO_FOR_POPUP:
       return Object.assign({}, state, { popupInfo: action.payload });

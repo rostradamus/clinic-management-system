@@ -3,7 +3,7 @@ import axios from "axios";
 
 export default class AuthAction {
   static checkUser = () => {
-    return async dispatch => {
+    return async (dispatch) => {
       dispatch({
         type: AUTH_ACTION_TYPE.LOGIN_REQUEST,
         payload: { isFetching: true }
@@ -19,18 +19,18 @@ export default class AuthAction {
             hasLoggedIn: true
           }
         });
-      } catch(err) {
+      } catch (err) {
         dispatch({
           type: AUTH_ACTION_TYPE.LOGIN_FAILURE,
           payload: { err, isFetching: false }
         });
         throw err;
       }
-    }
+    };
   };
 
-  static loginUser = ({username, password}) => {
-    return async dispatch => {
+  static loginUser = ({ username, password }) => {
+    return async (dispatch) => {
       dispatch({
         type: AUTH_ACTION_TYPE.LOGIN_REQUEST,
         payload: { isFetching: true }
@@ -49,7 +49,7 @@ export default class AuthAction {
             hasLoggedIn: true
           }
         });
-      } catch(err) {
+      } catch (err) {
         dispatch({
           type: AUTH_ACTION_TYPE.LOGIN_FAILURE,
           payload: {
@@ -58,11 +58,11 @@ export default class AuthAction {
           }
         });
       }
-    }
+    };
   };
 
-  static logoutUser = history => {
-    return async dispatch => {
+  static logoutUser = (history) => {
+    return async (dispatch) => {
       dispatch({
         type: AUTH_ACTION_TYPE.LOGOUT_REQUEST,
         payload: { isFetching: true }
@@ -78,12 +78,12 @@ export default class AuthAction {
           }
         });
         history.push("/login");
-      } catch(err) {
+      } catch (err) {
         dispatch({
           type: AUTH_ACTION_TYPE.LOGOUT_FAILURE,
           payload: { err, isFetching: false }
         });
       }
-    }
+    };
   };
-};
+}

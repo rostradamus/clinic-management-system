@@ -3,52 +3,52 @@ const reportManager = require("@app/helpers/queryManager/report");
 const moment = require('moment');
 
 // Helper functions
-function validateAppointmentDate(admisisonDate, dischargeDate, startDate, endDate) {
+function validateAppointmentDate(admissionDate, dischargeDate, appointmentDate) {
     if (!dischargeDate) {
-        return moment(startDate).isSameOrAfter(admisisonDate);
+        return moment(appointmentDate).isSameOrAfter(admissionDate);
     } else {
-        return (moment(startDate).isSameOrAfter(admisisonDate)) && (moment(endDate).isSameOrBefore(dischargeDate));
+        return (moment(appointmentDate).isSameOrAfter(admissionDate)) && (moment(appointmentDate).isSameOrBefore(dischargeDate));
     }
 }
 
 function groupByPatient(appointmentList) {
     let result = [];
-    appointmentList.forEach((item) => {            
-        if (!result.some(p => p.patientName === item.patient_name)) {
-            let patient = {};
-            patient.patientName = item.patient_name;
-            patient.patientId = item.mrn;
-            patient.recordDatas = [];
-            result.push(patient);
-        }
+    appointmentList.forEach((item) => {
+      if (!result.some(p => p.patientName === item.patient_name)) {
+        let patient = {};
+        patient.patientName = item.patient_name;
+        patient.patientId = item.mrn;
+        patient.recordDatas = [];
+        result.push(patient);
+      }
 
-        let recordDatas = result.find(p => p.patientName === item.patient_name).recordDatas;
+      let recordDatas = result.find(p => p.patientName === item.patient_name).recordDatas;
 
-        if (!recordDatas.some(r => r.recordId === item.record_id)) {
-            let recordData = {};
-            recordData.recordId = item.record_id;
-            recordData.admissionDate = item.admission_date;
-            recordData.dischargeDate = item.discharge_date;
-            recordData.diagnosisName = item.type_of_injury;
-            recordData.diagnosisCategory = item.patient_category;
-            recordData.appointments = [];
-            recordDatas.push(recordData);
-        }
+      if (!recordDatas.some(r => r.recordId === item.record_id)) {
+        let recordData = {};
+        recordData.recordId = item.record_id;
+        recordData.admissionDate = item.admission_date;
+        recordData.dischargeDate = item.discharge_date;
+        recordData.diagnosisName = item.type_of_injury;
+        recordData.diagnosisCategory = item.patient_category;
+        recordData.appointments = [];
+        recordDatas.push(recordData);
+      }
 
-        let appointments = recordDatas.find(r => r.recordId === item.record_id).appointments;
+      let appointments = recordDatas.find(r => r.recordId === item.record_id).appointments;
 
-        let appointment = {};
+      let appointment = {};
 
-        if (validateAppointmentDate(item.admission_date, item.discharge_date, item.start_date, item.end_date)) {
-            appointment.appointmentId = item.appointment_id;
-            appointment.startDate = item.start_date;
-            appointment.endDate = item.end_date;
-            appointment.duration = item.duration;
-            appointment.therapyType = item.type_of_therapy;
-            appointment.isAttend = item.is_attend;
-            appointment.isCancelled = item.is_cancelled;
-            appointments.push(appointment);
-        } 
+      if (validateAppointmentDate(item.admission_date, item.discharge_date, item.start_date)) {
+        appointment.appointmentId = item.appointment_id;
+        appointment.startDate = item.start_date;
+        appointment.endDate = item.end_date;
+        appointment.duration = item.duration;
+        appointment.therapyType = item.type_of_therapy;
+        appointment.isAttend = item.is_attend;
+        appointment.isCancelled = item.is_cancelled;
+        appointments.push(appointment);
+      }
     });
 
     return result;
@@ -56,14 +56,13 @@ function groupByPatient(appointmentList) {
 
 routes.get("/", async (req, res) => {
     try {
-        const appointmentList = await reportManager.getAllAppointmentsWithPatientAndAdmissionRecordInfo();
-        const reports = groupByPatient(appointmentList);
-
-        res.status(200);
-        res.send(reports);
+      const appointmentList = await reportManager.getAllAppointmentsWithPatientAndAdmissionRecordInfo();
+      const reports = groupByPatient(appointmentList);
+      res.status(200);
+      res.send(reports);
     } catch (err) {
-        res.status(500);
-        console.log(err);
+      res.status(500);
+      console.log(err);
     }
 });
 

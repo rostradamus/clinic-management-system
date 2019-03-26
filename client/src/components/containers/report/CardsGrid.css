@@ -7,10 +7,10 @@
 
 .ui.card.card_ct {
   margin: 0px;
-  margin-right: 0.9375rem;
+  margin-right: 1.5rem;
   margin-bottom: 2.3rem;
   width: 14rem;
-  height: 8.5rem;
+  height: 7.8rem;
   border: 2px solid #eeeeee !important;
   box-shadow: 0 0.3rem 0.6rem 0 rgba(0, 0, 0, 0.25) !important;
 }
@@ -36,7 +36,7 @@
 
 .ui.card > .content > .description.description_ct {
   font-size: 1em;
-  padding-top: 1.5625rem;
+  padding-top: 0.8rem;
   display: flex;
   flex-direction: row;
 }

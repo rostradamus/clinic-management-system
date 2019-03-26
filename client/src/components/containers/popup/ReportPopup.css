@@ -1,7 +1,5 @@
 .ui.modal > .header.header_ct {
-  margin-left: 1.5em;
-  margin-right: 1.5em;
-  padding-bottom: 0.5em;
+  padding: 1rem 3.5rem 1.5rem 3.5rem;
 }
 .ui.container.headerContainer {
   display: flex;
@@ -32,30 +30,44 @@
   font-weight: 600;
   color: #383838;
 }
-.ui.label.date {
-  width: 7rem;
+
+.field.date_pu > .ui.input > input,
+.field.date_pu > .ui.input.focus > input,
+.field.date_pu > .ui.input > input:focus {
+  width: 7.5rem;
   margin-top: auto;
   margin-bottom: auto;
   height: 2.3rem;
-  border-radius: 0.5rem;
-  background-color: #aaba32;
+  border-radius: 0.5rem !important;
+  background-color: #aaba32 !important;
   text-align: center;
-  color: #fefefe;
+  color: #fefefe !important;
   font-size: 1rem;
   font-weight: 500;
+  cursor: pointer;
 }
+
 .admDis {
   font-size: 0.9rem;
   color: #696969;
   margin: 0.2rem;
   margin-left: 0.3rem;
 }
+
+.dateBox {
+  text-align: center;
+}
+
+.dateBox .calendar.icon {
+  display: none;
+}
+
 .dataContainer {
   display: flex !important;
   flex-direction: row;
   align-items: center;
   margin-right: -0.4em;
-  margin-bottom: -1.1rem;
+  margin-bottom: -1.7rem;
 }
 .container.dataBox {
   width: 10px;
@@ -70,23 +82,22 @@
   justify-content: space-between !important;
 }
 .patientInfo {
-  width: 20%;
+  width: 7rem;
 }
 .contentContainer {
-  height: 400px;
+  height: 60vh;
   padding-left: 35px;
   padding-right: 35px;
 }
-.contentContainer.content {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  margin-top: 0px;
+.ui.container.reportComponent {
+  padding-left: 2rem;
+  padding-right: 3rem;
+  margin-bottom: 8vh;
 }
 .ui.header.descriptionHeader {
-  font-size: 2rem;
+  font-size: 1.7rem;
   font-weight: 300 !important;
-  margin: 0px;
+  margin-bottom: 2rem;
 }
 .description.description_ct {
   display: flex;
@@ -113,7 +124,6 @@
   margin-top: 3rem !important;
   display: inherit !important;
 }
-
 .ui.button.btn_pu {
   width: 7.5em;
 }
