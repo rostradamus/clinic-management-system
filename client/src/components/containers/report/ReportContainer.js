@@ -1,9 +1,11 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import { bindActionCreators } from 'redux';
 import { Label, Input, Container } from "semantic-ui-react";
 import { ReportAction } from "actions";
 import CardsGrid from "./CardsGrid";
 import ReportPopup from "components/containers/popup/ReportPopup";
+import { isEqual } from 'lodash';
 import "./ReportContainer.css";
 
 const reportStyle = {
@@ -17,32 +19,15 @@ const reportStyle = {
 class ReportContainer extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      filteredPatients: []
-    };
-    this._handleSearch = this._handleSearch.bind(this);
-    this._filterPatients = this._filterPatients.bind(this);
+    this.handleSearchText = this.handleSearchText.bind(this);
   }
 
   componentDidMount() {
-    this.props.requestPatients().then(() => {
-      this.setState({ filteredPatients: this.props.patients });
-    });
+    this.props.requestPatients();
   }
 
-  _handleSearch(e, data) {
-    this._filterPatients(data.value);
-  }
-
-  _filterPatients(searchField) {
-    const { patients } = this.props;
-    let filteredPatients = null;
-    if (patients !== null) {
-      filteredPatients = patients.filter((patient) => {
-        return patient.patientName.toLowerCase().search(searchField.toLowerCase()) !== -1;
-      });
-      this.setState({ filteredPatients: filteredPatients });
-    }
+  handleSearchText(e, { value }) {
+    this.props.setSearchText(value);
   }
 
   render() {
@@ -56,31 +41,41 @@ class ReportContainer extends Component {
         ))}
       </div>
     );
-
+    const { openPopup, popupInfo, patients } = this.props;
     return (
       <Container>
         <Container className="container_ct">
           <CategoryLabels />
           <label className="patient">Patients</label>
-          <Input onChange={this._handleSearch.bind(this)} className="search" iconPosition="left" icon="search" placeholder="Search" />
+          <Input onChange={this.handleSearchText} className="search" iconPosition="left" icon="search" placeholder="Search" />
         </Container>
-        <CardsGrid patients={this.state.filteredPatients} />
-        <ReportPopup />
+        <CardsGrid patients={ patients } />
+        { openPopup && !isEqual(popupInfo, {}) ?
+          <ReportPopup
+            openPopup= { openPopup }
+            popupInfo= { popupInfo }
+          />
+          : null
+        }
       </Container>
     );
   }
 }
 
-const mapDispatchToProps = (dispatch) => ({
-  requestPatients: () => dispatch(ReportAction.getPatients())
-});
+const mapStateToProp = state => {
+  const { openPopup, popupInfo, searchText, patients } = state.report;
+  return {
+    openPopup,
+    popupInfo,
+    patients: patients.filter(patient => patient.patientName.toLowerCase().includes(searchText))
+  }
+};
 
-const mapStateToProp = (state) => ({
-  openPopup: state.report.openPopup,
-  patients: state.report.patients
-});
+const mapDispatchToProps = dispatch => {
+  return bindActionCreators({
+    requestPatients: ReportAction.getPatients,
+    setSearchText: ReportAction.setSearchText,
+  }, dispatch);
+}
 
-export default connect(
-  mapStateToProp,
-  mapDispatchToProps
-)(ReportContainer);
+export default connect(mapStateToProp, mapDispatchToProps) (ReportContainer);

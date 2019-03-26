@@ -59,7 +59,7 @@ class IndividualReportStatistics {
   }
 
   isValidAppointment(appointment, start, end) {
-    // Misnomer alert: appointment's startDate is currently the date of the appointment. 
+    // Misnomer alert: appointment's startDate is currently the date of the appointment.
     return moment(appointment.startDate, DATE_FORMAT).isBetween(start, end, null, '[]');
   }
 
@@ -96,7 +96,7 @@ class IndividualReportStatistics {
           this.allAttendedDurations.push(duration);
           this.totalSum += duration;
         } else {
-          this.missedSessions.set(type, (this.missedSessions.get(type)) + 1);
+          this.missedSessions.set(type, (this.missedSessions.get(type) || 0) + 1);
         }
       }
     });
@@ -104,10 +104,9 @@ class IndividualReportStatistics {
 
   createMedianTherapyIntensityByDisciplines() {
     this.medianTherapyIntensityByDisciplines = [];
-
     therapyTypesForReport.forEach(type => {
       this.medianTherapyIntensityByDisciplines.push(
-        this.getMedian(this.attendedSessions.get(type))
+        this.getMedian(this.attendedSessions.get(type) || [])
       )
     });
   }
@@ -116,8 +115,8 @@ class IndividualReportStatistics {
     this.numberOfAttendedByDisciplines = [];
 
     therapyTypesForReport.forEach(type => {
-      this.medianTherapyIntensityByDisciplines.push(
-        this.attendedSessions.get(type).length
+      this.numberOfAttendedByDisciplines.push(
+        (this.attendedSessions.get(type) || []).length
       )
     });
   }
@@ -126,8 +125,8 @@ class IndividualReportStatistics {
     this.numberOfMissedByDisciplines = [];
 
     therapyTypesForReport.forEach(type => {
-      this.medianTherapyIntensityByDisciplines.push(
-        this.missedSessions.get(type)
+      this.numberOfMissedByDisciplines.push(
+        this.missedSessions.get(type) || 0
       )
     });
   }

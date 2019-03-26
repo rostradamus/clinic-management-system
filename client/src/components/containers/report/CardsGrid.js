@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Grid, Card, Label, Container } from "semantic-ui-react";
 import { connect } from "react-redux";
 import { ReportAction } from "actions";
+import { bindActionCreators } from 'redux';
 import { helper } from "./helper";
 import "./CardsGrid.css";
 
@@ -71,12 +72,11 @@ class CardsGrid extends Component {
   }
 }
 
-const mapDsipatchToProps = (dispatch) => ({
-  setInfo: (userInfo) => dispatch(ReportAction.setInfoForPopup(userInfo)),
-  openPopup: () => dispatch(ReportAction.openPopup())
-});
+const mapDispatchToProps = dispatch => {
+  return bindActionCreators({
+    setInfo: ReportAction.setInfoForPopup,
+    openPopup: ReportAction.openPopup
+  }, dispatch);
+}
 
-export default connect(
-  null,
-  mapDsipatchToProps
-)(CardsGrid);
+export default connect(null, mapDispatchToProps)(CardsGrid);

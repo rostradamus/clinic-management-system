@@ -12,9 +12,9 @@ const MenuTitle = {
 
 const TherapyType = {
   PT: "PT",
-  PTRA: "PT RA",
-  OT: "OT", 
-  OTRA: "OT RA",
+  PTRA: "PTRA",
+  OT: "OT",
+  OTRA: "OTRA",
   SLP: "SLP",
   SLPA: "SLPA",
   SW: "SW",
