@@ -1,7 +1,7 @@
 const qm = require("@app/helpers/queryManager");
 const mysql = require('mysql');
 const db = require("@config/db/connection").connectDatabase();
-const userManager = require("@app/helpers/queryManager/User");
+const userManager = require("@app/helpers/queryManager/user");
 
 const TABLE_NAME = "Admission_record";
 
