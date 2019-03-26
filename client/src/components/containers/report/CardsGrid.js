@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Grid, Card, Label, Container } from "semantic-ui-react";
 import { connect } from "react-redux";
 import { ReportAction } from "actions";
+import { helper } from "./helper";
 import "./CardsGrid.css";
 
 const reportStyle = {
@@ -10,18 +11,29 @@ const reportStyle = {
 };
 
 class CardsGrid extends Component {
+  // TEMP SOLUTION
+  _createDiagnosisTitle(str) {
+    let title = str;
+
+    if (str.length > 0) {
+      title = str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    return title;
+  }
+
   // Create a single card
-  _makePatientCard(patient) {
+  _makePatientCard(patient, key) {
     return (
-      <Card className="card_ct" onClick={this.props.openPopup}>
+      <Card className="card_ct" onClick={this.props.openPopup} key={key}>
         <Card.Content onClick={() => this.props.setInfo(patient)}>
-          <Card.Header className="header_ct">{patient.name}</Card.Header>
+          <Card.Header className="header_ct">{patient.patientName}</Card.Header>
           <Card.Meta className="meta_ct">
             <span>{patient.patientId}</span>
           </Card.Meta>
           <Card.Description className="description_ct">
-            <Label style={reportStyle.label(patient.diagnosis.type - 1)} empty circular key={"#0"} />
-            <p className="diagnosis">{patient.diagnosis.name}</p>
+            <Label style={reportStyle.label(patient.recordDatas[0].diagnosisCategory - 1)} empty circular key={"#0"} />
+            <p className="diagnosis">{this._createDiagnosisTitle(patient.recordDatas[0].diagnosisName)}</p>
           </Card.Description>
         </Card.Content>
       </Card>
@@ -31,41 +43,20 @@ class CardsGrid extends Component {
   // Creare a single row of 4 cards
   _makeRow(patients) {
     const row = patients.map((patient, idx) => {
-      return this._makePatientCard(patient);
+      return this._makePatientCard(patient, idx);
     });
     return row;
   }
 
   // Stack rows of patient cards
   _makeRows(patientsList) {
-    const subArrays = _chunk(patientsList, 5);
-    const rows = subArrays.map((subArray, idx) => {
-      return this._makeRow(subArray);
-    });
-    return rows;
-
-    // Helper for splitting 'array' into subsrrays with the length of 'size'
-    function _chunk(array, size) {
-      const chunked_arr = [];
-      for (let i = 0; i < array.length; i++) {
-        const last = chunked_arr[chunked_arr.length - 1];
-        if (!last || last.length === size) {
-          chunked_arr.push([array[i]]);
-        } else {
-          last.push(array[i]);
-        }
-      }
-      return chunked_arr;
+    if (patientsList !== undefined) {
+      const subArrays = helper._chunk(patientsList, 5);
+      const rows = subArrays.map((subArray, idx) => {
+        return this._makeRow(subArray);
+      });
+      return rows;
     }
-  }
-
-  // Filter based on search field
-  _filterPatients(patients) {
-    const { searchText } = this.props;
-    const filteredlist = patients.filter((patient) => {
-      return patient.name.toLowerCase().search(searchText.toLowerCase()) !== -1;
-    });
-    return filteredlist;
   }
 
   render() {
@@ -73,28 +64,19 @@ class CardsGrid extends Component {
     return (
       <Container className="disable_scroll outerContainer">
         <Grid className="grid_ct" columns={5}>
-          {this._makeRows(this._filterPatients(patients))}
+          {this._makeRows(patients)}
         </Grid>
       </Container>
     );
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    searchText: state.report.searchText,
-    patients: state.report.patients
-  };
-};
-
 const mapDsipatchToProps = (dispatch) => ({
   setInfo: (userInfo) => dispatch(ReportAction.setInfoForPopup(userInfo)),
-  openPopup: () => dispatch(ReportAction.openPopup()),
-  resetSearchField: () => dispatch(ReportAction.setSearch("")),
-  requestPatients: () => dispatch(ReportAction.getPatients())
+  openPopup: () => dispatch(ReportAction.openPopup())
 });
 
 export default connect(
-  mapStateToProps,
+  null,
   mapDsipatchToProps
 )(CardsGrid);

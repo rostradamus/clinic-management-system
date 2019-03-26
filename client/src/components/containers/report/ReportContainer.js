@@ -15,12 +15,34 @@ const reportStyle = {
 };
 
 class ReportContainer extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      filteredPatients: []
+    };
+    this._handleSearch = this._handleSearch.bind(this);
+    this._filterPatients = this._filterPatients.bind(this);
+  }
+
   componentDidMount() {
-    this.props.requestPatients();
+    this.props.requestPatients().then(() => {
+      this.setState({ filteredPatients: this.props.patients });
+    });
   }
 
   _handleSearch(e, data) {
-    this.props.handleSearchChange(data.value);
+    this._filterPatients(data.value);
+  }
+
+  _filterPatients(searchField) {
+    const { patients } = this.props;
+    let filteredPatients = null;
+    if (patients !== null) {
+      filteredPatients = patients.filter((patient) => {
+        return patient.patientName.toLowerCase().search(searchField.toLowerCase()) !== -1;
+      });
+      this.setState({ filteredPatients: filteredPatients });
+    }
   }
 
   render() {
@@ -42,7 +64,7 @@ class ReportContainer extends Component {
           <label className="patient">Patients</label>
           <Input onChange={this._handleSearch.bind(this)} className="search" iconPosition="left" icon="search" placeholder="Search" />
         </Container>
-        <CardsGrid />
+        <CardsGrid patients={this.state.filteredPatients} />
         <ReportPopup />
       </Container>
     );
@@ -50,13 +72,12 @@ class ReportContainer extends Component {
 }
 
 const mapDispatchToProps = (dispatch) => ({
-  requestPatients: () => dispatch(ReportAction.getPatients()),
-  handleSearchChange: (input) => dispatch(ReportAction.setSearch(input))
+  requestPatients: () => dispatch(ReportAction.getPatients())
 });
 
 const mapStateToProp = (state) => ({
-  patientForPopup: state.report.popupInfo,
-  openPopup: state.report.openPopup
+  openPopup: state.report.openPopup,
+  patients: state.report.patients
 });
 
 export default connect(
