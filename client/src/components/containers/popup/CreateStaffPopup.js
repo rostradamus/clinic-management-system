@@ -116,11 +116,17 @@ class CreateStaffPopup extends Component{
       .catch(() => alert("Fatal: This should never happen"));
   }
 
+  validateEmail() {
+    const {email} = this.state.form;
+    const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return email !== '' && regex.test(String(email).toLowerCase());
+  }
+
   validateForm() {
     const errorFields={};
     Object.entries(this.state.error).map(entry => {
-      if(this.state.form[entry[0]]==='' ){
-        errorFields[entry[0]]=true;
+      if((entry[0] === 'email' && !this.validateEmail()) || this.state.form[entry[0]] === ''){
+        errorFields[entry[0]] = true;
       }
     });
     this.setState({error: errorFields});
@@ -202,7 +208,7 @@ class CreateStaffPopup extends Component{
         {fields.map(field=> (
           <Form.Field error={this.state.error[field]} key = {field}>
             <label>{STATE_CONST[field]}</label>
-            <Input placeholder={STATE_CONST[field]} onChange={e=> this.handleInputChange(e, field)}/>
+            <Input maxLength='255' placeholder={STATE_CONST[field]} onChange={e=> this.handleInputChange(e, field)}/>
           </Form.Field>
         ))}
       </Container>
