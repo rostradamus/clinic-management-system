@@ -38,19 +38,32 @@ NODE_PATH=src/
 ```
 
 ### DB Setup
-1. MySQL version 8.0.13 is definitely being supported. Not guaranteed for other version
-
+1. MySQL version **8.0.13** is definitely being supported. Not guaranteed for other version.
+2. On your .env file, add NODE_ENV value depending on which database you want to use.
 ```
-<!-- DB initialization instruction -->
-$ mysql -u root -p
-$ Enter Password: your_password
-$ source ~/path/to/schedule-system/config/db/sql/201903092035_create_database.sql
+NODE_ENV=development
+``` 
+for testing create .env.test file and add
 ```
-
+NODE_ENV=test
 ```
-<!-- Demo data instruction -->
-$ Run DB initialization
-$ source ~/path/to/schedule-system/config/db/sql/201903092036_demo_data.sql
+3. Run the following commands (you only need to do it once)
+```
+npm install -g db-migrate
+npm install
+```
+4. Log in to your MySQL console and create databases with following command
+```
+CREATE DATABASE schedule_system_development;
+CREATE DATABASE schedule_system_test;
+```
+5. Run the following command
+```
+db-migrate up
+```
+For test DB
+```
+NODE_ENV=test db-migrate up
 ```
 
 ### Commands to Run Application
