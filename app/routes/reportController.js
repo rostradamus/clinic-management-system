@@ -62,43 +62,41 @@ routes.get("/", async (req, res) => {
       res.send(reports);
     } catch (err) {
       res.status(500);
-      console.log(err);
     }
 });
 
 routes.get("/:user_id", async (req, res) => {
-    try {
-        const patientInfo = await reportManager.getPatientInfoFromUserId(req.params.user_id);
+  try {
+    const patientInfo = await reportManager.getPatientInfoFromUserId(req.params.user_id);
 
-        if (!patientInfo || patientInfo.length === 0) {
-            res.status(404)
-                .json({ message: `Patient with id = ${req.params.user_id} does NOT exist`});
-        }
-
-        const appointmentList = await reportManager.getAppointmentsWithRecordId(patientInfo[0].current_admission_record);
-
-        let result = {};
-        result.patientName = patientInfo[0].patient_name;
-        result.patientId = patientInfo[0].mrn;
-        result.currentRecord = patientInfo[0].current_admission_record;
-        result.appointments = [];
-
-        appointmentList.forEach((item) => {
-            let appointment = {};
-            appointment.appointmentId = item.appointment_id;
-            appointment.startDate = item.start_date;
-            appointment.endDate = item.end_date;
-            appointment.duration = item.duration;
-
-            result.appointments.push(appointment);
-        });
-
-        res.status(200);
-        res.send(result);
-    } catch (err) {
-        res.status(500);
-        console.log(err);
+    if (!patientInfo || patientInfo.length === 0) {
+      res.status(404)
+          .json({ message: `Patient with id = ${req.params.user_id} does NOT exist`});
     }
+
+    const appointmentList = await reportManager.getAppointmentsWithRecordId(patientInfo[0].current_admission_record);
+
+    let result = {};
+    result.patientName = patientInfo[0].patient_name;
+    result.patientId = patientInfo[0].mrn;
+    result.currentRecord = patientInfo[0].current_admission_record;
+    result.appointments = [];
+
+    appointmentList.forEach((item) => {
+      let appointment = {};
+      appointment.appointmentId = item.appointment_id;
+      appointment.startDate = item.start_date;
+      appointment.endDate = item.end_date;
+      appointment.duration = item.duration;
+
+      result.appointments.push(appointment);
+    });
+
+    res.status(200);
+    res.send(result);
+  } catch (err) {
+    res.status(500);
+  }
 });
 
 module.exports = routes;
