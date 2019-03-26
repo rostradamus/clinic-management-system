@@ -100,8 +100,11 @@ class CalendarSideBar extends Component {
         </Grid.Row>
 
         { currentUser && currentUser.type === "Administrator" && isSearchOpen ?
-          <PatientStaffSearch isOpen={ isSearchOpen }
-            onClose={ this.toggleSearchModal } />
+          <PatientStaffSearch
+            isOpen={ isSearchOpen }
+            onClose={ this.toggleSearchModal }
+            patientsStaffs={ patientsStaffs }
+          />
           : null
         }
         { currentUser && currentUser.type === "Administrator" && isCalendarPopupOpen ?
