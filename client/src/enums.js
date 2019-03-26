@@ -1,5 +1,3 @@
-// UserType
-
 const UserType = {
   PATIENT: "Patient",
   STAFF: "Staff",
@@ -12,12 +10,39 @@ const MenuTitle = {
   USERS: "USERS"
 }
 
+const TherapyType = {
+  PT: "PT",
+  PTRA: "PT RA",
+  OT: "OT", 
+  OTRA: "OT RA",
+  SLP: "SLP",
+  SLPA: "SLPA",
+  SW: "SW",
+  SWA: "SWA",
+  MUSIC: "Music",
+  REC: "Rec",
+  RD: "RD",
+  RN: "RN",
+  MD: "MD",
+  PSYCH: "Psych",
+  PSYCHIATRY: "Psychiatry",
+  VOC: "Voc",
+  SH: "S&H",
+  PHARMACY: "Pharmacy",
+  WOUND: "Wound",
+  CML: "CML",
+  TST: "TST",
+  OTHER: "Other"
+}
+
 if (Object.freeze) {
   Object.freeze(UserType);
   Object.freeze(MenuTitle);
+  Object.freeze(TherapyType);
 }
 
 module.exports = {
   UserType: UserType,
-  MenuTitle: MenuTitle
+  MenuTitle: MenuTitle,
+  TherapyType: TherapyType
 }
