@@ -1,4 +1,4 @@
-import { CREATE_USER_ACTION_TYPE, USER_ACTION_TYPE } from "actions/ActionTypes";
+import { USER_ACTION_TYPE } from "actions/ActionTypes";
 
 const initialState = {
   isFetching: false,

@@ -13,6 +13,11 @@ const PATIENT_CAT = [
   { key: '2', text: '2', value: '2' },
   { key: '3', text: '3', value: '3' }
 ];
+const PLACEHOLDER = {
+  mrn: 'up to 10 alphanumeric characters',
+  patient_program: 'up to 5 alphanumeric characters',
+  type_of_injury: 'ex. stroke',
+}
 
 class CreatePatientPopup extends Component{
   constructor(props) {
@@ -80,20 +85,25 @@ class CreatePatientPopup extends Component{
       ...this.state.error,
         [key]:false
       }
-    });
+    })
   }
 
   handleDateChange(field, { value }, formtype) {
-    this.setState({form: {
-      ...this.state.form,
-      [formtype]: {
-        ...this.state.form[formtype],
-        [field]: moment(new Date(value)).format("YYYY-MM-DD")}}
-      ,error: {
-      ...this.state.error,
-        [field]:false
-      }})
-    }
+    if(value.match(/[a-z]/i)){
+      this.setState({error:{
+        ...this.state.error,
+        [field]: true}})
+      }else{
+      this.setState({form: {
+        ...this.state.form,
+        [formtype]: {
+          ...this.state.form[formtype],
+          [field]: moment(new Date(value)).format("YYYY-MM-DD")}}
+        ,error: {
+        ...this.state.error,
+          [field]:false
+        }})
+      }}
 
   handleSelectChange(field, { value }, formtype) {
     if(field === 'is_in_patient') value = !this.state.form.Patient.is_in_patient;
@@ -107,7 +117,7 @@ class CreatePatientPopup extends Component{
 
   handlemrnSubmit( ){
     const mrn = this.state.form.Patient['mrn'];
-    if(mrn.length === 7 && Number.isInteger(parseInt(mrn,10))){
+    if(mrn.length > 0 && mrn.length <= 10 && /^[a-z0-9]+$/i.test(mrn)){
       this.props.getPatient(mrn);
     }else{
       this.setState({error: {
@@ -138,9 +148,9 @@ class CreatePatientPopup extends Component{
   }
 
    handleNewAccountSubmit(){
+    const {email} = this.state.form.User;
     const fields = ['last_name', 'first_name', 'phone_number', 'mrn','date_of_birth','address','is_in_patient','patient_program'];
-    // this.validateField(fields);
-    if(this.validateField(fields)){
+    if(this.validateField(fields) && this.validateEmail()){
         this.props.nextSlide();
       }else{
         //TODO: error message
@@ -153,7 +163,7 @@ class CreatePatientPopup extends Component{
         <Form>
           <Form.Field error= {this.state.error['mrn']}>
             <label>{STATE_CONST['mrn']}</label>
-            <Input placeholder={STATE_CONST['mrn']} onChange={e=>  this.handleInputChange(e, 'mrn', 'Patient')}/>
+            <Input maxLength="10" placeholder= {PLACEHOLDER['mrn']} onChange={e=>  this.handleInputChange(e, 'mrn', 'Patient')}/>
           </Form.Field>
         </Form>
       </Modal.Content>
@@ -238,12 +248,12 @@ class CreatePatientPopup extends Component{
           (e,data) => this.handleDateChange(field, data, formtype)
         }
         />
-        {!this.checkValidDate(field) && <Label basic color = 'red' pointing> Invalid Date </Label> }
+        {!this.validateDate(field) && <Label basic color = 'red' pointing> Invalid Date </Label> }
       </Form.Field>
     );
   }
 
-  checkValidDate(field){
+  validateDate(field){
     if(field !== 'date_of_birth' && field !== 'discharge_date') return true;
     const { date_of_birth } = this.state.form.Patient;
     const {admission_date, discharge_date} = this.state.form.Admission_record;
@@ -261,9 +271,9 @@ class CreatePatientPopup extends Component{
         key = {field}
         error={this.state.error[field]}
         >
-        <label>{field==="email" ? "Email (Optional)" : STATE_CONST[field]}</label>
-        <Input value={this.state.form[formtype][field]}
-        placeholder={STATE_CONST[field]} onChange={e=> this.handleInputChange(e, field, formtype)}/>
+        <label>{field==="email" ? "Email (Optional)" : STATE_CONST[field] }</label>
+        <Input maxLength = { field === 'patient_program' ? '5' : '255' } value={this.state.form[formtype][field]}
+        placeholder={!PLACEHOLDER[field]? STATE_CONST[field] : PLACEHOLDER[field] } onChange={e=> this.handleInputChange(e, field, formtype)}/>
         </Form.Field>
         ))}
       </Container>
@@ -279,7 +289,7 @@ class CreatePatientPopup extends Component{
         errorFields[field]=true;
         }
       }
-      if(!this.checkValidDate(field)) errorFields[field] = true;
+      if(!this.validateDate(field)) errorFields[field] = true;
     });
     this.setState({
       error: {
@@ -288,6 +298,13 @@ class CreatePatientPopup extends Component{
       }});
     return (!Object.keys(errorFields).length);
   }
+
+  validateEmail() {
+    const {email} = this.state.form.User;
+    const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return email === '' || regex.test(String(email).toLowerCase());
+  }
+
 
   renderRepeatDropDownForm() {
     return(
