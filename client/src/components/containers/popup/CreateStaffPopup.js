@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Modal, Grid, Button, Select, Header, Input, Form, Container, Divider} from "semantic-ui-react";
+import { Label, Modal, Grid, Button, Select, Header, Input, Form, Container, Divider, Message} from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import * as moment from 'moment';
 import { UserAction, CreateUserAction } from 'actions';
@@ -93,9 +93,6 @@ class CreateStaffPopup extends Component{
           if(this.props.typeUser === 'Administrator'){
               this.handleCreateAdmin();
             }else this.handleCreateStaff();
-      }else{
-       alert("Email exists")
-       //TODO: error handle
       }})
      .catch(() => alert("Fatal: This should never happen"));
   }
@@ -138,6 +135,10 @@ class CreateStaffPopup extends Component{
     return(
       <Modal.Content image scrolling>
         <Form id="create-user">
+        {this.props.error && <Message negative>
+           <Message.Header>There has been an error with your submission.</Message.Header>
+          {this.props.user.length !== 0 && <p> Existing Email! </p>}
+         </Message> }
           <Header>Basic Information</Header>
           {this.renderFieldHelper(['first_name', 'last_name', 'phone_number', 'email'])}
 
@@ -282,7 +283,8 @@ const mapDispatchToProps = dispatch => {
 }
 
 const mapStateToProps = state => (
-  { typeUser: state.createUser.typeUser,
+  { error:state.createUser.error,
+    typeUser: state.createUser.typeUser,
     user: state.createUser.user,
     created: state.createUser.created});
 

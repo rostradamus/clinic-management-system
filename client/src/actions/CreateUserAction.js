@@ -38,7 +38,7 @@ export default class CreateUserAction {
       } catch (err) {
         dispatch({
           type: CREATE_USER_ACTION_TYPE.PATIENT_CREATE_FAILURE,
-          payload: data
+          payload: { error: true }
         })
 
       }
@@ -56,7 +56,7 @@ export default class CreateUserAction {
       } catch (err) {
         dispatch({
           type: CREATE_USER_ACTION_TYPE.CREATE_ADMISSION_RECORD_FAILURE,
-          payload: data
+          payload: { error: true }
         })
       }
     }
@@ -77,7 +77,7 @@ export default class CreateUserAction {
       } catch (err) {
         dispatch({
           type: CREATE_USER_ACTION_TYPE.ADMIN_CREATE_FAILURE,
-          payload: { err }
+          payload: { error: true }
         });
       }
     }
@@ -98,7 +98,7 @@ export default class CreateUserAction {
       } catch (err) {
         dispatch({
           type: CREATE_USER_ACTION_TYPE.STAFF_CREATE_FAILURE,
-          payload: { err }
+          payload: { error: true }
         });
       }
     }

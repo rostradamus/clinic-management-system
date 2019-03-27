@@ -8,7 +8,7 @@ const initialState = {
   isExisting: false,
   popup: false,
   created:false,
-  error:{}
+  error: false,
 };
 
 export default (state = initialState, action) => {
@@ -40,7 +40,7 @@ export default (state = initialState, action) => {
     case CREATE_USER_ACTION_TYPE.PREV_SLIDE: {
       const index = isExisting ? slideIndex - 2 : slideIndex - 1;
       if(index === 0) return {...initialState, popup: true};
-      return Object.assign({...state}, {slideIndex: index});
+      return Object.assign({...state}, {error: false, slideIndex: index});
     }
     case CREATE_USER_ACTION_TYPE.CLOSE_POPUP: {
       return initialState;
@@ -53,8 +53,7 @@ export default (state = initialState, action) => {
     case CREATE_USER_ACTION_TYPE.ADMIN_CREATE_FAILURE:
     case CREATE_USER_ACTION_TYPE.PATIENT_CREATE_FAILURE:
     case CREATE_USER_ACTION_TYPE.CREATE_ADMISSION_RECORD_FAILURE:{
-      return Object.assign({...state},
-        { error: action.payload})
+      return Object.assign({...state}, action.payload);
     }
     case CREATE_USER_ACTION_TYPE.STAFF_CREATE_SUCCESS:
     case CREATE_USER_ACTION_TYPE.ADMIN_CREATE_SUCCESS:

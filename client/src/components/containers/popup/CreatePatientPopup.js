@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Label, Modal, Grid, Button, Select, Header, Input, Form, Container } from "semantic-ui-react";
+import { Label, Modal, Grid, Button, Select, Header, Input, Form, Container, Message } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import * as moment from 'moment';
 import { UserAction, CreateUserAction} from 'actions';
@@ -140,7 +140,7 @@ class CreatePatientPopup extends Component{
         const { User, Patient, Admission_record } = this.state.form;
         this.props.createPatient({User, Patient, Admission_record})
           .then(() => this.props.getUsers())
-          .catch(() => alert("Fatal: This should never happen"));
+          .catch(() =>  "fail...");
       }
     }
   }
@@ -151,7 +151,6 @@ class CreatePatientPopup extends Component{
     if(this.validateField(fields) && this.validateEmail()){
         this.props.nextSlide();
       }
-
    }
 
   rendermrnCheck() {
@@ -170,6 +169,10 @@ class CreatePatientPopup extends Component{
   renderNewAdmissionRecord(){
     return(
       <Modal.Content>
+       {this.props.error && <Message negative>
+           <Message.Header>There has been an error with your submission.</Message.Header>
+          <p>Please try again!</p>
+         </Message> }
         <Form id="create-user">
           <Header>Admission Record</Header>
           {this.renderFieldHelper(['type_of_injury'], 'Admission_record')}
@@ -414,7 +417,8 @@ const mapDispatchToProps = dispatch => {
 }
 
 const mapStateToProps = state => (
-  { slideIndex: state.createUser.slideIndex,
+  { error: state.createUser.error,
+    slideIndex: state.createUser.slideIndex,
     exists: state.createUser.isExisting,
     patient: state.createUser.user });
 
