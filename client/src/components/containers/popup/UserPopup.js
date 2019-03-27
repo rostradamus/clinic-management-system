@@ -14,7 +14,6 @@ const INITIAL_STATE = {
     cPassword: "",
     phone_number: "",
     type: "",
-    permission_level: "",
   },
   error: {}
 };
@@ -59,7 +58,6 @@ class UserPopup extends Component {
     if (user.password === ""){
       delete user["password"];
     }
-
     this.props.dispatch(UserAction.editUser(user))
       .then(this._closePopup)
       .catch(() => alert("Fatal: This should never happen"));
@@ -123,8 +121,7 @@ class UserPopup extends Component {
 
   render() {
     const { first_name, last_name, email, password, cPassword,
-      phone_number, type, permission_level } = this.state.user;
-
+      phone_number, type  } = this.state.user;
     return (
       <Modal
         size="small"
@@ -178,11 +175,6 @@ class UserPopup extends Component {
                 label="Type"
                 name="type"
                 placeholder={ type }
-                onChange={ this._handleInputChange.bind(this) } />
-              <Form.Input fluid readOnly
-                label="Permission"
-                name="permission_level"
-                placeholder={ permission_level }
                 onChange={ this._handleInputChange.bind(this) } />
             </Form.Group>
           </Form>
