@@ -1,9 +1,9 @@
-import CardsGrid from "./CardsGrid";
+import PatientCardMatrix from "./PatientCardMatrix";
 import IndividualReportStatistics from "./IndividualReportStatistics";
 import ReportContainer from "./ReportContainer";
 
 export {
-  CardsGrid,
+  PatientCardMatrix,
   IndividualReportStatistics,
   ReportContainer
 };
