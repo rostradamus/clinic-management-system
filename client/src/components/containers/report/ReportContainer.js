@@ -3,8 +3,7 @@ import { connect } from "react-redux";
 import { bindActionCreators } from 'redux';
 import { Label, Input, Container } from "semantic-ui-react";
 import { ReportAction } from "actions";
-import CardsGrid from "./CardsGrid";
-import ReportPopup from "components/containers/popup/ReportPopup";
+import PatientCardMatrix from "./PatientCardMatrix";
 import { isEqual } from 'lodash';
 import "./ReportContainer.css";
 
@@ -17,11 +16,6 @@ const reportStyle = {
 };
 
 class ReportContainer extends Component {
-  constructor(props) {
-    super(props);
-    this.handleSearchText = this.handleSearchText.bind(this);
-  }
-
   componentDidMount() {
     this.props.requestPatients();
   }
@@ -30,8 +24,9 @@ class ReportContainer extends Component {
     this.props.setSearchText(value);
   }
 
-  render() {
-    const CategoryLabels = () => (
+  // TODO: refactor for aggregate report to use Semantic-ui-react
+  _renderCategoryLabels() {
+    return(
       <div>
         <h2 className="category">Category Summaries</h2>
         {reportStyle.types.map((type, idx) => (
@@ -40,34 +35,32 @@ class ReportContainer extends Component {
           </Label>
         ))}
       </div>
-    );
+    )
+  }
+
+  render() {
     const { openPopup, popupInfo, patients } = this.props;
     return (
       <Container>
         <Container className="container_ct">
-          <CategoryLabels />
+          { this._renderCategoryLabels() }
           <label className="patient">Patients</label>
-          <Input onChange={this.handleSearchText} className="search" iconPosition="left" icon="search" placeholder="Search" />
+          <Input onChange={this.handleSearchText.bind(this)} className="search" iconPosition="left" icon="search" placeholder="Search" />
         </Container>
-        <CardsGrid patients={ patients } />
-        { openPopup && !isEqual(popupInfo, {}) ?
-          <ReportPopup
-            openPopup= { openPopup }
-            popupInfo= { popupInfo }
-          />
-          : null
-        }
+        <PatientCardMatrix
+          patients={ patients }
+          popupInfo= { popupInfo }
+        />
       </Container>
     );
   }
 }
 
 const mapStateToProp = state => {
-  const { openPopup, popupInfo, searchText, patients } = state.report;
+  const { searchText, patients } = state.report;
+  const filteredPatients = patients.filter(patient => patient.patientName.toLowerCase().includes(searchText.toLowerCase()) );
   return {
-    openPopup,
-    popupInfo,
-    patients: patients.filter(patient => patient.patientName.toLowerCase().includes(searchText))
+    patients: filteredPatients
   }
 };
 

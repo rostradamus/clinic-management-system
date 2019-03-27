@@ -6,9 +6,15 @@ export default class ReportAction {
     return async (dispatch) => {
       try {
         const res = await axios.get(`/api/reports`);
-        dispatch({ type: REPORT_ACTION_TYPE.FETCH_PATIENTS_SUCCESS, payload: res.data });
+        dispatch({
+          type: REPORT_ACTION_TYPE.FETCH_PATIENTS_SUCCESS,
+          payload: res.data
+        });
       } catch (err) {
-        dispatch({ type: REPORT_ACTION_TYPE.FETCH_PATIENTS_FAILURE, payload: err });
+        dispatch({
+          type: REPORT_ACTION_TYPE.FETCH_PATIENTS_FAILURE,
+          payload: err.response.data
+        });
       }
     };
   };
@@ -16,30 +22,17 @@ export default class ReportAction {
   static getPatient = (id) => {
     return async (dispatch) => {
       try {
-        const res = await axios.get(`/api/reports/:${id}`);
-        console.log(res);
-        dispatch({ type: REPORT_ACTION_TYPE.FETCH_PATIENTS_SUCCESS, payload: res.data });
+        const res = await axios.get(`/api/reports/${id}`);
+        dispatch({
+          type: REPORT_ACTION_TYPE.FETCH_PATIENTS_SUCCESS,
+          payload: res.data
+        });
       } catch (err) {
-        dispatch({ type: REPORT_ACTION_TYPE.FETCH_PATIENTS_FAILURE, payload: err });
+        dispatch({
+          type: REPORT_ACTION_TYPE.FETCH_PATIENTS_FAILURE,
+          payload: err.response.data
+        });
       }
-    };
-  };
-
-  static setInfoForPopup = (info) => {
-    return (dispatch) => {
-      dispatch({ type: REPORT_ACTION_TYPE.SET_INFO_FOR_POPUP, payload: info });
-    };
-  };
-
-  static openPopup = () => {
-    return (dispatch) => {
-      dispatch({ type: REPORT_ACTION_TYPE.OPEN_POPUP, payload: true });
-    };
-  };
-
-  static closePopup = () => {
-    return (dispatch) => {
-      dispatch({ type: REPORT_ACTION_TYPE.CLOSE_POPUP, payload: false });
     };
   };
 

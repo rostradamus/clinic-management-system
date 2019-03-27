@@ -1,43 +1,41 @@
 import React, { Component } from "react";
 import { Button, Header, Modal, Label, Container } from "semantic-ui-react";
 import { DateInput } from "semantic-ui-calendar-react";
-import { connect } from "react-redux";
-import { bindActionCreators } from 'redux';
-import { ReportAction } from "actions";
-import { helper } from "components/containers/report/helper";
 import IndividualReportStatistics from "components/containers/report/IndividualReportStatistics";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import moment from "moment";
-import "./ReportPopup.css";
-moment.locale("en");
+import "./IndividualReportPopup.css";
 
+moment.locale("en");
 const REPORT_CONST = {
-  DIAG_NAME: "diagnosisName",
-  DIAG_CATEG: "diagnosisCategory",
-  PRESENT: "PRESENT"
+  DIAGNOSIS_NAME: "diagnosisName",
+  DIAGNOSIS_CATEGORY: "diagnosisCategory"
 };
 
 // Requires set of series and yAxis values
-const defaultChartOptions = {
-  chart: { type: "column" },
-  title: { text: "" },
-  subtitle: { text: "" },
-  xAxis: { categories: ["PT", "PTRA", "OT", "OTRA", "SLP", "SLPA"], crosshair: true},
-  tooltip: {
-    headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td><td style="padding:0"><b>{point.y:.f} times</b></td></tr>',
-    footerFormat: "</table>",
-    shared: true,
-    useHTML: true
-  },
-  plotOptions: { column: { pointPadding: 0.2, borderWidth: 0 } },
-  credits: {
-    enabled: false
-  }
-};
+const defaultChartOptions = point => {
+  return {
+    chart: { type: "column" },
+    title: { text: "" },
+    subtitle: { text: "" },
+    xAxis: { categories: ["PT", "PTRA", "OT", "OTRA", "SLP", "SLPA"], crosshair: true},
+    tooltip: {
+      headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+      pointFormat: `<tr><td style="color:{series.color};padding:0">{series.name}: </td><td style="padding:0"><b>{point.y:.f} ${point}</b></td></tr>`,
+      footerFormat: "</table>",
+      shared: true,
+      useHTML: true
+    },
+    plotOptions: { column: { pointPadding: 0.2, borderWidth: 0 } },
+    credits: {
+      enabled: false
+    }
+  };
+}
 
-class ReportPopup extends Component {
+
+class IndividualReportPopup extends Component {
   _isMounted = false;
 
   constructor(props) {
@@ -52,7 +50,7 @@ class ReportPopup extends Component {
 
     this.state = {
       filterStartDate: moment(recordData.admissionDate, "YYYY-MM-DD").format("YYYY-MM-DD"),
-      filterEndDate
+      filterEndDate: filterEndDate
     };
 
     this._handleFilterDateChange = this._handleFilterDateChange.bind(this);
@@ -82,11 +80,6 @@ class ReportPopup extends Component {
     this.setState({
       [key]: chosenDate,
     });
-  }
-
-  _returnAdmissionDate() {
-    const { popupInfo } = this.props;
-    return !helper._checkUndefined(popupInfo.recordDatas) ? popupInfo.recordDatas[0] : "Not Identified";
   }
 
   _returnDiagnosis(recordData, diagnosis) {
@@ -149,7 +142,7 @@ class ReportPopup extends Component {
             name="date"
             placeholder="Date"
             value={ moment(filterEndDate, "YYYY-MM-DD").format("YYYY-MM-DD") }
-            onChange={(e, data) => this._handleFilterDateChange(e, data) }
+            onChange={(e, data) => this._handleFilterDateChange(e, data, "filterEndDate") }
           />
         </div>
       </div>
@@ -162,10 +155,10 @@ class ReportPopup extends Component {
       <div>
         <p className="patient_detail">{popupInfo.patientId}</p>
         <p className="patient_detail">
-          {this._returnCategory(recordData, REPORT_CONST.DIAG_CATEG)}
+          {this._returnCategory(recordData, REPORT_CONST.DIAGNOSIS_CATEGORY)}
         </p>
         <p className="patient_detail">
-          { this._returnDiagnosis(recordData, REPORT_CONST.DIAG_NAME) }
+          { this._returnDiagnosis(recordData, REPORT_CONST.DIAGNOSIS_NAME) }
         </p>
       </div>
     )
@@ -174,8 +167,8 @@ class ReportPopup extends Component {
   _renderButtons() {
     return(
       <Modal.Actions>
-        <Button primary className="btn_pu" onClick={this._print}>Print</Button>
-        <Button className="btn_pu" onClick={this.props.closePopup}>Close</Button>
+        <Button primary className="btn_pu" onClick={ this._print }>Print</Button>
+        <Button className="btn_pu" onClick={ this.props.onClose }>Close</Button>
       </Modal.Actions>
     )
   }
@@ -195,7 +188,7 @@ class ReportPopup extends Component {
       }]
     };
     const yAxis = { yAxis: { min: 0, title: { text: "Minutes" } } };
-    const chartOptions = Object.assign({...defaultChartOptions}, {...series}, {...yAxis});
+    const chartOptions = Object.assign({...defaultChartOptions("minutes")}, {...series}, {...yAxis});
     return <HighchartsReact highcharts={Highcharts} options={chartOptions} />;
   }
 
@@ -215,7 +208,7 @@ class ReportPopup extends Component {
     };
 
     const yAxis = { yAxis: { min: 0, tickInterval: 1, title: { text: "Number of Sessions" } } };
-    const chartOptions = Object.assign({...defaultChartOptions}, {...series}, {...yAxis});
+    const chartOptions = Object.assign({...defaultChartOptions("times")}, {...series}, {...yAxis});
     return <HighchartsReact highcharts={Highcharts} options={chartOptions} />;
   }
 
@@ -234,19 +227,19 @@ class ReportPopup extends Component {
       }]
     };
     const yAxis = { yAxis: { min: 0, tickInterval: 1, title: { text: "Number of Sessions" } } };
-    const chartOptions = Object.assign({...defaultChartOptions}, {...series}, {...yAxis});
+    const chartOptions = Object.assign({...defaultChartOptions("times")}, {...series}, {...yAxis});
     return <HighchartsReact highcharts={Highcharts} options={chartOptions} />;
   }
 
   render() {
-    const { popupInfo, openPopup } = this.props;
+    const { popupInfo, isOpen, onClose } = this.props;
     const recordData = popupInfo.recordDatas[0] || {};
     const appointments = recordData.appointments || [];
     const { filterStartDate, filterEndDate } = this.state;
     const stats = this.individualReportStatistics.retrieveStatistics(filterStartDate, filterEndDate);
 
     return (
-      <Modal open={openPopup} centered={false}>
+      <Modal onClose={ onClose } open={ isOpen } centered={false}>
         <Modal.Header className="header_ct">
           <p className="name">{popupInfo.patientName}</p>
           <Container className="headerContainer">
@@ -287,10 +280,4 @@ class ReportPopup extends Component {
   }
 }
 
-const mapDispatchToProps = dispatch => {
-  return bindActionCreators({
-    closePopup: ReportAction.closePopup
-  }, dispatch);
-}
-
-export default connect(null , mapDispatchToProps)(ReportPopup);
+export default IndividualReportPopup;
