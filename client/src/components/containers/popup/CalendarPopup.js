@@ -295,7 +295,7 @@ class CalendarPopup extends Component {
       <div>
         { isUpdateAppointment ?
           <Button color='red' onClick={ this.handleCancellationPopup }>
-            Cancel
+            Cancel Appointment
           </Button> :
           null
         }
@@ -306,6 +306,10 @@ class CalendarPopup extends Component {
           onClick={ this.onSubmit }
         />
         <Confirm
+          header="Cancel Appointment Confirmation"
+          content="Are you sure you want to cancel this appointment?"
+          confirmButton="Yes"
+          cancelButton="No"
           open={ this.state.showCancellationPopup }
           onCancel={ this.handleCancellationPopup }
           onConfirm={ this.onCancel }
@@ -425,10 +429,12 @@ class CalendarPopup extends Component {
       </Form.Field>
     )
   }
+
   _getTherapyTypePlaceholder(value) {
     const therapy = THERAPY_TYPE_CONST.find(elem => elem.value === value);
     return therapy ? therapy.text : "Select a Therapy Type";
   }
+
   _renderTypeOfTherapy() {
     const { therapyType } = this.state;
     return(
