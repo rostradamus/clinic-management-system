@@ -55,6 +55,7 @@ function groupByPatient(appointmentList) {
 
 routes.get("/", async (req, res) => {
   try {
+    // used to retrieve individual reports
     const appointmentList = await reportManager.getAllAppointmentsWithPatientAndAdmissionRecordInfo();
     const reports = groupByPatient(appointmentList);
     res.status(200);

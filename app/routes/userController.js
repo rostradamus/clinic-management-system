@@ -1,15 +1,17 @@
 const routes = require('express').Router();
 const userManager = require("@app/helpers/queryManager/user");
 
-routes.get("/", (req, res) => {
-  userManager.getAllActiveUsers(req.query)
-    .then(result => {
-      res.status(200);
-      res.send(result);
-    })
-    .catch(err => {
-      res.status(500).json(err);
-    });
+routes.get("/", async (req, res) => {
+  const { getInactivePatients } = req.query;
+  try {
+    const result = getInactivePatients ?
+      await userManager.getAllActiveUsersWithAllPatients() :
+      await userManager.getAllActiveUsers(req.query);
+    res.status(200);
+    res.send(result);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 routes.get("/:user_id", async (req, res) => {

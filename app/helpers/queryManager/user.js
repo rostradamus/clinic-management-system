@@ -1,4 +1,5 @@
 const qm = require("@app/helpers/queryManager");
+const mysql = require('mysql');
 const bcrypt = require("bcrypt");
 const appointmentManager = require("@app/helpers/queryManager/appointment");
 
@@ -25,7 +26,7 @@ module.exports = {
   TABLE_NAME: "User",
 
   VISIBILE_COLUMNS: ["id", "username", "email", "phone_number",
-    "first_name","last_name", "type", "permission_level"],
+    "first_name","last_name", "type", "permission_level", "active"],
 
   getUserWithUsername: function(username, isForAuth) {
     const options = {
@@ -47,6 +48,12 @@ module.exports = {
       where: Object.assign({...query}, { active: true })
     };
     const stmt = qm.getBaseQuery(this.TABLE_NAME, options);
+    return qm.makeQuery(stmt);
+  },
+
+  getAllActiveUsersWithAllPatients: function() {
+    const query = "SELECT ?? FROM ?? WHERE active = 1 OR type = 'Patient'";
+    const stmt = mysql.format(query, [this.VISIBILE_COLUMNS, this.TABLE_NAME]);
     return qm.makeQuery(stmt);
   },
 

@@ -3,6 +3,7 @@ const qm = require("@app/helpers/queryManager");
 const PATIENT_COLUMNS = ["id", "mrn", "current_admission_record"];
 
 module.exports = {
+  // Retrieves individual reports
   getAllAppointmentsWithPatientAndAdmissionRecordInfo: function () {
     const query = "SELECT A.id AS appointment_id, A.patient_id , A.record_id, CONCAT(U.first_name, ' ', U.last_name) AS patient_name, " +
       "P.mrn, A.start_date, A.end_date, (TIME_TO_SEC(A.end_time) - TIME_TO_SEC(A.start_time))/60 DIV 1 as duration, " +
@@ -11,18 +12,19 @@ module.exports = {
       "LEFT JOIN Admission_record AS AR ON A.record_id = AR.id " +
       "LEFT JOIN User AS U ON A.patient_id = U.id " +
       "LEFT JOIN Patient AS P on A.patient_id = P.id " +
-      "WHERE A.is_cancelled = false ORDER BY AR.admission_date DESC";
+      "WHERE A.is_cancelled = false AND U.active = 1 " +
+      "ORDER BY AR.admission_date DESC";
 
     return qm.makeQuery(query);
   },
 
   getAllAppointmentsByCategory: function (category) {
     // TODO: Mapping of database styled variables to JS conventions done here, but eventually
-    // there should be a universal way of doing it on a higher layer. 
+    // there should be a universal way of doing it on a higher layer.
     const query = "SELECT " +
       "A.patient_id AS patientId, " +
-      "A.record_id AS recordId, " + 
-      "A.type_of_therapy AS therapyType, " + 
+      "A.record_id AS recordId, " +
+      "A.type_of_therapy AS therapyType, " +
       "A.start_date AS date, " +
       "(TIME_TO_SEC(A.end_time) - TIME_TO_SEC(A.start_time))/60 DIV 1 AS duration, " +
       "A.is_attend AS isAttend " +
