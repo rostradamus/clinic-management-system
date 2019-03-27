@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Modal, Container} from "semantic-ui-react";
+import { Icon, Header, Button, Modal, Container} from "semantic-ui-react";
 import CreatePatientPopup from "./CreatePatientPopup";
 import CreateStaffPopup from "./CreateStaffPopup";
 import { connect } from "react-redux";
@@ -29,83 +29,56 @@ export const STATE_CONST = {
 class CreateUserPopup extends Component{
   constructor(props) {
     super(props);
-    this.initialState = {
-      typeUser:'',
-      onNext:false,
-    };
-
-    this.state= this.initialState;
-
-    this.onNextClick = this.onNextClick.bind(this);
-    this.onPrevClick = this.onPrevClick.bind(this);
   }
 
   _handleSelectUserClick = (e, { id }) => {
-    this.setState({ typeUser: id });
+    this.props.dispatch(CreateUserAction.selectUser(id));
   };
 
-  onNextClick(){
-    if(this.state.typeUser !== '') {
-      this.setState({onNext: true});
-    }
-  }
-
-  onPrevClick(){
-    this.setState(this.initialState);
-  }
-
-  closePopup(){
+  _closePopup = () =>{
     this.props.dispatch(CreateUserAction.closePopup())
-    this.setState(this.initialState);
   }
 
   render() {
-    const { typeUser, onNext } = this.state;
-    const labels = [ {key:'Admin', value:'Administrator'}, {key:'Staff', value:'Staff'}, {key:'Patient', value:'Patient'}];
-
+    const { typeUser } = this.props;
+    const labels = [ 'Administrator', 'Staff', 'Patient' ];
     return(
-      <Modal size="tiny" className="createUserPopupModal" closeIcon onClose={ () => this.closePopup() } open={ this.props.popup }>
+      <React.Fragment>
+      <Modal size="tiny" className="createUserPopupModal" closeIcon onClose={this._closePopup} open={ this.props.popup }>
         <Modal.Header>
-          {!this.state.onNext ? "New User" : "New " + this.state.typeUser}
+          New User
         </Modal.Header>
-        {!onNext &&
-          <React.Fragment>
             <Modal.Content>
+              <Header as='h2' icon textAlign='center' color="grey">
+                <Icon name='users' circular />
+                <Header.Content>Select Role</Header.Content>
+              </Header>
               <Container textAlign='center' className="select-user">
                 {labels.map(label=>(
-                  <div key={label['key']}>
+                  <div key={label}>
                     <Button
                       size='big'
                       className="select-btn"
-                      toggle active = {this.state.isUserSelected && (label['value'] === this.typeUser)}
                       onClick={this._handleSelectUserClick}
-                      id={label['value']}
+                      id={label}
                     >
-                    {label['key']}
+                    {label}
                     </Button>
                   </div>
                 ))}
               </Container>
             </Modal.Content>
-
-            <Modal.Actions>
-              <Button
-                primary
-                className="next-btn"
-                onClick={this.onNextClick}
-              >
-              Next
-              </Button>
-            </Modal.Actions>
-          </React.Fragment>
-        }
-        {onNext && typeUser === 'Patient' && <CreatePatientPopup onClose={ () => this.closePopup() } onPrev = {this.onPrevClick}/>}
-        {onNext && typeUser !== 'Patient' && <CreateStaffPopup onClose={ () => this.closePopup() } onPrev= {this.onPrevClick} typeUser={this.state.typeUser}/>}
-      </Modal>
+        </Modal>
+        <CreatePatientPopup open ={ typeUser === 'Patient'} onClose={this._closePopup}/>
+        <CreateStaffPopup open= { typeUser === 'Administrator' || typeUser === 'Staff' } onClose={this._closePopup}/>
+      </React.Fragment>
     );
   }
 }
 
-const mapStateToProps = state => ({popup: state.createUser.popup});
+const mapStateToProps = state =>
+({popup: state.createUser.popup,
+  typeUser: state.createUser.typeUser
+});
 
 export default connect(mapStateToProps)(CreateUserPopup)

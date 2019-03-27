@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Modal, Grid, Button, Select, Header, Input, Form, Container, Divider} from "semantic-ui-react";
+import { Label, Modal, Grid, Button, Select, Header, Input, Form, Container, Divider} from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import * as moment from 'moment';
 import { UserAction, CreateUserAction } from 'actions';
@@ -19,32 +19,18 @@ const THERAPIST_TYPE = [
   { key: 'SWA', text: 'SWA', value: 'SWA' }
 ];
 
-const PERMISSION_TYPE = [
-  { key: 'High', text: 'High', value: 'High' },
-  { key: 'Medium', text: 'Medium', value: 'Medium' },
-  { key: 'Low', text: 'Low', value: 'Low' },
-];
-
-const defaultPermission = {
-  Administrator: 'High',
-  Staff: 'Medium',
-  Patient: 'Low'
-}
-
 class CreateStaffPopup extends Component{
   constructor(props) {
     super(props);
-    moment.locale('en');
-
-    this.state = {
+    this.initialState = {
       form: {
         therapist_type: THERAPIST_TYPE[0].value,
         first_name: '',
         last_name:'',
         email:'',
         phone_number:'',
-        type: this.props.typeUser,
-        permission_level:defaultPermission[this.props.typeUser]
+        type: '',
+        permission_level:''
       },
       error: { // erase the optional fields?
         first_name: false,
@@ -54,9 +40,26 @@ class CreateStaffPopup extends Component{
         phone_number: false
       }
     };
+    moment.locale('en');
+    this.state = this.initialState;
     this.handleInputChange=this.handleInputChange.bind(this);
     this.handleDateChange=this.handleDateChange.bind(this);
     this.handleSelectChange=this.handleSelectChange.bind(this);
+  }
+
+  static getDerivedStateFromProps(props, state) {
+
+    const permission = props.typeUser === 'Staff' ? 'Medium' : 'High';
+    if (props.typeUser && props.typeUser !== state.form.typeUser) {
+      return {
+        ...state,
+        form:{
+          ...state.form,
+        permission_level: permission,
+        type: props.typeUser
+      }};
+    }
+    return {};
   }
 
   handleInputChange(event, key) {
@@ -83,9 +86,7 @@ class CreateStaffPopup extends Component{
 
   handleFinalValidation(event) {
     event.preventDefault();
-    var createAction;
     if(!this.validateForm()) return;
-
     this.props.getUserByEmail(this.state.form.email)
      .then(()=> {
       if(this.props.user.length === 0){
@@ -119,10 +120,11 @@ class CreateStaffPopup extends Component{
   validateEmail() {
     const {email} = this.state.form;
     const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return email !== '' && regex.test(String(email).toLowerCase());
+    return regex.test(String(email).toLowerCase());
   }
 
   validateForm() {
+    const {email} = this.state.form;
     const errorFields={};
     Object.entries(this.state.error).map(entry => {
       if((entry[0] === 'email' && !this.validateEmail()) || this.state.form[entry[0]] === ''){
@@ -147,11 +149,6 @@ class CreateStaffPopup extends Component{
               {this.renderRepeatDropDownForm(THERAPIST_TYPE, 'therapist_type')}
             </Container>
           }
-
-          <Divider/>
-          <Header>Permission Level</Header>
-          {this.renderRepeatDropDownForm(PERMISSION_TYPE, 'permission_level')}
-
         </Form>
       </Modal.Content>
     );
@@ -168,16 +165,14 @@ class CreateStaffPopup extends Component{
   }
 
    renderRepeatDropDownForm(type, field) {
-    const defaultValue = field === 'permission_level' ? this.state.form.permission_level : THERAPIST_TYPE[0].value;
-
     return(
       <Form.Field
         className="user-field"
-        defaultValue={ defaultValue }
+        defaultValue={ THERAPIST_TYPE[0].value }
         control={ Select }
         options={ type }
         label={{ children: STATE_CONST[field], htmlFor: 'form-select-control-repeat' }}
-        placeholder= { defaultValue }
+        placeholder= { THERAPIST_TYPE[0].value }
         search
         searchInput={{ id: 'form-select-control-repeat' }}
         onChange={
@@ -209,6 +204,7 @@ class CreateStaffPopup extends Component{
           <Form.Field error={this.state.error[field]} key = {field}>
             <label>{STATE_CONST[field]}</label>
             <Input maxLength='255' placeholder={STATE_CONST[field]} onChange={e=> this.handleInputChange(e, field)}/>
+            {field === 'email' && this.state.form.email !== '' && !this.validateEmail() && <Label basic color = 'red' pointing> Invalid Email </Label> }
           </Form.Field>
         ))}
       </Container>
@@ -223,7 +219,7 @@ class CreateStaffPopup extends Component{
           <Button
             className="back-btn"
             floated="left"
-            onClick={e => this.props.onPrev()}
+            onClick={this.onPrevClick}
           >
           Back
           </Button>
@@ -243,6 +239,11 @@ class CreateStaffPopup extends Component{
     );
   }
 
+  onPrevClick = (e) => {
+      this.setState(this.initialState);
+      this.props.prevSlide();
+  }
+
   onNextClick(event){
     if(this.props.created){
       this.props.onClose();
@@ -251,13 +252,20 @@ class CreateStaffPopup extends Component{
     }
   }
 
+  onClose = (e) => {
+    this.setState(this.initialState);
+    this.props.onClose();
+  }
+
   render() {
+    const {open, onClose } = this.props;
     return (
-      <React.Fragment>
+       <Modal size="tiny" className="createUserPopupModal" closeIcon onClose={ this.onClose } open={ open }>
+        <Modal.Header>{this.props.typeUser}</Modal.Header>
         {!this.props.created && this.renderForm()}
         {this.props.created && this.renderFinal()}
         <Modal.Actions children={this.renderModalActionButton()}/>
-      </React.Fragment>
+      </Modal>
     );
   }
 }
@@ -268,14 +276,16 @@ const mapDispatchToProps = dispatch => {
       createAdmin: CreateUserAction.createAdmin,
       createStaff: CreateUserAction.createStaff,
       getUsers: UserAction.getUsers,
-      getUserByEmail: CreateUserAction.getUserByEmail
+      getUserByEmail: CreateUserAction.getUserByEmail,
+      prevSlide: CreateUserAction.prevSlide
     },
     dispatch
   );
 }
 
 const mapStateToProps = state => (
-  { user: state.createUser.user,
+  { typeUser: state.createUser.typeUser,
+    user: state.createUser.user,
     created: state.createUser.created});
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateStaffPopup);

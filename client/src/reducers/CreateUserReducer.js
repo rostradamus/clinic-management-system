@@ -1,9 +1,10 @@
-import { CREATE_USER_ACTION_TYPE } from "actions/ActionTypes";
+ import { CREATE_USER_ACTION_TYPE } from "actions/ActionTypes";
 
 const initialState = {
   isFetching: false,
-  slideIndex:1,
+  slideIndex:0,
   user:{},
+  typeUser:'',
   isExisting: false,
   popup: false,
   created:false,
@@ -18,6 +19,9 @@ export default (state = initialState, action) => {
     case CREATE_USER_ACTION_TYPE.ADMIN_CREATE_REQUEST:
     case CREATE_USER_ACTION_TYPE.FETCH_MRN_REQUEST: {
       return Object.assign({...state}, {isFetching: true});
+    }
+    case CREATE_USER_ACTION_TYPE.SELECT_USER:{
+      return Object.assign({...state}, {typeUser: action.payload, popup: false, slideIndex: 1});
     }
     case CREATE_USER_ACTION_TYPE.FETCH_MRN_SUCCESS:{
       const exists = action.payload.length > 0 ? true : false;
@@ -35,8 +39,8 @@ export default (state = initialState, action) => {
     }
     case CREATE_USER_ACTION_TYPE.PREV_SLIDE: {
       const index = isExisting ? slideIndex - 2 : slideIndex - 1;
-      if(index === 1) return Object.assign({...initialState}, {popup: true});
-      else return Object.assign({...state}, {slideIndex: index});
+      if(index === 0) return {...initialState, popup: true};
+      return Object.assign({...state}, {slideIndex: index});
     }
     case CREATE_USER_ACTION_TYPE.CLOSE_POPUP: {
       return initialState;

@@ -1,8 +1,9 @@
 .select-user .ui.select-btn {
-  width: 30%;
+  width: 50%;
   background-color: #73AACE;
   color: #FFFFFF;
   margin: 1rem;
+  font-size: 2rem;
 
 }
 
