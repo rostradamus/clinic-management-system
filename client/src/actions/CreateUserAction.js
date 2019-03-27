@@ -153,4 +153,11 @@ export default class CreateUserAction {
       payload:{}
     });
   }
+
+  static selectUser(user){
+    return ({
+      type: CREATE_USER_ACTION_TYPE.SELECT_USER,
+      payload:user
+    })
+  }
 }

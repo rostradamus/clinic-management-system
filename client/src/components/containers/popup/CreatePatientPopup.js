@@ -15,7 +15,6 @@ const PATIENT_CAT = [
 ];
 const PLACEHOLDER = {
   mrn: 'up to 10 alphanumeric characters',
-  patient_program: 'up to 5 alphanumeric characters',
   type_of_injury: 'ex. stroke',
 }
 
@@ -37,7 +36,7 @@ class CreatePatientPopup extends Component{
           date_of_birth:null,
           address:'',
           is_in_patient:true,
-          patient_program:''
+          patient_program:'PT'
         },
         Admission_record : {
           type_of_injury:'',
@@ -55,7 +54,6 @@ class CreatePatientPopup extends Component{
         date_of_birth:false,
         address:false,
         is_in_patient:false,
-        patient_program:false,
         type_of_injury:false,
         admission_date:false,
         patient_category:false
@@ -149,12 +147,11 @@ class CreatePatientPopup extends Component{
 
    handleNewAccountSubmit(){
     const {email} = this.state.form.User;
-    const fields = ['last_name', 'first_name', 'phone_number', 'mrn','date_of_birth','address','is_in_patient','patient_program'];
+    const fields = ['last_name', 'first_name', 'phone_number', 'mrn','date_of_birth','address','is_in_patient'];
     if(this.validateField(fields) && this.validateEmail()){
         this.props.nextSlide();
-      }else{
-        //TODO: error message
       }
+
    }
 
   rendermrnCheck() {
@@ -209,7 +206,6 @@ class CreatePatientPopup extends Component{
                 (e,data)=>this.handleSelectChange('is_in_patient', data, 'Patient')}
             />
           </Form.Group>
-          {this.renderFieldHelper(['patient_program'], 'Patient')}
         </Form>
 
       </Modal.Content>
@@ -272,9 +268,11 @@ class CreatePatientPopup extends Component{
         error={this.state.error[field]}
         >
         <label>{field==="email" ? "Email (Optional)" : STATE_CONST[field] }</label>
-        <Input maxLength = { field === 'patient_program' ? '5' : '255' } value={this.state.form[formtype][field]}
+        <Input maxLength = '255' value={this.state.form[formtype][field]}
         placeholder={!PLACEHOLDER[field]? STATE_CONST[field] : PLACEHOLDER[field] } onChange={e=> this.handleInputChange(e, field, formtype)}/>
+        {field === 'email' && !this.validateEmail() && <Label basic color = 'red' pointing> Invalid Email </Label> }
         </Form.Field>
+
         ))}
       </Container>
       );
@@ -325,39 +323,40 @@ class CreatePatientPopup extends Component{
 
   renderModalActionButton(){
     const nextBtn = ['Next', 'Next', 'Create', 'Done'];
-    return (
-      <Grid columns={2} className="modal-action">
-        <Grid.Column>
+     return (
+       <Grid columns={2} className="modal-action">
+         <Grid.Column>
           {this.props.slideIndex !== 4 &&
-            <Button
-              className="back-btn"
-              floated="left"
-              onClick={this.onPrevClick}
-            >
+             <Button
+               className="back-btn"
+               floated="left"
+               onClick={this.onPrevClick}
+             >
             Back</Button>}
-        </Grid.Column>
-        <Grid.Column>
-          <Button
-            primary
-            className="next-btn"
-            floated="right"
-            onClick={e => this.onNextClick(e)}>
+         </Grid.Column>
+         <Grid.Column>
+           <Button
+             className="next-btn"
+             floated="right"
+             primary
+             onClick={e => this.onNextClick(e)}>
               {nextBtn[this.props.slideIndex - 1 ]}
-          </Button>
-        </Grid.Column>
-      </Grid>
-    );
-  }
+           </Button>
+         </Grid.Column>
+       </Grid>
+      )
+   }
 
   onPrevClick = (e) => {
-    if(this.props.slideIndex===1){
-      this.props.onPrev();
-    }else {
-      if ((this.props.slideIndex === 3 && this.props.exists) || this.props.slideIndex === 2){
-      this.setState(this.initialState);
+      if (!(this.props.slideIndex === 3 && !this.props.exists)){
+        this.setState(this.initialState);
       }
       this.props.prevSlide();
-    }
+  }
+
+  onClose = (e) => {
+    this.setState(this.initialState);
+    this.props.onClose();
   }
 
   onNextClick(event){
@@ -389,11 +388,14 @@ class CreatePatientPopup extends Component{
   }
 
   render() {
+    const {open} = this.props;
       return (
-        <React.Fragment>
+        <Modal size="tiny" className="createUserPopupModal" closeIcon onClose={ this.onClose } open={ open }>
+          <Modal.Header>Patient</Modal.Header>
           {this.renderPage()}
           <Modal.Actions children={this.renderModalActionButton()}/>
-        </React.Fragment>
+        </Modal>
+
   )}
 }
 

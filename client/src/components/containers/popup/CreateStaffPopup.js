@@ -31,12 +31,11 @@ const defaultPermission = {
   Patient: 'Low'
 }
 
+
 class CreateStaffPopup extends Component{
   constructor(props) {
     super(props);
-    moment.locale('en');
-
-    this.state = {
+    this.initialState = {
       form: {
         therapist_type: THERAPIST_TYPE[0].value,
         first_name: '',
@@ -54,6 +53,8 @@ class CreateStaffPopup extends Component{
         phone_number: false
       }
     };
+    moment.locale('en');
+    this.state = this.initialState;
     this.handleInputChange=this.handleInputChange.bind(this);
     this.handleDateChange=this.handleDateChange.bind(this);
     this.handleSelectChange=this.handleSelectChange.bind(this);
@@ -147,11 +148,6 @@ class CreateStaffPopup extends Component{
               {this.renderRepeatDropDownForm(THERAPIST_TYPE, 'therapist_type')}
             </Container>
           }
-
-          <Divider/>
-          <Header>Permission Level</Header>
-          {this.renderRepeatDropDownForm(PERMISSION_TYPE, 'permission_level')}
-
         </Form>
       </Modal.Content>
     );
@@ -168,16 +164,14 @@ class CreateStaffPopup extends Component{
   }
 
    renderRepeatDropDownForm(type, field) {
-    const defaultValue = field === 'permission_level' ? this.state.form.permission_level : THERAPIST_TYPE[0].value;
-
     return(
       <Form.Field
         className="user-field"
-        defaultValue={ defaultValue }
+        defaultValue={ THERAPIST_TYPE[0].value }
         control={ Select }
         options={ type }
         label={{ children: STATE_CONST[field], htmlFor: 'form-select-control-repeat' }}
-        placeholder= { defaultValue }
+        placeholder= { THERAPIST_TYPE[0].value }
         search
         searchInput={{ id: 'form-select-control-repeat' }}
         onChange={
@@ -223,7 +217,7 @@ class CreateStaffPopup extends Component{
           <Button
             className="back-btn"
             floated="left"
-            onClick={e => this.props.onPrev()}
+            onClick={this.onPrevClick}
           >
           Back
           </Button>
@@ -243,6 +237,11 @@ class CreateStaffPopup extends Component{
     );
   }
 
+  onPrevClick = (e) => {
+      this.setState(this.initialState);
+      this.props.prevSlide();
+  }
+
   onNextClick(event){
     if(this.props.created){
       this.props.onClose();
@@ -251,13 +250,20 @@ class CreateStaffPopup extends Component{
     }
   }
 
+  onClose = (e) => {
+    this.setState(this.initialState);
+    this.props.onClose();
+  }
+
   render() {
+    const {open, onClose } = this.props;
     return (
-      <React.Fragment>
+       <Modal size="tiny" className="createUserPopupModal" closeIcon onClose={ this.onClose } open={ open }>
+        <Modal.Header>{this.props.typeUser}</Modal.Header>
         {!this.props.created && this.renderForm()}
         {this.props.created && this.renderFinal()}
         <Modal.Actions children={this.renderModalActionButton()}/>
-      </React.Fragment>
+      </Modal>
     );
   }
 }
@@ -268,14 +274,16 @@ const mapDispatchToProps = dispatch => {
       createAdmin: CreateUserAction.createAdmin,
       createStaff: CreateUserAction.createStaff,
       getUsers: UserAction.getUsers,
-      getUserByEmail: CreateUserAction.getUserByEmail
+      getUserByEmail: CreateUserAction.getUserByEmail,
+      prevSlide: CreateUserAction.prevSlide
     },
     dispatch
   );
 }
 
 const mapStateToProps = state => (
-  { user: state.createUser.user,
+  { typeUser: state.createUser.typeUser,
+    user: state.createUser.user,
     created: state.createUser.created});
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateStaffPopup);
