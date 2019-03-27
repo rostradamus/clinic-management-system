@@ -14,7 +14,7 @@ const PATIENT_CAT = [
   { key: '3', text: '3', value: '3' }
 ];
 const PLACEHOLDER = {
-  mrn: 'up to 10 alphanumeric characters',
+  mrn: 'Up to 10 alphanumeric characters',
   type_of_injury: 'ex. stroke',
 }
 

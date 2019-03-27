@@ -35,7 +35,7 @@ class CreateUserPopup extends Component{
     this.props.dispatch(CreateUserAction.selectUser(id));
   };
 
-  closePopup(){
+  _closePopup = () =>{
     this.props.dispatch(CreateUserAction.closePopup())
   }
 
@@ -44,7 +44,7 @@ class CreateUserPopup extends Component{
     const labels = [ 'Administrator', 'Staff', 'Patient' ];
     return(
       <React.Fragment>
-      <Modal size="tiny" className="createUserPopupModal" closeIcon onClose={ () => this.closePopup() } open={ this.props.popup }>
+      <Modal size="tiny" className="createUserPopupModal" closeIcon onClose={this._closePopup} open={ this.props.popup }>
         <Modal.Header>
           New User
         </Modal.Header>
@@ -69,8 +69,8 @@ class CreateUserPopup extends Component{
               </Container>
             </Modal.Content>
         </Modal>
-        <CreatePatientPopup open ={ typeUser === 'Patient'} onClose={()=>this.closePopup()}/>
-        <CreateStaffPopup open= { typeUser === 'Administrator' || typeUser === 'Staff' } onClose={()=>this.closePopup()}/>
+        <CreatePatientPopup open ={ typeUser === 'Patient'} onClose={this._closePopup}/>
+        <CreateStaffPopup open= { typeUser === 'Administrator' || typeUser === 'Staff' } onClose={this._closePopup}/>
       </React.Fragment>
     );
   }

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Modal, Grid, Button, Select, Header, Input, Form, Container, Divider} from "semantic-ui-react";
+import { Label, Modal, Grid, Button, Select, Header, Input, Form, Container, Divider} from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import * as moment from 'moment';
 import { UserAction, CreateUserAction } from 'actions';
@@ -25,13 +25,6 @@ const PERMISSION_TYPE = [
   { key: 'Low', text: 'Low', value: 'Low' },
 ];
 
-const defaultPermission = {
-  Administrator: 'High',
-  Staff: 'Medium',
-  Patient: 'Low'
-}
-
-
 class CreateStaffPopup extends Component{
   constructor(props) {
     super(props);
@@ -42,8 +35,8 @@ class CreateStaffPopup extends Component{
         last_name:'',
         email:'',
         phone_number:'',
-        type: this.props.typeUser,
-        permission_level:defaultPermission[this.props.typeUser]
+        type: '',
+        permission_level:''
       },
       error: { // erase the optional fields?
         first_name: false,
@@ -58,6 +51,21 @@ class CreateStaffPopup extends Component{
     this.handleInputChange=this.handleInputChange.bind(this);
     this.handleDateChange=this.handleDateChange.bind(this);
     this.handleSelectChange=this.handleSelectChange.bind(this);
+  }
+
+  static getDerivedStateFromProps(props, state) {
+
+    const permission = props.typeUser === 'Staff' ? 'Medium' : 'High';
+    if (props.typeUser && props.typeUser !== state.form.typeUser) {
+      return {
+        ...state,
+        form:{
+          ...state.form,
+        permission_level: permission,
+        type: props.typeUser
+      }};
+    }
+    return {};
   }
 
   handleInputChange(event, key) {
@@ -83,10 +91,9 @@ class CreateStaffPopup extends Component{
   }
 
   handleFinalValidation(event) {
+    console.log(this.state);
     event.preventDefault();
-    var createAction;
     if(!this.validateForm()) return;
-
     this.props.getUserByEmail(this.state.form.email)
      .then(()=> {
       if(this.props.user.length === 0){
@@ -105,6 +112,8 @@ class CreateStaffPopup extends Component{
     const staff = Object.assign({
           Staff:{therapist_type:therapist_type},
           User});
+    console.log(this.state.form);
+    console.log(staff);
     this.props.createStaff(staff)
       .then(() => this.props.getUsers())
       .catch(() => alert("Fatal: This should never happen"));
@@ -120,10 +129,12 @@ class CreateStaffPopup extends Component{
   validateEmail() {
     const {email} = this.state.form;
     const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return email !== '' && regex.test(String(email).toLowerCase());
+    return regex.test(String(email).toLowerCase());
   }
 
   validateForm() {
+    console.log(this.state.form);
+    const {email} = this.state.form;
     const errorFields={};
     Object.entries(this.state.error).map(entry => {
       if((entry[0] === 'email' && !this.validateEmail()) || this.state.form[entry[0]] === ''){
@@ -197,12 +208,14 @@ class CreateStaffPopup extends Component{
   }
 
   renderFieldHelper(fields){
+    console.log(this.state);
     return(
       <Container>
         {fields.map(field=> (
           <Form.Field error={this.state.error[field]} key = {field}>
             <label>{STATE_CONST[field]}</label>
             <Input maxLength='255' placeholder={STATE_CONST[field]} onChange={e=> this.handleInputChange(e, field)}/>
+            {field === 'email' && this.state.form.email !== '' && !this.validateEmail() && <Label basic color = 'red' pointing> Invalid Email </Label> }
           </Form.Field>
         ))}
       </Container>

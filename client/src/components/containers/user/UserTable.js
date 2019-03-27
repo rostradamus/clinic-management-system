@@ -18,7 +18,6 @@ class UserTable extends Component {
         <Table.Cell content={user.email} />
         <Table.Cell content={user.phone_number} />
         <Table.Cell content={user.type} />
-        <Table.Cell content={user.permission_level} />
       </Table.Row>
     );
   }
@@ -49,11 +48,6 @@ class UserTable extends Component {
               sorted={sortKey === "type" ? sort.direction : null}
               onClick={this.handleSort.bind(this, ["type"])}>
               User Type
-            </Table.HeaderCell>
-            <Table.HeaderCell
-              sorted={sortKey === "permission_level" ? sort.direction : null}
-              onClick={this.handleSort.bind(this, ["permission_level"])}>
-              Permission
             </Table.HeaderCell>
           </Table.Row>
         </Table.Header>
