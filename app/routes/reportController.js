@@ -3,11 +3,11 @@ const reportManager = require("@app/helpers/queryManager/report");
 const moment = require('moment');
 
 // Helper functions
-function validateAppointmentDate(admisisonDate, dischargeDate, appointmentDate) {
+function validateAppointmentDate(admissionDate, dischargeDate, appointmentDate) {
   if (!dischargeDate) {
-    return moment(appointmentDate).isSameOrAfter(admisisonDate);
+    return moment(appointmentDate).isSameOrAfter(admissionDate);
   } else {
-    return (moment(appointmentDate).isSameOrAfter(admisisonDate)) && (moment(appointmentDate).isSameOrBefore(dischargeDate));
+    return (moment(appointmentDate).isSameOrAfter(admissionDate)) && (moment(appointmentDate).isSameOrBefore(dischargeDate));
   }
 }
 
@@ -41,8 +41,6 @@ function groupByPatient(appointmentList) {
 
     if (validateAppointmentDate(item.admission_date, item.discharge_date, item.start_date)) {
       appointment.appointmentId = item.appointment_id;
-      appointment.patientId = item.patient_id;
-      appointment.recordId = item.record_id;
       appointment.startDate = item.start_date;
       appointment.endDate = item.end_date;
       appointment.duration = item.duration;
@@ -61,6 +59,16 @@ routes.get("/", async (req, res) => {
     const reports = groupByPatient(appointmentList);
     res.status(200);
     res.send(reports);
+  } catch (err) {
+    res.status(500);
+  }
+});
+
+routes.get("/category/:category_type", async (req, res) => {
+  try {
+    const appointmentList = await reportManager.getAllAppointmentsByCategory(req.params.category_type);
+    res.status(200);
+    res.send(appointmentList);
   } catch (err) {
     res.status(500);
   }
