@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { isEmpty } from "lodash";
 import { UserAction } from "actions";
-import { Confirm, Grid, Modal, Button, Icon, Form, Label } from "semantic-ui-react";
+import { Confirm, Modal, Button, Icon, Form, Label, Container} from "semantic-ui-react";
 
 const INITIAL_STATE = {
   deleteOpen: false,
@@ -14,7 +14,6 @@ const INITIAL_STATE = {
     cPassword: "",
     phone_number: "",
     type: "",
-    permission_level: "",
   },
   error: {}
 };
@@ -34,18 +33,6 @@ class UserPopup extends Component {
     return {};
   }
 
-  _renderDeleteButton() {
-    const isOwnUser = this.props.user && this.props.user.id === this.props.current_user.id;
-    if (isOwnUser)
-      return (<Grid.Column />);
-    return (
-      <Grid.Column>
-        <Button floated="left"onClick={this._deleteOpen}><Icon name="delete"/>Delete</Button>
-        <Confirm open={this.state.deleteOpen} onCancel={this._deleteOpen} onConfirm={() => this._deleteUser(this.state) }/>
-      </Grid.Column>
-    );
-  }
-
   _handleInputChange(e, {name, value}) {
     const user = Object.assign({...this.state.user}, {[name]: value});
     this.setState({user});
@@ -59,7 +46,6 @@ class UserPopup extends Component {
     if (user.password === ""){
       delete user["password"];
     }
-
     this.props.dispatch(UserAction.editUser(user))
       .then(this._closePopup)
       .catch(() => alert("Fatal: This should never happen"));
@@ -123,8 +109,7 @@ class UserPopup extends Component {
 
   render() {
     const { first_name, last_name, email, password, cPassword,
-      phone_number, type, permission_level } = this.state.user;
-
+      phone_number, type  } = this.state.user;
     return (
       <Modal
         size="small"
@@ -179,28 +164,20 @@ class UserPopup extends Component {
                 name="type"
                 placeholder={ type }
                 onChange={ this._handleInputChange.bind(this) } />
-              <Form.Input fluid readOnly
-                label="Permission"
-                name="permission_level"
-                placeholder={ permission_level }
-                onChange={ this._handleInputChange.bind(this) } />
             </Form.Group>
           </Form>
 
         </Modal.Content>
           <Modal.Actions>
-            <Grid columns={2} className="modal-action">
-            { this._renderDeleteButton() }
-            <Grid.Column>
+            {!(this.props.user && this.props.user.id === this.props.current_user.id) &&
+              <Button onClick={this._deleteOpen}><Icon name="delete"/>Delete</Button>}
+              <Confirm open={this.state.deleteOpen} onCancel={this._deleteOpen} onConfirm={() => this._deleteUser(this.state) }/>
               <Button
-              positive
+              primary
               onClick={ () => this._saveUser() }>
               <Icon name="save" />
               Save
             </Button>
-            </Grid.Column>
-          </Grid>
-
         </Modal.Actions>
       </Modal>
     );
