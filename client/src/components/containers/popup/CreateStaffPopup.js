@@ -19,12 +19,6 @@ const THERAPIST_TYPE = [
   { key: 'SWA', text: 'SWA', value: 'SWA' }
 ];
 
-const PERMISSION_TYPE = [
-  { key: 'High', text: 'High', value: 'High' },
-  { key: 'Medium', text: 'Medium', value: 'Medium' },
-  { key: 'Low', text: 'Low', value: 'Low' },
-];
-
 class CreateStaffPopup extends Component{
   constructor(props) {
     super(props);
@@ -91,7 +85,6 @@ class CreateStaffPopup extends Component{
   }
 
   handleFinalValidation(event) {
-    console.log(this.state);
     event.preventDefault();
     if(!this.validateForm()) return;
     this.props.getUserByEmail(this.state.form.email)
@@ -112,8 +105,6 @@ class CreateStaffPopup extends Component{
     const staff = Object.assign({
           Staff:{therapist_type:therapist_type},
           User});
-    console.log(this.state.form);
-    console.log(staff);
     this.props.createStaff(staff)
       .then(() => this.props.getUsers())
       .catch(() => alert("Fatal: This should never happen"));
@@ -133,7 +124,6 @@ class CreateStaffPopup extends Component{
   }
 
   validateForm() {
-    console.log(this.state.form);
     const {email} = this.state.form;
     const errorFields={};
     Object.entries(this.state.error).map(entry => {
@@ -208,7 +198,6 @@ class CreateStaffPopup extends Component{
   }
 
   renderFieldHelper(fields){
-    console.log(this.state);
     return(
       <Container>
         {fields.map(field=> (
