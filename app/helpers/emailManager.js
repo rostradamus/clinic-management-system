@@ -22,8 +22,7 @@ let generateMailOptionsForNewAppointment = function(appointment, patientUser, st
   let event = iCalAttachmentGenerator(appointment, patientUser);
   return {
     from: process.env.NODE_MAILER_USER,
-    // to: staffUser.email,
-    to: "gfstrongteststaff@gmail.com",
+    to: staffUser.email,
     subject: `New appointment with ${patientUser.first_name} ${patientUser.last_name}`,
     text: `You have an upcoming appointment with ${patientUser.first_name} ${patientUser.last_name}. \n To save this event in your calendar you must do this: \n 1. Open the ics attachment \n 2. Click 'Save & close'`,
     icalEvent: event
@@ -34,8 +33,7 @@ let generateMailOptionsForUpdateAppointment = function(appointment, currentAppoi
   let event = iCalAttachmentGenerator(appointment, patientUser);
   return {
     from: process.env.NODE_MAILER_USER,
-    // to: staffUser.email,
-    to: "gfstrongteststaff@gmail.com",
+    to: staffUser.email,
     subject: `Updated appointment with ${patientUser.first_name} ${patientUser.last_name}`,
     text: `The appointment with ${patientUser.first_name} ${patientUser.last_name} on ${currentAppointment.start_date} ${currentAppointment.start_time} to ${currentAppointment.end_time} has been changed. \n Please save this event to your calendar, and remove the previous appointment. \n To save this event in your calendar you must do this: \n 1. Open the ics attachment \n 2. Click 'Save & close'`,
     icalEvent: event
@@ -45,8 +43,7 @@ let generateMailOptionsForUpdateAppointment = function(appointment, currentAppoi
 let generateMailOptionsForCancellation = function(appointment, patientUser, staffUser) {
   return {
     from: process.env.NODE_MAILER_USER,
-    // to: staffUser.email,
-    to: "gfstrongteststaff@gmail.com",
+    to: staffUser.email,
     subject: `Appointment with ${patientUser.first_name} ${patientUser.last_name} CANCELLED`,
     text: `The appointment with ${patientUser.first_name} ${patientUser.last_name} on ${appointment.start_date} ${appointment.start_time} to ${appointment.end_time} has been cancelled. \n Please remove the event from your calendar.`
   }
