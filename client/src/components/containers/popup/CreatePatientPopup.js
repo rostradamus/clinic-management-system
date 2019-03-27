@@ -14,7 +14,7 @@ const PATIENT_CAT = [
   { key: '3', text: '3', value: '3' }
 ];
 const PLACEHOLDER = {
-  mrn: 'Up to 10 alphanumeric characters',
+  mrn: '1 to 10 alphanumeric characters',
   type_of_injury: 'ex. stroke',
 }
 
@@ -151,6 +151,7 @@ class CreatePatientPopup extends Component{
     if(this.validateField(fields) && this.validateEmail()){
         this.props.nextSlide();
       }
+
    }
 
   rendermrnCheck() {

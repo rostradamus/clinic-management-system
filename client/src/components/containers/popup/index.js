@@ -4,6 +4,7 @@ import CreateUserPopup from "./CreateUserPopup";
 import CreatePatientPopup from "./CreatePatientPopup";
 import CreateStaffPopup from "./CreateStaffPopup";
 import PatientStaffSearch from "./PatientStaffSearch";
+import IndividualReportPopup from "./IndividualReportPopup";
 
 export {
   CalendarPopup,
@@ -11,5 +12,6 @@ export {
   CreateUserPopup,
   CreatePatientPopup,
   CreateStaffPopup,
-  PatientStaffSearch
+  PatientStaffSearch,
+  IndividualReportPopup
 };

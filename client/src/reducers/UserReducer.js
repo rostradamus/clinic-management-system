@@ -17,10 +17,13 @@ export default (state = initialState, action) => {
   switch (action.type) {
     case USER_ACTION_TYPE.STAFF_DELETE_REQUEST:
     case USER_ACTION_TYPE.ADMIN_DELETE_REQUEST:
+    case USER_ACTION_TYPE.FETCH_ALL_REQUEST:
     case USER_ACTION_TYPE.FETCH_REQUEST:
     case USER_ACTION_TYPE.PATIENT_DELETE_REQUEST:{
       return Object.assign({...state}, {isFetching: true}, action.payload);
     }
+    case USER_ACTION_TYPE.FETCH_ALL_SUCCESS:
+    case USER_ACTION_TYPE.FETCH_ALL_FAILURE:
     case USER_ACTION_TYPE.FETCH_SUCCESS:
     case USER_ACTION_TYPE.FETCH_FAILURE:
     case USER_ACTION_TYPE.ADMIN_DELETE_FAILURE:

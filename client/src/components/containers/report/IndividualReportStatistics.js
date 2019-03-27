@@ -25,9 +25,9 @@ class IndividualReportStatistics {
   totalMinimum;
   totalMaximum;
 
-  medianTherapyIntensityByDisciplines
-  numberOfAttendedByDisciplines
-  numberOfMissedByDisciplines
+  medianTherapyIntensityByDisciplines;
+  numberOfAttendedByDisciplines;
+  numberOfMissedByDisciplines;
 
   constructor(appointments) {
     this.appointments = appointments;
@@ -35,7 +35,7 @@ class IndividualReportStatistics {
 
   getStatisticsObject() {
     return {
-      totalAverage: this.totalAverage.toFixed(2),
+      totalAverage: this.totalAverage,
       totalMedian: this.totalMedian,
       totalMinimum: this.totalMinimum,
       totalMaximum: this.totalMaximum,
@@ -105,9 +105,10 @@ class IndividualReportStatistics {
   createMedianTherapyIntensityByDisciplines() {
     this.medianTherapyIntensityByDisciplines = [];
     therapyTypesForReport.forEach(type => {
-      this.medianTherapyIntensityByDisciplines.push(
-        this.getMedian(this.attendedSessions.get(type) || [])
-      )
+      let tiArr = this.attendedSessions.get(type) || [];
+      tiArr.sort();
+
+      this.medianTherapyIntensityByDisciplines.push(this.getMedian(tiArr));
     });
   }
 
@@ -149,7 +150,7 @@ class IndividualReportStatistics {
     if (this.allAttendedDurations.length > 0) {
       this.allAttendedDurations.sort();
 
-      this.totalAverage = this.totalSum / this.allAttendedDurations.length;
+      this.totalAverage = Math.round(this.totalSum / this.allAttendedDurations.length);
       this.totalMedian = this.getMedian(this.allAttendedDurations);
       this.totalMinimum = this.allAttendedDurations[0];
       this.totalMaximum = this.allAttendedDurations[this.allAttendedDurations.length - 1];

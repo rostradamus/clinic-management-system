@@ -27,6 +27,31 @@ export default class UserAction {
     };
   }
 
+  static getAllUsers(){
+    return async dispatch => {
+       dispatch({
+        type: USER_ACTION_TYPE.FETCH_ALL_REQUEST,
+        payload: {}
+      });
+      try {
+        const res = await axios.get("/api/users", { params: { getInactivePatients: true } });
+        dispatch({
+          type: USER_ACTION_TYPE.FETCH_ALL_SUCCESS,
+          payload: {
+            items: res.data
+          }
+        });
+      } catch (err) {
+        dispatch({
+          type: USER_ACTION_TYPE.FETCH_ALL_FAILURE,
+          payload: {
+            err: err
+          }
+        });
+      }
+    };
+  }
+
   static getUser(id) {
     return async dispatch => {
       dispatch({
