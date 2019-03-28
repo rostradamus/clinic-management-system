@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Header, Modal, Label, Container, Form } from "semantic-ui-react";
+import { Button, Header, Modal, Label, Container, Form, Grid, Divider } from "semantic-ui-react";
 import { DateInput, YearInput } from "semantic-ui-calendar-react";
 import { AggregateReportStatistics } from "components/containers/report";
 import Highcharts from "highcharts";
@@ -44,12 +44,11 @@ class AggregateReportPopup extends Component {
     super(props);
     this.aggregateReportStatistics = new AggregateReportStatistics(this.props.categorySummary);
     this.state = {
-      filterFisicalYear: moment().subtract(1, "year").format("YYYY"),
-      filterFisicalYearError: false
+      filterFisicalYear: moment().format("YYYY")
     };
 
-    this._renderAggregateSummaryHeader = this._renderAggregateSummaryHeader.bind(this);
     this._handleFilterDateChange = this._handleFilterDateChange.bind(this);
+    this._renderAggregateSummaryHeader = this._renderAggregateSummaryHeader.bind(this);
     this._renderStastics = this._renderStastics.bind(this);
     this._renderDateFilter = this._renderDateFilter.bind(this);
   }
@@ -68,10 +67,9 @@ class AggregateReportPopup extends Component {
   }
 
   _handleFilterDateChange(event, { value }) {
-    //TODO: if value is > then current year.
-    const chosenDate = moment(value, "YYYY").format("YYYY");
+    const chosenDate = moment(value, "YYYY");
     this.setState({
-      filterFisicalYear: chosenDate,
+      filterFisicalYear: chosenDate.format("YYYY"),
     });
   }
 
@@ -81,64 +79,32 @@ class AggregateReportPopup extends Component {
     });
   }
 
-  _returnCategory(recordData, category) {
-    return recordData[category];
-  }
-
-  _renderStastics(stats) {
+  _renderButtons() {
     return(
-      <Container centered="true" className="statContainer">
-        <Container className="stat">
-          <p className="statValue">{ stats.totalAverage }</p>
-          <p>Average</p>
-        </Container>
-        <Container className="stat">
-          <p className="statValue">{ stats.totalMedian } </p>
-          <p>Median</p>
-        </Container>
-        <Container className="stat">
-          <p className="statValue">{ stats.totalMaximum }</p>
-          <p>Maximum</p>
-        </Container>
-        <Container className="stat">
-          <p className="statValue">{ stats.totalMinimum }</p>
-          <p>Minimum</p>
-        </Container>
-      </Container>
-    );
+      <Modal.Actions>
+        <Button primary onClick={ this._print }>Print</Button>
+        <Button  onClick={ this.props.onClose }>Close</Button>
+      </Modal.Actions>
+    )
   }
 
   _renderDateFilter() {
-    const { filterFisicalYear, filterFisicalYearError } = this.state;
+    const { filterFisicalYear } = this.state;
     return(
-      <Form.Field error={true}>
-        <label>Select Fisical Year</label>
-        <YearInput
-          icon={false}
-          className="date_pu"
-          dateFormat="YYYY"
-          name="date"
-          placeholder="Date"
-          value={ filterFisicalYear }
-          onChange={ this._handleFilterDateChange }
-        />
-      </Form.Field>
-    )
-    // return(
-    //   <div className="filterDateContainer">
-    //     <div className="dateBox">
-    //       <p className="filterDateInput">Start Date</p>
-    //       <YearInput
-    //         className="date_pu"
-    //         dateFormat="YYYY"
-    //         name="date"
-    //         placeholder="Date"
-    //         value={ filterFisicalYear }
-    //         onChange={ this._handleFilterDateChange }
-    //       />
-    //     </div>
-    //   </div>
-    // );
+      <Form className="aggReportFormContainer">
+        <Form.Field className="aggReportFormField">
+          <label className="aggReportFilterLabel">Select Fisical Year</label>
+          <YearInput
+            className="aggReportYearInput"
+            icon={false}
+            dateFormat="YYYY"
+            name="date"
+            value={ filterFisicalYear }
+            onChange={ this._handleFilterDateChange }
+          />
+        </Form.Field>
+      </Form>
+    );
   }
 
   _renderAggregateSummaryHeader() {
@@ -146,17 +112,42 @@ class AggregateReportPopup extends Component {
     // TODO: better error handling.
     if (selectedCategory < 1) return (<div>NOOOOOO</div>);
     return (
-        <p className="summaryHeader">{`Category ${CATEGORY_ARR[selectedCategory - 1]} Aggregate Report`}</p>
+      <Header as='h1' className="summaryHeader">
+        {`Category ${CATEGORY_ARR[selectedCategory - 1]} Aggregate Report`}
+      </Header>
     );
   }
 
-  _renderButtons() {
+  _renderStastics(stats) {
     return(
-      <Modal.Actions>
-        <Button primary  onClick={ this._print }>Print</Button>
-        <Button  onClick={ this.props.onClose }>Close</Button>
-      </Modal.Actions>
-    )
+      <Container className="aggReportContentContainer">
+        <Header className="aggReportModalContentHeader">Therapy Intensity Statistics</Header>
+        <Grid className="aggStatisticContainer">
+          <Grid.Row className="aggStatisticRow">
+            <Grid.Column width={4} className="aggStatisticColumn">
+              <p className="aggStatisticValue">{ stats.totalAverage }</p>
+              <p className="aggStatisticDescription">Average</p>
+            </Grid.Column>
+
+            <Grid.Column width={4} className="aggStatisticColumn">
+              <p className="aggStatisticValue">{ stats.totalMedian } </p>
+              <p className="aggStatisticDescription">Median</p>
+            </Grid.Column>
+
+            <Grid.Column width={4} className="aggStatisticColumn">
+              <p className="aggStatisticValue">{ stats.totalMaximum }</p>
+              <p className="aggStatisticDescription">Maximum</p>
+            </Grid.Column>
+
+            <Grid.Column width={4} className="aggStatisticColumn">
+              <p className="aggStatisticValue">{ stats.totalMinimum }</p>
+              <p className="aggStatisticDescription">Minimum</p>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+        <Divider />
+      </Container>
+    );
   }
 
   _renderMedianTherapyIntensityHistogram({medianTherapyIntensityByDisciplines}) {
@@ -175,7 +166,14 @@ class AggregateReportPopup extends Component {
     };
     const yAxis = { yAxis: { min: 0, title: { text: "Minutes" } } };
     const chartOptions = Object.assign({...defaultChartOptions("minutes")}, {...series}, {...yAxis});
-    return <HighchartsReact highcharts={Highcharts} options={chartOptions} />;
+
+    return (
+      <Container className="aggReportContentContainer">
+        <Header className="aggReportModalContentHeader">Median Therapy Intensity by Disciplines</Header>
+        <HighchartsReact highcharts={Highcharts} options={chartOptions} />
+        <Divider />
+      </Container>
+    );
   }
 
   _renderMedianNumberOfAttendedByDisciplines({ medianNumberOfAttendedByDisciplines }) {
@@ -195,7 +193,14 @@ class AggregateReportPopup extends Component {
 
     const yAxis = { yAxis: { min: 0, tickInterval: 1, title: { text: "Number of Sessions" } } };
     const chartOptions = Object.assign({...defaultChartOptions("times")}, {...series}, {...yAxis});
-    return <HighchartsReact highcharts={Highcharts} options={chartOptions} />;
+
+    return (
+      <Container className="aggReportContentContainer">
+        <Header className="aggReportModalContentHeader">Median Number of Sessions Attended by Disciplines</Header>
+        <HighchartsReact highcharts={Highcharts} options={chartOptions} />
+        <Divider />
+      </Container>
+    );
   }
 
   _renderMedianNumberOfMissedByDisciplines({ medianNumberOfMissedByDisciplines }) {
@@ -214,7 +219,12 @@ class AggregateReportPopup extends Component {
     };
     const yAxis = { yAxis: { min: 0, tickInterval: 1, title: { text: "Number of Sessions" } } };
     const chartOptions = Object.assign({...defaultChartOptions("times")}, {...series}, {...yAxis});
-    return <HighchartsReact highcharts={Highcharts} options={chartOptions} />;
+    return (
+      <Container className="aggReportContentContainer">
+        <Header className="aggReportModalContentHeader">Median Number of Sessions Missed by Disciplines</Header>
+        <HighchartsReact highcharts={Highcharts} options={chartOptions} />
+      </Container>
+    );
   }
 
   render() {
@@ -225,38 +235,25 @@ class AggregateReportPopup extends Component {
 
     return (
       <Modal onClose={ this.props.onClose } open={ this.props.isOpen } centered={false}>
-        <Modal.Header className="header_ct aggregateHeader">
+        <Modal.Header className={"a"/**"header_ct aggregateHeader"*/}>
+          <Grid>
+            <Grid.Row>
+              <Grid.Column width={13}>
+                { this._renderAggregateSummaryHeader() }
+              </Grid.Column>
 
-          <Container className="headerContainer">
-            <div className="endToEnd">
-              { this._renderAggregateSummaryHeader() }
-              { this._renderDateFilter() }
-            </div>
-          </Container>
+              <Grid.Column width={3}>
+                { this._renderDateFilter() }
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
         </Modal.Header>
 
-        <Modal.Content className="modalContentContainer" scrolling>
-          <Modal.Description className="description_ct">
-            <Container className="reportComponent">
-              <Header className="descriptionHeader">Therapy Intensity Statistics</Header>
-              { this._renderStastics(stats) }
-            </Container>
-            <Container className="reportComponent">
-              <Header className="descriptionHeader">Median Therapy Intensity by Disciplines</Header>
-              { this._renderMedianTherapyIntensityHistogram(stats) }
-            </Container>
-
-            <Container className="reportComponent">
-              <Header className="descriptionHeader">Median Number of Sessions Attended by Disciplines</Header>
-              { this._renderMedianNumberOfAttendedByDisciplines(stats) }
-            </Container>
-
-            <Container className="reportComponent">
-              <Header className="descriptionHeader">Median Number of Sessions Missed by Disciplines</Header>
-              { this._renderMedianNumberOfMissedByDisciplines(stats) }
-            </Container>
-
-          </Modal.Description>
+        <Modal.Content className="aggModalContentContainer" scrolling>
+          { this._renderStastics(stats) }
+          { this._renderMedianTherapyIntensityHistogram(stats) }
+          { this._renderMedianNumberOfAttendedByDisciplines(stats) }
+          { this._renderMedianNumberOfMissedByDisciplines(stats) }
         </Modal.Content>
         { this._renderButtons() }
       </Modal>

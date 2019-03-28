@@ -1,71 +1,34 @@
-.ui.label.label_rc {
-  width: 14.325rem;
-  height: 7.125rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.25);
-  text-align: center;
-  margin: 1.25rem;
-  margin-left: 0px;
-  padding-top: 2rem;
+.ui.container.reportSubContainer.reportCategoryContainer > .ui.equal.width.grid >
+.row.categoryCardRow > .column > .ui.card.categoryCard#categoryOne {
+  background-color: #2a9d8f;
 }
 
-.ui.container.reportHeaderContainer {
-  display: flex;
-  flex-direction: column;
-  margin-left: 5px !important;
+.ui.container.reportSubContainer.reportCategoryContainer > .ui.equal.width.grid >
+.row.categoryCardRow > .column > .ui.card.categoryCard#categoryTwo {
+  background-color: #e9c46a;
 }
 
-div.reportContainer > div.ui.container.reportHeaderContainer > div.ui.grid {
-  margin-bottom: 1rem;
+.ui.container.reportSubContainer.reportCategoryContainer > .ui.equal.width.grid >
+.row.categoryCardRow > .column > .ui.card.categoryCard#categoryThree {
+  background-color: #e76f51;
 }
 
-div.reportContainer > div.ui.container.reportHeaderContainer > div.ui.grid > div.row > div.column {
-  width: 17rem;
-}
-
-.patient {
-  font-size: calc(14px + 1.25rem);
-  font-weight: 300;
-  padding-top: 1.5rem;
-  padding-bottom: 0.8rem;
-}
-
-.ui.input.search {
-  width: 35em;
-  height: 3.5rem;
-  margin-top: 10px;
-  text-align: left;
-}
-
-.type {
-  font-size: calc(14px + 1.5rem);
-  color: #000000;
-}
-@media only screen and (min-width: 2000px) {
-  .type {
-    font-size: calc(14px + 2.5rem);
-  }
-}
-.category {
-  font-size: calc(14px + 1.25rem);
-  color: #000000;
-  font-weight: 300;
-  margin: 0px;
-}
-
-.ui.card.card_category {
+.row.categoryCardRow > div.column > a.ui.card.categoryCard {
   height: 7rem;
   text-align: center;
   border-radius: 20px;
 }
 
-.ui.card.card_category > div.content > .header {
+.row.categoryCardRow > div.column > a.ui.card.categoryCard > div.content > div.header {
   font-weight: bold;
   font-size: 2.5rem;
   line-height: 2em;
 }
 
-h2.category_header {
-  font-size: calc(14px + 1.25rem);
-  font-weight: 300;
+.ui.container.reportSubContainer.reportPatientListContainer > div.input.searchInput {
+  width: 30rem;
+}
+
+div.ui.container.reportSubContainer {
+  margin-bottom: 1.5rem;
 }
