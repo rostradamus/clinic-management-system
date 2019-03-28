@@ -27,6 +27,31 @@ export default class UserAction {
     };
   }
 
+  static getDischargedPatients(){
+    return async dispatch => {
+       dispatch({
+        type: USER_ACTION_TYPE.FETCH_DISCHARGED_PATIENTS_REQUEST,
+        payload: {}
+      });
+      try {
+       const res = await axios.get("/api/patients/discharged");
+        dispatch({
+          type: USER_ACTION_TYPE.FETCH_DISCHARGED_PATIENTS_SUCCESS,
+          payload: {
+            itemsDischarged: res.data
+          }
+        });
+      } catch (err) {
+        dispatch({
+          type: USER_ACTION_TYPE.FETCH_DISCHARGED_PATIENTS_FAILURE,
+          payload: {
+            err: err
+          }
+        });
+      }
+    };
+  }
+
   static getUser(id) {
     return async dispatch => {
       dispatch({
@@ -111,6 +136,29 @@ export default class UserAction {
       } catch (err) {
         dispatch({
           type: USER_ACTION_TYPE.DELETE_FAILURE,
+          payload: {
+            err: err
+          }
+        });
+      }
+    };
+  }
+
+  static dischargePatient(data) {
+    return async dispatch => {
+      dispatch({
+        type: USER_ACTION_TYPE.PATIENT_DISCHARGE_REQUEST,
+        payload: {}
+      });
+      try {
+        const res = await axios.delete(`/api/patients/${data.id}/admission_records/current`);
+        dispatch({
+          type: USER_ACTION_TYPE.PATIENT_DISCHARGE_SUCCESS,
+          payload: data.id
+        });
+      } catch (err) {
+        dispatch({
+          type: USER_ACTION_TYPE.PATIENT_DISCHARGE_FAILURE,
           payload: {
             err: err
           }
@@ -221,6 +269,13 @@ export default class UserAction {
     return dispatch => dispatch({
       type: USER_ACTION_TYPE.CLOSE_POPUP,
       payload: { popupUser: null }
+    });
+  }
+
+  static closeDischargedPopup() {
+    return dispatch => dispatch({
+      type: USER_ACTION_TYPE.CLOSE_DISCHARGED_POPUP,
+      payload: { popupDischarged: false }
     });
   }
 }

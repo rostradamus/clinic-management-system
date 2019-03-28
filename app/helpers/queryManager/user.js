@@ -3,6 +3,7 @@ const mysql = require('mysql');
 const bcrypt = require("bcrypt");
 const appointmentManager = require("@app/helpers/queryManager/appointment");
 
+
 const BCRYPT_SALT_ROUNDS = 10;
 
 const AUTH_ONLY_COLUMNS = ["password"];
@@ -31,14 +32,16 @@ module.exports = {
   getUserWithUsername: function(username, isForAuth) {
     const options = {
       columns: isForAuth ? [...this.VISIBILE_COLUMNS, ...AUTH_ONLY_COLUMNS] : this.VISIBILE_COLUMNS,
-      where: { username: username }
+      where: { username: username, active: true }
     };
     const query = qm.getBaseQuery(this.TABLE_NAME, options);
     return qm.makeQuery(query);
   },
 
   getUserWithId: function(id) {
-    const query = qm.getWithIdBaseQuery(this.TABLE_NAME, id, { columns: this.VISIBILE_COLUMNS });
+    const query = qm.getWithIdBaseQuery(this.TABLE_NAME, id, {
+      columns: this.VISIBILE_COLUMNS
+    });
     return qm.makeQuery(query);
   },
 
@@ -51,10 +54,20 @@ module.exports = {
     return qm.makeQuery(stmt);
   },
 
-  getAllActiveUsersWithAllPatients: function() {
-    const query = "SELECT ?? FROM ?? WHERE active = 1 OR type = 'Patient'";
-    const stmt = mysql.format(query, [this.VISIBILE_COLUMNS, this.TABLE_NAME]);
-    return qm.makeQuery(stmt);
+  getAllOngoingUsers: async function(query = {}) {
+    const options = {
+      columns: this.VISIBILE_COLUMNS,
+      where: Object.assign({...query}, { active: true })
+    };
+    const stmt = qm.getBaseQuery(this.TABLE_NAME, options) + " AND (type = 'Administrator' OR type = 'Staff')";
+    const users = await qm.makeQuery(stmt);
+    const patientManager = require("@app/helpers/queryManager/patient");
+    const patients = await patientManager.getOngoingPatients(query);
+    patients.forEach(patient => {
+      users.push(patient.User);
+    });
+
+    return users;
   },
 
   createUser: async function(data) {

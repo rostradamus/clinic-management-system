@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import {connect} from 'react-redux';
 import UserTable from "./UserTable";
-import { UserPopup, CreateUserPopup } from "components/containers/popup";
-import { Container, Button, Menu, Input } from "semantic-ui-react";
+import { UserPopup, CreateUserPopup, DischargedPatientsPopup } from "components/containers/popup";
+import { Container, Button, Menu, Input, Checkbox } from "semantic-ui-react";
 import { UserAction, CreateUserAction } from "actions";
 
 
@@ -62,7 +62,12 @@ class UserContainer extends Component {
           primary
           style={{ margin:"1rem"}}
           onClick={ () => this.props.dispatch(CreateUserAction.openPopup()) }>Create User</Button>
+        <Button
+          primary
+          style={{ margin:"1rem"}}
+          onClick={ () => this.props.dispatch(UserAction.getDischargedPatients()) }>Discharged Patients</Button>
         <CreateUserPopup />
+        <DischargedPatientsPopup />
         <UserTable />
       </Container>
     );

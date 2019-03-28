@@ -6,6 +6,8 @@ const userManager = require("@app/helpers/queryManager/user");
 const TABLE_NAME = "Admission_record";
 
 module.exports = {
+  TABLE_NAME: TABLE_NAME,
+   
   getAdmissionRecords: function(query = {}) {
     const options = { where: query };
     const stmt = qm.getBaseQuery(TABLE_NAME, options);
@@ -56,5 +58,13 @@ module.exports = {
       [TABLE_NAME, { discharge_date: moment().format("YYYY-MM-DD") }, patient_id, moment().format("YYYY-MM-DD")]
     );
     return qm.makeQuery(stmt);
+  },
+
+  getCurrentRecordStmt: function(columns) {
+    return mysql.format(
+      `${qm.getBaseQuery(TABLE_NAME, columns ? { columns } : null)}
+      WHERE discharge_date IS NULL OR discharge_date > ?`,
+      [moment().format("YYYY-MM-DD")]
+    );
   }
 }

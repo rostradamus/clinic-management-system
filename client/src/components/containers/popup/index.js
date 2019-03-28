@@ -5,6 +5,7 @@ import CreatePatientPopup from "./CreatePatientPopup";
 import CreateStaffPopup from "./CreateStaffPopup";
 import PatientStaffSearch from "./PatientStaffSearch";
 import IndividualReportPopup from "./IndividualReportPopup";
+import DischargedPatientsPopup from "./DischargedPatientsPopup";
 import AggregateReportPopup from "./AggregateReportPopup";
 
 export {
@@ -15,5 +16,6 @@ export {
   CreateStaffPopup,
   PatientStaffSearch,
   IndividualReportPopup,
+  DischargedPatientsPopup,
   AggregateReportPopup
 };

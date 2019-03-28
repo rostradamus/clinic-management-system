@@ -4,15 +4,60 @@ const patientManager = require("@app/helpers/queryManager/patient");
 const admissionRecordManager = require("@app/helpers/queryManager/admissionRecord");
 const db = require("@config/db/connection").connectDatabase();
 
-routes.get("/", (req, res) => {
-  patientManager.getActivePatients(req.query)
+routes.get("/", async (req, res) => {
+  let patients;
+  try {
+    patients = req.query.mrn ? await patientManager.getActivePatients(req.query) 
+      : await patientManager.getOngoingPatients(req.query);
+  } catch (e) {
+    return res.status(500).json(e);
+  }
+  res.status(200);
+  res.send(patients);
+});
+
+routes.get("/discharged", (req, res) => {
+  patientManager.getDischargedPatients(req.query)
     .then(result => {
       res.status(200);
       res.send(result);
     })
     .catch(err => {
       res.status(500).json(err);
+    })
+});
+
+routes.get("/:patient_id/admission_records/current", (req, res) => {
+  const { patient_id } = req.params;
+  admissionRecordManager.getCurrentAdmissionRecords({ patient_id })
+    .then(result => {
+      if (result.length !== 1) {
+        if (result.length === 0) {
+          // TODO: better error message using MessageUtils
+          res.status(404);
+          return res.send("Current admission record does not exist");
+        } else {
+          // TODO: better message
+          throw new Error("your database is messed up");
+        }
+      }
+      res.status(200);
+      res.send(result[0]);
+    })
+    .catch(err => {
+      res.status(500).json(err);
     });
+});
+
+routes.delete("/:patient_id/admission_records/current", (req, res) => {
+  const { patient_id } = req.params;
+  admissionRecordManager.dischargeAdmissionRecordWithPatientId(patient_id)
+    .then(result => {
+      res.sendStatus(204);
+    })
+    .catch(err => {
+      res.status(500).json(err);
+    })
 });
 
 routes.get("/:patient_id", async (req, res) => {

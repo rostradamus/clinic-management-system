@@ -36,7 +36,7 @@ export default class CreateUserAction {
       } catch (err) {
         dispatch({
           type: CREATE_USER_ACTION_TYPE.PATIENT_CREATE_FAILURE,
-          payload: { error: err }
+          payload: { error: true }
         })
 
       }

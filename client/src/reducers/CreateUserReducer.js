@@ -54,7 +54,8 @@ export default (state = initialState, action) => {
     case CREATE_USER_ACTION_TYPE.ADMIN_CREATE_FAILURE:
     case CREATE_USER_ACTION_TYPE.PATIENT_CREATE_FAILURE:
     case CREATE_USER_ACTION_TYPE.CREATE_ADMISSION_RECORD_FAILURE:{
-      if(action.payload.error.response.data.code ==='ER_DUP_ENTRY') user[0] = [];
+      if(action.payload.error.response.data.code ==='ER_DUP_ENTRY')
+          user[0] = [];
       return Object.assign({...state}, {user: user}, action.payload);
     }
     case CREATE_USER_ACTION_TYPE.STAFF_CREATE_SUCCESS:

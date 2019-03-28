@@ -87,9 +87,9 @@ class CreateStaffPopup extends Component{
   handleFinalValidation(event) {
     event.preventDefault();
     if(!this.validateForm()) return;
-      if(this.props.typeUser === 'Administrator'){
-        this.handleCreateAdmin();
-      }else this.handleCreateStaff();
+    if(this.props.typeUser === 'Administrator'){
+      this.handleCreateAdmin();
+    }else this.handleCreateStaff();
   }
 
   handleCreateStaff() {
@@ -135,6 +135,10 @@ class CreateStaffPopup extends Component{
           {this.props.user.length && <p>Existing Email!</p>}
          </Message> }
         <Form id="create-user">
+        {this.props.error && <Message negative>
+           <Message.Header>There has been an error with your submission.</Message.Header>
+          {this.props.user.length !== 0 && <p> Existing Email! </p>}
+         </Message> }
           <Header>Basic Information</Header>
           {this.renderFieldHelper(['first_name', 'last_name', 'phone_number', 'email'])}
 
