@@ -27,28 +27,28 @@ export default class UserAction {
     };
   }
 
-  static getAllUsers(){
+  static getDischargedPatients(){
     return async dispatch => {
-       dispatch({
-        type: USER_ACTION_TYPE.FETCH_ALL_REQUEST,
-        payload: {}
-      });
-      try {
-        const res = await axios.get("/api/users", { params: { getInactivePatients: true } });
-        dispatch({
-          type: USER_ACTION_TYPE.FETCH_ALL_SUCCESS,
-          payload: {
-            items: res.data
-          }
-        });
-      } catch (err) {
-        dispatch({
-          type: USER_ACTION_TYPE.FETCH_ALL_FAILURE,
-          payload: {
-            err: err
-          }
-        });
-      }
+      //  dispatch({
+      //   type: USER_ACTION_TYPE.FETCH_DISCHARGED_PATIENTS_REQUEST,
+      //   payload: {}
+      // });
+      // try {
+      //  const res = await axios.get("" });
+      //   dispatch({
+      //     type: USER_ACTION_TYPE.FETCH_DISCHARGED_PATIENTS_SUCCESS,
+      //     payload: {
+      //       itemsDischarged: res.data
+      //     }
+      //   });
+    //   } catch (err) {
+    //     dispatch({
+    //       type: USER_ACTION_TYPE.FETCH_DISCHARGED_PATIENTS_FAILURE,
+    //       payload: {
+    //         err: err
+    //       }
+    //     });
+    //   }
     };
   }
 
@@ -246,6 +246,13 @@ export default class UserAction {
     return dispatch => dispatch({
       type: USER_ACTION_TYPE.CLOSE_POPUP,
       payload: { popupUser: null }
+    });
+  }
+
+  static closeDischargedPopup() {
+    return dispatch => dispatch({
+      type: USER_ACTION_TYPE.CLOSE_DISCHARGED_POPUP,
+      payload: { popupDischarged: false }
     });
   }
 }

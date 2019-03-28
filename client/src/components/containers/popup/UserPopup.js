@@ -56,7 +56,7 @@ class UserPopup extends Component {
     const {user} = this.state;
     const {type} = this.state.user;
     if(type ==='Patient'){
-      deleteAction = this.props.dispatch(UserAction.deletePatient(user))
+   //   deleteAction = this.props.dispatch(UserAction.deletePatient(user))
     }else if (type === 'Administrator') {
       deleteAction = this.props.dispatch(UserAction.deleteAdmin(user));
     }else {
@@ -170,12 +170,11 @@ class UserPopup extends Component {
         </Modal.Content>
           <Modal.Actions>
             {!(this.props.user && this.props.user.id === this.props.current_user.id) &&
-              <Button onClick={this._deleteOpen}><Icon name="delete"/>Delete</Button>}
+              <Button onClick={this._deleteOpen}>{this.state.user.type === 'Patient' ?  'Discharge' : 'Delete'}</Button>}
               <Confirm open={this.state.deleteOpen} onCancel={this._deleteOpen} onConfirm={() => this._deleteUser(this.state) }/>
               <Button
               primary
               onClick={ () => this._saveUser() }>
-              <Icon name="save" />
               Save
             </Button>
         </Modal.Actions>
