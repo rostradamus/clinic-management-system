@@ -87,14 +87,9 @@ class CreateStaffPopup extends Component{
   handleFinalValidation(event) {
     event.preventDefault();
     if(!this.validateForm()) return;
-    this.props.getUserByEmail(this.state.form.email)
-     .then(()=> {
-      if(this.props.user.length === 0){
-          if(this.props.typeUser === 'Administrator'){
-              this.handleCreateAdmin();
-            }else this.handleCreateStaff();
-      }})
-     .catch(() => alert("Fatal: This should never happen"));
+    if(this.props.typeUser === 'Administrator'){
+      this.handleCreateAdmin();
+    }else this.handleCreateStaff();
   }
 
   handleCreateStaff() {
