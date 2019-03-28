@@ -63,6 +63,10 @@ class IndividualReportStatistics {
     return moment(appointment.startDate, DATE_FORMAT).isBetween(start, end, null, '[]');
   }
 
+  sortIntArr(arr) {
+    arr.sort((a, b) => a - b);
+  }
+
   getMedian(arr) {
     if (arr.length === 0) {
       return 0
@@ -106,7 +110,7 @@ class IndividualReportStatistics {
     this.medianTherapyIntensityByDisciplines = [];
     therapyTypesForReport.forEach(type => {
       let tiArr = this.attendedSessions.get(type) || [];
-      tiArr.sort();
+      this.sortIntArr(tiArr);
 
       this.medianTherapyIntensityByDisciplines.push(this.getMedian(tiArr));
     });
@@ -148,7 +152,7 @@ class IndividualReportStatistics {
     this.filterAndProcessAppointments();
 
     if (this.allAttendedDurations.length > 0) {
-      this.allAttendedDurations.sort();
+      this.sortIntArr(this.allAttendedDurations);
 
       this.totalAverage = Math.round(this.totalSum / this.allAttendedDurations.length);
       this.totalMedian = this.getMedian(this.allAttendedDurations);
