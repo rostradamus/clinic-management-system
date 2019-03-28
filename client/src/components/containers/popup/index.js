@@ -16,6 +16,6 @@ export {
   CreateStaffPopup,
   PatientStaffSearch,
   IndividualReportPopup,
-  DischargedPatientsPopup
+  DischargedPatientsPopup,
   AggregateReportPopup
 };
