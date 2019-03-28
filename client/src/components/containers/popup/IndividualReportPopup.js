@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Button, Header, Modal, Label, Container } from "semantic-ui-react";
 import { DateInput } from "semantic-ui-calendar-react";
-import IndividualReportStatistics from "components/containers/report/IndividualReportStatistics";
+import { IndividualReportStatistics } from "components/containers/report";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import moment from "moment";
