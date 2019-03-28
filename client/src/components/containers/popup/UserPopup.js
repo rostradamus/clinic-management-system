@@ -52,14 +52,14 @@ class UserPopup extends Component {
   }
 
   _deleteUser(data) {
-    var deleteAction;
+    let deleteAction;
     const {user} = this.state;
     const {type} = this.state.user;
-    if(type ==='Patient'){
-   //   deleteAction = this.props.dispatch(UserAction.deletePatient(user))
-    }else if (type === 'Administrator') {
+    if (type ==='Patient') {
+      deleteAction = this.props.dispatch(UserAction.dischargePatient(user))
+    } else if (type === 'Administrator') {
       deleteAction = this.props.dispatch(UserAction.deleteAdmin(user));
-    }else {
+    } else {
       deleteAction = this.props.dispatch(UserAction.deleteStaff(user));
     }
     deleteAction

@@ -2,11 +2,8 @@ const routes = require('express').Router();
 const userManager = require("@app/helpers/queryManager/user");
 
 routes.get("/", async (req, res) => {
-  const { getInactivePatients } = req.query;
   try {
-    const result = getInactivePatients ?
-      await userManager.getAllActiveUsersWithAllPatients() :
-      await userManager.getAllActiveUsers(req.query);
+    const result = await userManager.getAllOngoingUsers(req.query);
     res.status(200);
     res.send(result);
   } catch (err) {

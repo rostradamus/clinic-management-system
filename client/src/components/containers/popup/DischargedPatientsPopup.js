@@ -15,12 +15,21 @@ class DischargedPatientsPopup extends Component{
     super(props);
     this.state = {
       deleteOpen:false,
-      items: props.user.itemsDischarged,
       searchText: "",
+      items: [],
       sortKeys: [],
       sortDirection: 1
     };
     this._handleSearchInputChange = this._handleSearchInputChange.bind(this);
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    if (props.user.itemsDischarged) {
+      return {
+        items: props.user.itemsDischarged
+      };
+    }
+    return {};
   }
 
   _handleSearchInputChange(event, { value }) {
@@ -41,10 +50,6 @@ class DischargedPatientsPopup extends Component{
     const {deleteOpen} = this.state;
     this.setState({ deleteOpen: !deleteOpen })
   };
-
-  deleteUser(user) {
-    this.props.deletePatient();
-  }
 
   handleSort(keys) {
       const { items, sortDirection } = this.state;
@@ -70,23 +75,28 @@ class DischargedPatientsPopup extends Component{
     });
   }
 
+  handleDeleteSubmit(user) {
+    this.props.deletePatient(user);
+    this._deleteOpen();
+  }
 
   _renderTableRow(user) {
+    const { User, Patient } = user;
     return (
       <Table.Row
-        key={ user.id }>
-        <Table.Cell content={`${user.first_name} ${user.last_name}`} />
-        <Table.Cell content={user.email} />
-        <Table.Cell content={user.phone_number} />
-        <Table.Cell content={user.discharged_date} />
+        key={ User.id }>
+        <Table.Cell content={`${User.first_name} ${User.last_name}`} />
+        <Table.Cell content={Patient.mrn} />
+        <Table.Cell content={User.email} />
+        <Table.Cell content={User.phone_number} />
         <Table.Cell textAlign="center">
-          <Button icon
-          onClick={ () => this.props.dispatch(UserAction.deletePatient(user))}>
+          <Button icon onClick={ this._deleteOpen }>
           <Icon name='delete'/></Button></Table.Cell>
-          <Confirm open={this.state.deleteOpen} onCancel={this._deleteOpen} onConfirm={() => this._deleteUser(this.state) }/>
+          <Confirm open={this.state.deleteOpen} onCancel={this._deleteOpen} onConfirm={ this.handleDeleteSubmit.bind(this, User) }/>
       </Table.Row>
     );
   }
+
    _closePopup = () => {
     this.props.closePopup();
   };
@@ -117,6 +127,11 @@ class DischargedPatientsPopup extends Component{
                         Name
                       </Table.HeaderCell>
                       <Table.HeaderCell
+                        sorted={sortKeys === "mrn" ? sortDirection : null}
+                        onClick={this.handleSort.bind(this, ["mrn"])}>
+                        MRN
+                      </Table.HeaderCell>
+                      <Table.HeaderCell
                         sorted={sortKeys === "email" ? sortDirection : null}
                         onClick={this.handleSort.bind(this, ["email"])}>
                         Email
@@ -125,11 +140,6 @@ class DischargedPatientsPopup extends Component{
                         sorted={sortKeys === "phone_number" ? sortDirection : null}
                         onClick={this.handleSort.bind(this, ["phone_number"])}>
                         Phone
-                      </Table.HeaderCell>
-                      <Table.HeaderCell
-                        sorted={sortKeys === "discharged_date" ? sortDirection : null}
-                        onClick={this.handleSort.bind(this, ["discharged_date"])}>
-                        Discharged Date
                       </Table.HeaderCell>
                       <Table.HeaderCell>
                         <Icon label="delete"/>
