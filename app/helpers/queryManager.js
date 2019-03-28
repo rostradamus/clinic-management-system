@@ -38,7 +38,8 @@ module.exports = {
   },
 
   getWithIdBaseQuery: function(table, id, options = {}) {
-    return mysql.format(`${this.getBaseQuery(table, options)} WHERE id = ?`, id);
+    const where = Object.assign({ id }, options.where);
+    return this.getBaseQuery(table, Object.assign(options, { where }));
   },
 
   createBaseQuery: function(table, data) {

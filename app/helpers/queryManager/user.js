@@ -39,7 +39,9 @@ module.exports = {
   },
 
   getUserWithId: function(id) {
-    const query = qm.getWithIdBaseQuery(this.TABLE_NAME, id, { columns: this.VISIBILE_COLUMNS });
+    const query = qm.getWithIdBaseQuery(this.TABLE_NAME, id, {
+      columns: this.VISIBILE_COLUMNS
+    });
     return qm.makeQuery(query);
   },
 
