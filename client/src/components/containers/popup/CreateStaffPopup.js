@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Label, Modal, Grid, Button, Select, Header, Input, Form, Container, Divider} from "semantic-ui-react";
+import { Label, Modal, Grid, Button, Select, Header, Input, Form, Container, Divider, Message} from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import * as moment from 'moment';
 import { UserAction, CreateUserAction } from 'actions';
@@ -87,17 +87,9 @@ class CreateStaffPopup extends Component{
   handleFinalValidation(event) {
     event.preventDefault();
     if(!this.validateForm()) return;
-    this.props.getUserByEmail(this.state.form.email)
-     .then(()=> {
-      if(this.props.user.length === 0){
-          if(this.props.typeUser === 'Administrator'){
-              this.handleCreateAdmin();
-            }else this.handleCreateStaff();
-      }else{
-       alert("Email exists")
-       //TODO: error handle
-      }})
-     .catch(() => alert("Fatal: This should never happen"));
+      if(this.props.typeUser === 'Administrator'){
+        this.handleCreateAdmin();
+      }else this.handleCreateStaff();
   }
 
   handleCreateStaff() {
@@ -137,7 +129,11 @@ class CreateStaffPopup extends Component{
 
   renderForm() {
     return(
-      <Modal.Content image scrolling>
+      <Modal.Content scrolling>
+      {this.props.error && <Message negative>
+           <Message.Header>There has been an error with your submission.</Message.Header>
+          {this.props.user.length && <p>Existing Email!</p>}
+         </Message> }
         <Form id="create-user">
           <Header>Basic Information</Header>
           {this.renderFieldHelper(['first_name', 'last_name', 'phone_number', 'email'])}
@@ -284,7 +280,8 @@ const mapDispatchToProps = dispatch => {
 }
 
 const mapStateToProps = state => (
-  { typeUser: state.createUser.typeUser,
+  { error:state.createUser.error,
+    typeUser: state.createUser.typeUser,
     user: state.createUser.user,
     created: state.createUser.created});
 
