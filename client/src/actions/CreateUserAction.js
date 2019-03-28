@@ -19,9 +19,7 @@ export default class CreateUserAction {
       } catch (err) {
         dispatch({
           type: CREATE_USER_ACTION_TYPE.FETCH_MRN_FAILURE,
-          payload: {
-            err: err
-          }
+          payload: { error: err }
         });
       }
     };
@@ -56,7 +54,7 @@ export default class CreateUserAction {
       } catch (err) {
         dispatch({
           type: CREATE_USER_ACTION_TYPE.CREATE_ADMISSION_RECORD_FAILURE,
-          payload: { error: true }
+          payload: { error: err }
         })
       }
     }
@@ -77,7 +75,7 @@ export default class CreateUserAction {
       } catch (err) {
         dispatch({
           type: CREATE_USER_ACTION_TYPE.ADMIN_CREATE_FAILURE,
-          payload: { error: true }
+          payload: {error: err}
         });
       }
     }
@@ -98,7 +96,7 @@ export default class CreateUserAction {
       } catch (err) {
         dispatch({
           type: CREATE_USER_ACTION_TYPE.STAFF_CREATE_FAILURE,
-          payload: { error: true }
+          payload: { error: err }
         });
       }
     }
@@ -120,9 +118,7 @@ export default class CreateUserAction {
       } catch (err) {
         dispatch({
           type: CREATE_USER_ACTION_TYPE.EMAIL_FETCH_FAILURE,
-          payload: {
-            err: err
-          }
+          payload: { error: err }
         });
       }
     }

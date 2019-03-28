@@ -373,7 +373,7 @@ class CreatePatientPopup extends Component{
       case 3:
         return this.handleNewAdmissionSubmit(event);
       default:
-        this.props.onClose();
+        this.onClose();
     }
   }
 

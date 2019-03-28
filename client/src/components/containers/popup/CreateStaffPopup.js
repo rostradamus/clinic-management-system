@@ -134,7 +134,11 @@ class CreateStaffPopup extends Component{
 
   renderForm() {
     return(
-      <Modal.Content image scrolling>
+      <Modal.Content scrolling>
+      {this.props.error && <Message negative>
+           <Message.Header>There has been an error with your submission.</Message.Header>
+          {this.props.user.length && <p>Existing Email!</p>}
+         </Message> }
         <Form id="create-user">
         {this.props.error && <Message negative>
            <Message.Header>There has been an error with your submission.</Message.Header>

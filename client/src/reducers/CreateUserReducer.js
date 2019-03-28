@@ -3,7 +3,7 @@
 const initialState = {
   isFetching: false,
   slideIndex:0,
-  user:{},
+  user:[],
   typeUser:'',
   isExisting: false,
   popup: false,
@@ -12,7 +12,7 @@ const initialState = {
 };
 
 export default (state = initialState, action) => {
-  const {slideIndex, patient, isExisting} = state;
+  const {slideIndex, user, isExisting} = state;
   switch (action.type) {
     case CREATE_USER_ACTION_TYPE.STAFF_CREATE_REQUEST:
     case CREATE_USER_ACTION_TYPE.EMAIL_FETCH_REQUEST:
@@ -29,10 +29,11 @@ export default (state = initialState, action) => {
       return Object.assign({...state}, {isFetching: false, isExisting: exists, slideIndex: index, user: action.payload});
     }
     case CREATE_USER_ACTION_TYPE.EMAIL_FETCH_SUCCESS:{
-      return Object.assign({...state}, {user:action.payload});
+      const error = action.payload.length !== 0;
+      return Object.assign({...state}, {user:action.payload, error: error});
     }
     case CREATE_USER_ACTION_TYPE.FETCH_MRN_FAILURE:{
-      return Object.assign({...state}, {isFetching: false}, action.payload);
+      return Object.assign({...state}, {isFetching: false});
     }
     case CREATE_USER_ACTION_TYPE.NEXT_SLIDE: {
       return Object.assign({...state}, {slideIndex: slideIndex + 1});
@@ -40,7 +41,7 @@ export default (state = initialState, action) => {
     case CREATE_USER_ACTION_TYPE.PREV_SLIDE: {
       const index = isExisting ? slideIndex - 2 : slideIndex - 1;
       if(index === 0) return {...initialState, popup: true};
-      return Object.assign({...state}, {slideIndex: index});
+      return Object.assign({...state}, {error: false, slideIndex: index});
     }
     case CREATE_USER_ACTION_TYPE.CLOSE_POPUP: {
       return initialState;
@@ -53,7 +54,9 @@ export default (state = initialState, action) => {
     case CREATE_USER_ACTION_TYPE.ADMIN_CREATE_FAILURE:
     case CREATE_USER_ACTION_TYPE.PATIENT_CREATE_FAILURE:
     case CREATE_USER_ACTION_TYPE.CREATE_ADMISSION_RECORD_FAILURE:{
-      return Object.assign({...state}, action.payload);
+      if(action.payload.error.response.data.code ==='ER_DUP_ENTRY')
+          user[0] = [];
+      return Object.assign({...state}, {user: user}, action.payload);
     }
     case CREATE_USER_ACTION_TYPE.STAFF_CREATE_SUCCESS:
     case CREATE_USER_ACTION_TYPE.ADMIN_CREATE_SUCCESS:
