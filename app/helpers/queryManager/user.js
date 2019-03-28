@@ -32,7 +32,7 @@ module.exports = {
   getUserWithUsername: function(username, isForAuth) {
     const options = {
       columns: isForAuth ? [...this.VISIBILE_COLUMNS, ...AUTH_ONLY_COLUMNS] : this.VISIBILE_COLUMNS,
-      where: { username: username }
+      where: { username: username, active: true }
     };
     const query = qm.getBaseQuery(this.TABLE_NAME, options);
     return qm.makeQuery(query);
