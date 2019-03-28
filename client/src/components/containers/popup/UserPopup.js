@@ -5,6 +5,7 @@ import { UserAction } from "actions";
 import { Confirm, Modal, Button, Icon, Form, Label, Container} from "semantic-ui-react";
 
 const INITIAL_STATE = {
+  open: false,
   deleteOpen: false,
   user: {
     first_name: "",
@@ -15,7 +16,13 @@ const INITIAL_STATE = {
     phone_number: "",
     type: "",
   },
-  error: {}
+  error: {
+    first_name:false,
+    last_name: false,
+    phone_number: false,
+    email:false,
+    password:false
+  }
 };
 
 class UserPopup extends Component {
@@ -25,22 +32,22 @@ class UserPopup extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    if (props.user && props.user.id !== state.user.id) {
-      return {
-        user: Object.assign({...state.user}, props.user)
-      };
-    }
-    return {};
-  }
+    if (props.user && !state.open) {
+       return {
+        ...state,
+        open: true,
+        user: props.user
+       };
+     }return {};
+   }
 
   _handleInputChange(e, {name, value}) {
-    const user = Object.assign({...this.state.user}, {[name]: value});
-    this.setState({user});
-  }
+    this.setState({user:{...this.state.user, [name]: value},error:{...this.state.error, [name]: false}});
+    }
 
   _saveUser() {
     const {user} = this.state;
-    if (!this._validatePassword())
+    if (!this._validateFields())
       return;
     delete user["cPassword"];
     if (user.password === ""){
@@ -67,23 +74,35 @@ class UserPopup extends Component {
       .catch(() => alert("Fatal: This should never happen"));
   }
 
+  _validateFields(){
+    const errorFields={};
+    const{ error } = this.state;
+    const {password, email, ... fields} = error;
+    Object.entries(fields).map(entry => {
+      if(this.state.user[entry[0]] === ''){
+        errorFields[entry[0]] = true;
+      }
+    });
+    if(!this._validateEmail()) errorFields['email'] = true;
+    if(!this._validatePassword()) errorFields['password'] = true;
+    this.setState({error: errorFields});
+    return (!Object.keys(errorFields).length);
+  }
+
+  _validateEmail() {
+    const {user} = this.state;
+    const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    const valid = regex.test(String(user.email).toLowerCase());
+    return user.type === 'Patient' ? (user.email === '' || valid) : valid;
+  }
+
   _validatePassword() {
     const { password, cPassword } = this.state.user;
-    // Password and Confirm Password match
-    if (password !== cPassword) {
-      this.setState({
-        error: {
-          field: "password",
-          message: "Password does NOT match."
-        }
-      });
+    if (password !== cPassword)
       return false;
-    }
-    // Empty password field
     if (password === "") {
       return true;
     }
-    // TODO: Validate password more firmly
     return true;
   }
 
@@ -98,8 +117,8 @@ class UserPopup extends Component {
   }
 
   _closePopup = () => {
+    this.props.dispatch(UserAction.closeUserPopup());
     this.setState(INITIAL_STATE);
-    this.props.dispatch(UserAction.closeUserPopup())
   };
 
   _deleteOpen = () => {
@@ -119,18 +138,18 @@ class UserPopup extends Component {
         <Modal.Content>
           <Form>
             <Form.Group widths="equal">
-              <Form.Input fluid
+              <Form.Input fluid error={this.state.error.first_name}
                 label="First Name"
                 name="first_name"
                 value={ first_name }
                 onChange={ this._handleInputChange.bind(this) } />
-              <Form.Input fluid
+              <Form.Input fluid error={this.state.error.last_name}
                 label="Last Name"
                 name="last_name"
                 value={ last_name }
                 onChange={ this._handleInputChange.bind(this) } />
             </Form.Group>
-            <Form.Input fluid
+            <Form.Input fluid error={this.state.error.email}
               label="Email"
               name="email"
               value={ email }
@@ -141,24 +160,24 @@ class UserPopup extends Component {
               label="New Password"
               name="password"
               autoComplete="new-password"
-              value={ password }
+              value={ password ? password : '' }
               onChange={ this._handleInputChange.bind(this) } />
             <Form.Field>
             <Form.Input fluid
               type="password"
               label="Confirm New Password"
               name="cPassword"
-              value={ cPassword }
+              value={ cPassword ? cPassword : '' }
               onChange={ this._handleInputChange.bind(this) } />
             </Form.Field>
             </Form.Group>
-            { this._handleInputError("password") }
-            <Form.Input fluid
+            {!this._validatePassword() && <Label basic color='red' pointing> Passwords do not match </Label>}
+            <Form.Group widths="equal">
+            <Form.Input fluid error={this.state.error.phone_number}
               label="Phone Number"
               name="phone_number"
               value={ phone_number }
               onChange={ this._handleInputChange.bind(this) } />
-            <Form.Group widths="equal">
               <Form.Input fluid readOnly
                 label="Type"
                 name="type"
