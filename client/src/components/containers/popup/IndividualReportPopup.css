@@ -1,134 +1,82 @@
-.ui.modal > .header.header_ct {
-  padding: 1rem 3.5rem 1.5rem 3.5rem;
+/* Individual Patient Report Modal Header*/
+.ui.container.patientSummaryContainer .patientSummary .patientDetailContainer div .patientSummaryPatientName {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  margin-left: -2px;
 }
-.ui.container.headerContainer {
-  display: flex;
+
+.patientSummaryContainer .ui.grid.patientSummary .patientDetailContainer * {
+  font-size: 1rem;
 }
-@media only screen and (min-width: 1920px) {
-  .ui.modal {
-    width: 1050px;
-    margin: 0;
-  }
+
+.patientSummaryContainer .ui.grid.patientSummary .row.patientDetailContainer {
+  padding: 0;
 }
-.name {
-  font-size: 3em;
-  font-weight: bold;
+
+.ui.grid.patientSummary {
+  margin-top: 0.5rem;
+}
+.patientSummaryContainer {
   margin-bottom: 1rem;
 }
-.details {
-  width: 100px;
-  font-size: 1rem;
-  color: #696969;
-  margin: 0px;
-  margin-bottom: 0.8rem;
-  font-weight: 600;
+.patientStatModalRow .statDateFilterColumn .ui.form.patientStatDateContainer .fields {
+  margin: 0;
 }
 
-.patient_detail {
-  font-size: 1rem;
-  margin-bottom: 0.8rem;
-  font-weight: 600;
-  color: #383838;
-}
-
-.field.date_pu > .ui.input > input,
-.field.date_pu > .ui.input.focus > input,
-.field.date_pu > .ui.input > input:focus {
-  width: 7.5rem;
-  margin-top: auto;
-  margin-bottom: auto;
-  height: 2.3rem;
-  border-radius: 0.5rem !important;
-  background-color: #aaba32 !important;
-  text-align: center;
-  color: #fefefe !important;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.admDis {
-  font-size: 0.9rem;
-  color: #696969;
-  margin: 0.2rem;
-  margin-left: 0.3rem;
-}
-
-.dateBox {
-  text-align: center;
-}
-
-.dateBox .calendar.icon {
+.patientStatDateContainer .patientStatFormInput .input div .patientStateDateInput > .ui.input > i.calendar.icon {
   display: none;
 }
 
-.dataContainer {
-  display: flex !important;
-  flex-direction: row;
-  align-items: center;
-  margin-right: -0.4em;
-  margin-bottom: -1.7rem;
+.statDateFilterColumn.patientStatModalColumn .ui.form.patientStatDateContainer .statDateSeparator {
+  line-height: 5.5rem;
+  height: 1rem;
 }
-.container.dataBox {
-  width: 10px;
+
+.statDateFilterColumn.patientStatModalColumn .ui.form.patientStatDateContainer {
+  margin-top: 4.5rem;
+  bottom: 0;
 }
-.ui.label.separator {
-  background-color: #ffffff;
+
+.patientStatDateContainer .patientStatFormInput .input div .patientStateDateInput > .ui.input > input {
+  width: 8rem;
+  height: 2.3rem;
+  border-radius: 0.5rem;
+  background-color: #aaba32;
+  text-align: center;
+  color: #fefefe;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
 }
-.endToEnd {
-  width: 100%;
-  display: flex !important;
-  justify-content: space-between !important;
+
+.patientStatModalHeader .ui.grid .patientStatModalRow .statDateFilterColumn .patientStatDateContainer {
+  float: right;
 }
-.filterDate {
-  width: 100%;
-  display: flex !important;
-  justify-content: flex-end !important;
-  margin-bottom: 2rem;
-}
-.patientInfo {
-  width: 7rem;
-}
-.contentContainer {
-  height: 60vh;
-  padding-left: 35px;
-  padding-right: 35px;
-}
-.ui.container.reportComponent {
-  padding-left: 2rem;
-  padding-right: 3rem;
-  margin-bottom: 8vh;
-}
-.ui.header.descriptionHeader {
-  font-size: 1.7rem;
-  font-weight: 300 !important;
-  margin-bottom: 2rem;
-}
-.description.description_ct {
-  display: flex;
-  flex-direction: column;
-}
-.ui.container.stat {
-  display: flex;
-  flex-direction: column;
+
+.patientStatModalHeader .ui.grid .patientStatModalRow .statDateFilterColumn.patientStatModalColumn .patientStatDateContainer div.fields .patientStatFormInput > div.ui.input {
+  display: block;
   text-align: center;
 }
-.statValue {
+
+/* Individual Patient Report Modal Content*/
+.ui.grid.patientStatisticContainer > .row.patientStatisticRow .patientStatisticColumn > p.patientStatisticValue {
   font-size: 5rem;
   margin-bottom: 0px;
   font-weight: 300;
   color: #0077b5;
+  text-align: center;
 }
-.ui.container.statContainer {
-  display: flex;
-  justify-content: space-evenly;
-  width: 100%;
-  margin-bottom: 2.3rem;
+
+.ui.grid.patientStatisticContainer > .row.patientStatisticRow .patientStatisticColumn > p.patientStatisticDescription {
+  text-align: center;
 }
-.ui.image {
-  margin-top: 3rem !important;
-  display: inherit !important;
+
+.patientContentContainer .ui.container.patientReportContentContainer {
+  margin: 0.5rem 0 3rem 0;
 }
-.ui.button.btn_pu {
-  width: 7.5em;
+
+.patientContentContainer .ui.header.patientReportModalContentHeader {
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
 }

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Header, Modal, Label, Container } from "semantic-ui-react";
+import { Button, Header, Modal, Label, Container, Grid, Table, Form, Divider } from "semantic-ui-react";
 import { DateInput } from "semantic-ui-calendar-react";
 import { IndividualReportStatistics } from "components/containers/report";
 import Highcharts from "highcharts";
@@ -13,6 +13,7 @@ const REPORT_CONST = {
   DIAGNOSIS_CATEGORY: "diagnosisCategory"
 };
 
+// TODO: can refactor later
 // Requires set of series and yAxis values
 const defaultChartOptions = point => {
   return {
@@ -92,78 +93,6 @@ class IndividualReportPopup extends Component {
     return recordData[category];
   }
 
-  _renderStastics(stats) {
-    return(
-      <Container centered="true" className="statContainer">
-        <Container className="stat">
-          <p className="statValue">{ stats.totalAverage }</p>
-          <p>Average</p>
-        </Container>
-        <Container className="stat">
-          <p className="statValue">{ stats.totalMedian } </p>
-          <p>Median</p>
-        </Container>
-        <Container className="stat">
-          <p className="statValue">{ stats.totalMaximum }</p>
-          <p>Maximum</p>
-        </Container>
-        <Container className="stat">
-          <p className="statValue">{ stats.totalMinimum }</p>
-          <p>Minimum</p>
-        </Container>
-      </Container>
-    );
-  }
-
-  _renderDateFilter() {
-    const { filterEndDate, filterStartDate } = this.state;
-    const { admissionDate } = this.props.popupInfo.recordDatas[0];
-
-    return(
-      <div className="dataContainer">
-        <div className="dateBox">
-          <p className="admDis">Start Date</p>
-          <DateInput
-            className="date_pu"
-            dateFormat="YYYY-MM-DD"
-            name="date"
-            placeholder="Date"
-            minDate={ moment(admissionDate, "YYYY-MM-DD").format("YYYY-MM-DD") }
-            value={ moment(filterStartDate, "YYYY-MM-DD").format("YYYY-MM-DD") }
-            onChange={(e, data) => this._handleFilterDateChange(e, data, "filterStartDate") }
-          />
-        </div>
-        <Label className="separator">&mdash;</Label>
-        <div className="dateBox">
-          <p className="admDis">End Date</p>
-          <DateInput
-            className="date_pu"
-            dateFormat="YYYY-MM-DD"
-            name="date"
-            placeholder="Date"
-            value={ moment(filterEndDate, "YYYY-MM-DD").format("YYYY-MM-DD") }
-            onChange={(e, data) => this._handleFilterDateChange(e, data, "filterEndDate") }
-          />
-        </div>
-      </div>
-    );
-  }
-
-  _renderPatientDetail(popupInfo) {
-    const recordData = popupInfo.recordDatas[0];
-    return(
-      <div>
-        <p className="patient_detail">{popupInfo.patientId}</p>
-        <p className="patient_detail">
-          {this._returnCategory(recordData, REPORT_CONST.DIAGNOSIS_CATEGORY)}
-        </p>
-        <p className="patient_detail">
-          { this._returnDiagnosis(recordData, REPORT_CONST.DIAGNOSIS_NAME) }
-        </p>
-      </div>
-    )
-  }
-
   _renderButtons() {
     return(
       <Modal.Actions>
@@ -171,6 +100,109 @@ class IndividualReportPopup extends Component {
         <Button className="btn_pu" onClick={ this.props.onClose }>Close</Button>
       </Modal.Actions>
     )
+  }
+
+  _renderPatientSummaryHeader(popupInfo) {
+    const recordData = popupInfo.recordDatas[0];
+    return(
+      <Container className="patientSummaryContainer">
+        <Grid className="patientSummary">
+          <Grid.Row className="patientDetailContainer">
+            <Grid.Column width={16}>
+              <Header as="h1" className="patientSummaryPatientName">{popupInfo.patientName}</Header>
+            </Grid.Column>
+          </Grid.Row>
+          <Grid.Row className="patientDetailContainer">
+            <Grid.Column width={3} className="patientDetailDescription">MRN</Grid.Column>
+            <Grid.Column width={13} className="patientDetailValue">{popupInfo.patientId}</Grid.Column>
+          </Grid.Row>
+
+          <Grid.Row className="patientDetailContainer">
+            <Grid.Column width={3} className="patientDetailDescription">Category</Grid.Column>
+            <Grid.Column width={13} className="patientDetailValue">
+              { recordData[REPORT_CONST.DIAGNOSIS_CATEGORY] }
+            </Grid.Column>
+          </Grid.Row>
+
+          <Grid.Row className="patientDetailContainer">
+            <Grid.Column width={3} className="patientDetailDescription">Diagnosis</Grid.Column>
+            <Grid.Column width={13} className="patientDetailValue">
+              { recordData[REPORT_CONST.DIAGNOSIS_NAME] }
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+      </Container>
+    );
+  }
+
+  _renderDateFilter() {
+    const { filterEndDate, filterStartDate } = this.state;
+    const { admissionDate } = this.props.popupInfo.recordDatas[0];
+    return (
+      <Form className="patientStatDateContainer">
+        <Form.Group>
+          <Form.Input className="patientStatFormInput">
+            <label className="patientStatDateLabel">Start Date</label>
+            <DateInput
+              icon={false}
+              className="patientStateDateInput patientStatStartDate"
+              dateFormat="YYYY-MM-DD"
+              name="date"
+              placeholder="Date"
+              minDate={ moment(admissionDate, "YYYY-MM-DD").format("YYYY-MM-DD") }
+              value={ moment(filterStartDate, "YYYY-MM-DD").format("YYYY-MM-DD") }
+              onChange={(e, data) => this._handleFilterDateChange(e, data, "filterStartDate") }
+            />
+          </Form.Input>
+          <label className="statDateSeparator">-</label>
+          <Form.Input className="patientStatFormInput">
+            <label className="patientStatDateLabel">End Date</label>
+            <DateInput
+              icon={false}
+              className="patientStateDateInput patientStatEndDate"
+              dateFormat="YYYY-MM-DD"
+              name="date"
+              placeholder="Date"
+              value={ moment(filterEndDate, "YYYY-MM-DD").format("YYYY-MM-DD") }
+              onChange={(e, data) => this._handleFilterDateChange(e, data, "filterEndDate") }
+            />
+          </Form.Input>
+        </Form.Group>
+      </Form>
+    );
+  }
+
+  _renderStastics(stats) {
+    return(
+      <Container className="patientReportContentContainer">
+        <Header className="patientReportModalContentHeader">
+          Therapy Intensity Statistics
+        </Header>
+        <Grid className="patientStatisticContainer">
+          <Grid.Row className="patientStatisticRow">
+            <Grid.Column width={4} className="patientStatisticColumn">
+              <p className="patientStatisticValue">{ stats.totalAverage }</p>
+              <p className="patientStatisticDescription">Average</p>
+            </Grid.Column>
+
+            <Grid.Column width={4} className="patientStatisticColumn">
+              <p className="patientStatisticValue">{ stats.totalMedian } </p>
+              <p className="patientStatisticDescription">Median</p>
+            </Grid.Column>
+
+            <Grid.Column width={4} className="patientStatisticColumn">
+              <p className="patientStatisticValue">{ stats.totalMaximum }</p>
+              <p className="patientStatisticDescription">Maximum</p>
+            </Grid.Column>
+
+            <Grid.Column width={4} className="patientStatisticColumn">
+              <p className="patientStatisticValue">{ stats.totalMinimum }</p>
+              <p className="patientStatisticDescription">Minimum</p>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+      </Container>
+    );
   }
 
   _renderTherapyIntensityHistogram({medianTherapyIntensityByDisciplines}) {
@@ -189,7 +221,12 @@ class IndividualReportPopup extends Component {
     };
     const yAxis = { yAxis: { min: 0, title: { text: "Minutes" } } };
     const chartOptions = Object.assign({...defaultChartOptions("minutes")}, {...series}, {...yAxis});
-    return <HighchartsReact highcharts={Highcharts} options={chartOptions} />;
+    return (
+      <Container className="patientReportContentContainer">
+        <HighchartsReact highcharts={Highcharts} options={chartOptions} />
+        <Divider />
+      </Container>
+    );
   }
 
   _renderDidAttendHistogram({ numberOfAttendedByDisciplines }) {
@@ -209,7 +246,13 @@ class IndividualReportPopup extends Component {
 
     const yAxis = { yAxis: { min: 0, tickInterval: 1, title: { text: "Number of Sessions" } } };
     const chartOptions = Object.assign({...defaultChartOptions("times")}, {...series}, {...yAxis});
-    return <HighchartsReact highcharts={Highcharts} options={chartOptions} />;
+    return (
+      <Container className="patientReportContentContainer">
+        <Header className="patientReportModalContentHeader">Number of Sessions Attended by Disciplines</Header>
+        <HighchartsReact highcharts={Highcharts} options={chartOptions} />
+        <Divider />
+      </Container>
+    );
   }
 
   _renderDidNotAttendHistogram({ numberOfMissedByDisciplines }) {
@@ -228,7 +271,12 @@ class IndividualReportPopup extends Component {
     };
     const yAxis = { yAxis: { min: 0, tickInterval: 1, title: { text: "Number of Sessions" } } };
     const chartOptions = Object.assign({...defaultChartOptions("times")}, {...series}, {...yAxis});
-    return <HighchartsReact highcharts={Highcharts} options={chartOptions} />;
+    return (
+      <Container className="patientReportContentContainer">
+        <Header className="patientReportModalContentHeader">Number of Sessions Missed by Disciplines</Header>
+        <HighchartsReact highcharts={Highcharts} options={chartOptions} />
+      </Container>
+    );
   }
 
   render() {
@@ -239,40 +287,25 @@ class IndividualReportPopup extends Component {
     const stats = this.individualReportStatistics.retrieveStatistics(filterStartDate, filterEndDate);
 
     return (
-      <Modal onClose={ onClose } open={ isOpen } centered={false}>
-        <Modal.Header className="header_ct">
-          <p className="name">{popupInfo.patientName}</p>
-          <Container className="headerContainer">
-            <div className="patientInfo">
-              <p className="details">MRN</p>
-              <p className="details">Category</p>
-              <p className="details">Diagnosis</p>
-            </div>
-            <div className="endToEnd">
-              { this._renderPatientDetail(popupInfo) }
-              { this._renderDateFilter() }
-            </div>
-          </Container>
+      <Modal onClose={ onClose } open={ isOpen }>
+        <Modal.Header className="patientStatModalHeader">
+          <Grid>
+            <Grid.Row className="patientStatModalRow">
+              <Grid.Column width={10} className="patientStatModalColumn">
+                { this._renderPatientSummaryHeader(popupInfo) }
+              </Grid.Column>
+              <Grid.Column width={6} className="statDateFilterColumn patientStatModalColumn">
+                { this._renderDateFilter() }
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
         </Modal.Header>
 
-        <Modal.Content className="contentContainer" scrolling>
-          <Modal.Description className="description_ct">
-            <Container className="reportComponent">
-              <Header className="descriptionHeader">Therapy Intensity Statistics</Header>
-              { this._renderStastics(stats) }
-            </Container>
-            <Container className="reportComponent">
-              { this._renderTherapyIntensityHistogram(stats) }
-            </Container>
-            <Container className="reportComponent">
-              <Header className="descriptionHeader">Number of Sessions Attended by Disciplines</Header>
-              { this._renderDidAttendHistogram(stats) }
-            </Container>
-            <Container className="reportComponent">
-              <Header className="descriptionHeader">Number of Sessions Missed by Disciplines</Header>
-              { this._renderDidNotAttendHistogram(stats) }
-            </Container>
-          </Modal.Description>
+        <Modal.Content className="patientContentContainer" scrolling>
+          { this._renderStastics(stats) }
+          { this._renderTherapyIntensityHistogram(stats) }
+          { this._renderDidAttendHistogram(stats) }
+          { this._renderDidNotAttendHistogram(stats) }
         </Modal.Content>
         { this._renderButtons() }
       </Modal>

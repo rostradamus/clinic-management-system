@@ -4,10 +4,7 @@ import { IndividualReportPopup } from "components/containers/popup";
 import "./PatientCardMatrix.css";
 
 const COLUMN_COUNT = 5;
-const reportStyle = {
-  label: (idx) => ({ marginRight: "8px", marginTop: "3px", backgroundColor: reportStyle.colors[idx] }),
-  colors: ["#2a9d8f", "#e9c46a", "#e76f51"]
-};
+const CATEGORY_ARR = ["categoryOne", "categoryTwo", "categoryThree"];
 
 class PatientCardMatrix extends Component {
   constructor(props) {
@@ -46,19 +43,19 @@ class PatientCardMatrix extends Component {
     return chunked_arr;
   }
 
-  _renderPatientCard(patient, key) {
+  _renderPatientCard(patient) {
     const recordData = patient.recordDatas[0];
-
+    const cssClassName = CATEGORY_ARR[recordData.diagnosisCategory - 1];
     return (
-      <Card className="card_ct" key={ key } onClick={() => this.toggleModal(patient)} >
+      <Card className="patientCard" key={ patient.patientId } onClick={() => this.toggleModal(patient)} >
         <Card.Content >
-          <Card.Header className="header_ct">{patient.patientName}</Card.Header>
-          <Card.Meta className="meta_ct">
+          <Card.Header className="patientCardHeader">{patient.patientName}</Card.Header>
+          <Card.Meta className="patientCardMetaData">
             <span>{patient.patientId}</span>
           </Card.Meta>
-          <Card.Description className="description_ct">
-            <Label style={reportStyle.label(recordData.diagnosisCategory - 1)} empty circular key={"#0"} />
-            <p className="diagnosis">{this._getDiagnosis(recordData.diagnosisName)}</p>
+          <Card.Description className="patientCardDescription">
+            <Label className={`patientCategoryLabel ${cssClassName}`} empty circular />
+            <p className="patientDiagnosis">{this._getDiagnosis(recordData.diagnosisName)}</p>
           </Card.Description>
         </Card.Content>
       </Card>
@@ -66,8 +63,8 @@ class PatientCardMatrix extends Component {
   }
 
   _generatePatientRow(patients) {
-    const row = patients.map((patient, idx) => {
-      return this._renderPatientCard(patient, idx);
+    const row = patients.map((patient) => {
+      return this._renderPatientCard(patient);
     });
     return row;
   }
@@ -84,8 +81,8 @@ class PatientCardMatrix extends Component {
     const { patients } = this.props;
     const { isReportOpen, selectedPatient } = this.state;
     return (
-      <Container className="disable_scroll outerContainer">
-        <Grid className="grid_ct" columns={COLUMN_COUNT}>
+      <Container className="disableScroll patientCardMatrixContainer">
+        <Grid className="patientCardGrid" columns={COLUMN_COUNT}>
           {this._generatePatientMatrix(patients)}
         </Grid>
         {isReportOpen ?

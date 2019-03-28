@@ -1,116 +1,53 @@
-.ui.modal > .header.header_ct {
-  padding: 1rem 3.5rem 1.5rem 3.5rem;
+/* Aggregate Report Header*/
+h1.ui.header.summaryHeader {
+  line-height: 2em;
+  font-size: 3rem;
 }
 
-.ui.container.headerContainer {
-  display: flex;
-}
-
-@media only screen and (min-width: 1920px) {
-  .ui.modal {
-    width: 1050px;
-    margin: 0;
-  }
-}
-
-.aggregateHeader .summaryHeader {
-  font-size: 2em;
-  font-weight: bold;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-}
-
-.field.date_pu > .ui.input > input,
-.field.date_pu > .ui.input.focus > input,
-.field.date_pu > .ui.input > input:focus {
-  width: 7.5rem;
-  margin-bottom: 1.2rem;
-  height: 2.3rem;
-  border-radius: 0.5rem !important;
-  background-color: #aaba32 !important;
-  text-align: center;
-  color: #fefefe !important;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.filterDateInput {
-  font-size: 0.9rem;
-  color: #696969;
-  margin: 0.2rem;
-  margin-left: 0.3rem;
-}
-
-.dateBox {
+.ui.form.aggReportFormContainer >.field.aggReportFormField {
   text-align: center;
 }
 
-.dateBox .calendar.icon {
+.ui.form.aggReportFormContainer > .field.aggReportFormField > div > .field.aggReportYearInput > .ui.input {
+  padding: 0 0.5em;
+}
+
+.ui.form.aggReportFormContainer > .field.aggReportFormField > div > .field.aggReportYearInput > .ui.input > i {
   display: none;
 }
 
-.filterDateContainer {
-  display: flex !important;
-  flex-direction: row;
-  align-items: center;
-}
-
-.ui.label.filterDateSeparator {
-  background-color: #ffffff;
-}
-
-.endToEnd {
-  padding-top: 0.5rem;
-  width: 100%;
-  display: flex !important;
-  justify-content: space-between !important;
-}
-
-.modalContentContainer {
-  height: 100%;
-  padding-left: 35px;
-  padding-right: 35px;
-}
-
-.ui.container.reportComponent {
-  padding-left: 2rem;
-  padding-right: 3rem;
-  margin-bottom: 2rem;
-}
-
-.ui.header.descriptionHeader {
-  font-size: 1.7rem;
-  font-weight: 300 !important;
-  margin-bottom: 2rem;
-}
-
-.description.description_ct {
-  display: flex;
-  flex-direction: column;
-}
-
-.ui.container.stat {
-  display: flex;
-  flex-direction: column;
+.ui.form.aggReportFormContainer > .field.aggReportFormField > div > .field.aggReportYearInput > .ui.input > input {
+  width: 8rem;
+  margin-bottom: 1.2rem;
+  height: 2.3rem;
+  border-radius: 0.5rem;
+  background-color: #aaba32;
   text-align: center;
+  color: #fefefe;
+  font-weight: 500;
+  font-size: 1.125rem;
+  cursor: pointer;
 }
 
-.statValue {
+/* Aggregate Report Content*/
+.aggModalContentContainer .aggReportContentContainer {
+  margin: 0.5rem 0 3rem 0;
+}
+
+.aggModalContentContainer .ui.container.aggReportContentContainer .aggReportModalContentHeader {
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+}
+
+.ui.grid.aggStatisticContainer > .row.aggStatisticRow .aggStatisticColumn > p.aggStatisticValue {
   font-size: 5rem;
   margin-bottom: 0px;
   font-weight: 300;
   color: #0077b5;
+  text-align: center;
 }
 
-.ui.container.statContainer {
-  display: flex;
-  justify-content: space-evenly;
-  width: 100%;
-  margin-bottom: 2.3rem;
-}
-
-.ui.image {
-  margin-top: 3rem !important;
-  display: inherit !important;
+.ui.grid.aggStatisticContainer > .row.aggStatisticRow .aggStatisticColumn > p.aggStatisticDescription {
+  text-align: center;
 }

@@ -1,11 +1,10 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from 'redux';
-import { Label, Input, Container, Grid, Card } from "semantic-ui-react";
+import { Label, Input, Container, Grid, Card, Header } from "semantic-ui-react";
 import { ReportAction } from "actions";
 import PatientCardMatrix from "./PatientCardMatrix";
 import { AggregateReportPopup } from "components/containers/popup";
-import { isEqual } from 'lodash';
 import "./ReportContainer.css";
 
 
@@ -25,31 +24,40 @@ class ReportContainer extends Component {
 
   _renderCategoryLabels() {
     return(
-      <Grid>
-        <Grid.Row>
+      <Grid columns='equal'>
+        <Grid.Row className="categoryCardRow">
           <Grid.Column>
             <Card
-              style={{backgroundColor: "#2a9d8f"}}
-              className="card_category"
+              id="categoryOne"
+              className="categoryCard"
               header="I"
               onClick={(e, data) => this.handleAggregateToggle(e, 1)}
             />
           </Grid.Column>
+
           <Grid.Column>
             <Card
-              style={{backgroundColor: "#e9c46a"}}
-              className="card_category"
+              id="categoryTwo"
+              className="categoryCard"
               header="II"
               onClick={(e, data) => this.handleAggregateToggle(e, 2)}
             />
           </Grid.Column>
+
           <Grid.Column>
             <Card
-              style={{backgroundColor: "#e76f51"}}
-              className="card_category"
+              id="categoryThree"
+              className="categoryCard"
               header="III"
               onClick={(e, data) => this.handleAggregateToggle(e, 3)}
             />
+          </Grid.Column>
+
+          <Grid.Column>
+            {/** Left in hear for spacing*/}
+          </Grid.Column>
+          <Grid.Column>
+            {/** Left in hear for spacing*/}
           </Grid.Column>
         </Grid.Row>
       </Grid>
@@ -62,11 +70,19 @@ class ReportContainer extends Component {
 
     return (
       <Container className="reportContainer">
-        <Container className="reportHeaderContainer">
-          <h2 className="category_header">Category Summaries</h2>
+        <Container className="reportSubContainer reportCategoryContainer">
+          <Header as='h1'>Category Summaries</Header>
           { this._renderCategoryLabels() }
-          <label className="patient">Patients</label>
-          <Input onChange={this.handleSearchText.bind(this)} className="search" iconPosition="left" icon="search" placeholder="Search" />
+        </Container>
+        <Container className="reportSubContainer reportPatientListContainer">
+          <Header as='h1'>Patients</Header>
+          <Input
+            onChange={this.handleSearchText.bind(this)}
+            className="searchInput"
+            iconPosition="left"
+            icon="search"
+            placeholder="Search"
+          />
         </Container>
         <PatientCardMatrix
           patients={ patients }
