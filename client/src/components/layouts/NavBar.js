@@ -26,6 +26,9 @@ const menuItems = [
 class NavBar extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      activeItem: null
+    }
   }
 
   static getDerivedStateFromProps(props, state) {

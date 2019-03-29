@@ -47,7 +47,7 @@ passport.use(new LocalStrategy((username, password, done) => {
 
 routes.get("/", (req, res) => {
   if (!req.user) {
-    res.redirect(401,'/login');
+    res.sendStatus(404);
   } else {
     res.status(200);
     res.send(req.user);
