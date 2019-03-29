@@ -3,7 +3,7 @@ import { Button, Modal, Container, Menu, Table, Icon, Input, Confirm } from "sem
 import { connect } from "react-redux";
 import { UserAction } from "actions";
 import { bindActionCreators } from 'redux';
-
+import "./UserPopup.css";
 
 const DIR_MAP = {
   "1" : "ascending",
@@ -89,10 +89,16 @@ class DischargedPatientsPopup extends Component{
         <Table.Cell content={Patient.mrn} />
         <Table.Cell content={User.email} />
         <Table.Cell content={User.phone_number} />
-        <Table.Cell textAlign="center">
-          <Button icon onClick={ this._deleteOpen }>
+        <Table.Cell >
+          <Button negative icon onClick={ this._deleteOpen }>
           <Icon name='delete'/></Button></Table.Cell>
-          <Confirm open={this.state.deleteOpen} onCancel={this._deleteOpen} onConfirm={ this.handleDeleteSubmit.bind(this, User) }/>
+          <Confirm
+            id="dischargePatientPopup_confirm"
+            content= "Are you sure you want to delete this patient?"
+            confirmButton="Delete"
+            open={this.state.deleteOpen}
+            onCancel={this._deleteOpen}
+            onConfirm={ this.handleDeleteSubmit.bind(this, User) }/>
       </Table.Row>
     );
   }
@@ -118,7 +124,7 @@ class DischargedPatientsPopup extends Component{
                     placeholder="Search"
                     onChange={ this._handleSearchInputChange } />
 
-                  <Table basic="very" columns={5} selectable sortable>
+                  <Table basic="very" columns={4} selectable sortable>
                   <Table.Header>
                     <Table.Row>
                       <Table.HeaderCell
@@ -142,7 +148,6 @@ class DischargedPatientsPopup extends Component{
                         Phone
                       </Table.HeaderCell>
                       <Table.HeaderCell>
-                        <Icon label="delete"/>
                         Delete
                       </Table.HeaderCell>
                       </Table.Row>
