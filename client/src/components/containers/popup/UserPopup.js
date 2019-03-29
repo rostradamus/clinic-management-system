@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { isEmpty } from "lodash";
 import { UserAction } from "actions";
 import { Confirm, Modal, Button, Icon, Form, Label, Container} from "semantic-ui-react";
+import "./UserPopup.css";
 
 const INITIAL_STATE = {
   open: false,
@@ -25,6 +26,11 @@ const INITIAL_STATE = {
   }
 };
 
+ const CONFIRM_CONTENT = {
+  Staff: "Are you sure you want to delete this staff?",
+  Administrator: "Are you sure you want to delete this administrator?",
+  Patient: "Are you sure you want to discharge this patient?"}
+
 class UserPopup extends Component {
   constructor(props) {
     super(props);
@@ -42,18 +48,22 @@ class UserPopup extends Component {
    }
 
   _handleInputChange(e, {name, value}) {
-    this.setState({user:{...this.state.user, [name]: value},error:{...this.state.error, [name]: false}});
+    const {user, error} = this.state;
+    if(name === 'cPassword') {
+      this.setState({user:{...this.state.user, [name]: value}});
+    }else this.setState({user:{...this.state.user, [name]: value},error:{...this.state.error, [name]: false}});
     }
 
   _saveUser() {
     const {user} = this.state;
     if (!this._validateFields())
       return;
-    delete user["cPassword"];
-    if (user.password === ""){
-      delete user["password"];
+
+    const {cPassword,...form} = user;
+    if(user.password === ""){
+      delete form["password"];
     }
-    this.props.dispatch(UserAction.editUser(user))
+    this.props.dispatch(UserAction.editUser(form))
       .then(this._closePopup)
       .catch(() => alert("Fatal: This should never happen"));
   }
@@ -98,12 +108,7 @@ class UserPopup extends Component {
 
   _validatePassword() {
     const { password, cPassword } = this.state.user;
-    if (password !== cPassword)
-      return false;
-    if (password === "") {
-      return true;
-    }
-    return true;
+    return ((password === cPassword) || (typeof password === 'undefined' && cPassword === "") || (password === "" && typeof cPassword === 'undefined'));
   }
 
   _handleInputError(field) {
@@ -131,10 +136,11 @@ class UserPopup extends Component {
       phone_number, type  } = this.state.user;
     return (
       <Modal
+        className="userPopupModal"
         size="small"
         open={ this.props.user && true }
-        onClose={ this._closePopup }>
-        <Modal.Header>User Profile</Modal.Header>
+        onClose={ this._closePopup } closeIcon>
+        <Modal.Header >User Profile</Modal.Header>
         <Modal.Content>
           <Form>
             <Form.Group widths="equal">
@@ -189,8 +195,13 @@ class UserPopup extends Component {
         </Modal.Content>
           <Modal.Actions>
             {!(this.props.user && this.props.user.id === this.props.current_user.id) &&
-              <Button onClick={this._deleteOpen}>{this.state.user.type === 'Patient' ?  'Discharge' : 'Delete'}</Button>}
-              <Confirm open={this.state.deleteOpen} onCancel={this._deleteOpen} onConfirm={() => this._deleteUser(this.state) }/>
+              <Button negative onClick={this._deleteOpen}>{type === 'Patient' ?  'Discharge' : 'Delete'}</Button>}
+              <Confirm id="userPopup_confirm"
+                confirmButton={type === 'Patient' ?  'Discharge' : 'Delete'}
+                open={this.state.deleteOpen}
+                onCancel={this._deleteOpen}
+                content ={CONFIRM_CONTENT[type]}
+                onConfirm={() => this._deleteUser(this.state) }/>
               <Button
               primary
               onClick={ () => this._saveUser() }>
