@@ -115,11 +115,17 @@ class CreateStaffPopup extends Component{
     return regex.test(String(email).toLowerCase());
   }
 
+  validatePhoneNum(field) {
+    const {phone_number} = this.state.form;
+    const regex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4}$/;
+    return field === "phone_number" ? (phone_number === "" || regex.test(String(phone_number))) : true;
+  }
+
   validateForm() {
     const {email} = this.state.form;
     const errorFields={};
     Object.entries(this.state.error).map(entry => {
-      if((entry[0] === 'email' && !this.validateEmail()) || this.state.form[entry[0]] === ''){
+      if((entry[0] === 'email' && !this.validateEmail()) || this.state.form[entry[0]] === '' || !this.validatePhoneNum(entry[0])){
         errorFields[entry[0]] = true;
       }
     });
@@ -130,10 +136,6 @@ class CreateStaffPopup extends Component{
   renderForm() {
     return(
       <Modal.Content scrolling>
-      {this.props.error && <Message negative>
-           <Message.Header>There has been an error with your submission.</Message.Header>
-          {this.props.user.length && <p>Existing Email!</p>}
-         </Message> }
         <Form id="create-user">
         {this.props.error && <Message negative>
            <Message.Header>There has been an error with your submission.</Message.Header>
@@ -205,6 +207,7 @@ class CreateStaffPopup extends Component{
             <label>{STATE_CONST[field]}</label>
             <Input maxLength='255' placeholder={STATE_CONST[field]} onChange={e=> this.handleInputChange(e, field)}/>
             {field === 'email' && this.state.form.email !== '' && !this.validateEmail() && <Label basic color = 'red' pointing> Invalid Email </Label> }
+            {field === 'phone_number' && !this.validatePhoneNum(field) && <Label basic color = 'red' pointing> Invalid Phone Number </Label> }
           </Form.Field>
         ))}
       </Container>
