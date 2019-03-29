@@ -24,7 +24,6 @@ export default class AuthAction {
           type: AUTH_ACTION_TYPE.LOGIN_FAILURE,
           payload: { err, isFetching: false }
         });
-        throw err;
       }
     };
   };
