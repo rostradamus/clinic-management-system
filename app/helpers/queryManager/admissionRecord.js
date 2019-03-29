@@ -7,7 +7,7 @@ const TABLE_NAME = "Admission_record";
 
 module.exports = {
   TABLE_NAME: TABLE_NAME,
-   
+
   getAdmissionRecords: function(query = {}) {
     const options = { where: query };
     const stmt = qm.getBaseQuery(TABLE_NAME, options);
@@ -36,9 +36,7 @@ module.exports = {
     await db.beginTransaction();
     try {
       const dischargeResult = await this.dischargeAdmissionRecordWithPatientId(data.patient_id);
-      if (!data.discharge_date || moment(data.discharge_date).isAfter(moment())) {
-        await userManager.updateUserWithId(data.patient_id, { active: true });
-      }
+      await userManager.updateUserWithId(data.patient_id, { active: true });
       result = await qm.createThenGetEntry(TABLE_NAME, data);
       await db.commit();
     } catch(e) {
