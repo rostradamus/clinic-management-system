@@ -94,6 +94,7 @@ class UserPopup extends Component {
       }
     });
     if(!this._validateEmail()) errorFields['email'] = true;
+    if(!this._validatePhoneNum()) errorFields['phone_number'] = true;
     if(!this._validatePassword()) errorFields['password'] = true;
     this.setState({error: errorFields});
     return (!Object.keys(errorFields).length);
@@ -104,6 +105,12 @@ class UserPopup extends Component {
     const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     const valid = regex.test(String(user.email).toLowerCase());
     return user.type === 'Patient' ? (user.email === '' || valid) : valid;
+  }
+
+  _validatePhoneNum() {
+    const {phone_number} = this.state.user;
+    const regex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4}$/;
+    return phone_number === "" || regex.test(String(phone_number));
   }
 
   _validatePassword() {
@@ -160,6 +167,7 @@ class UserPopup extends Component {
               name="email"
               value={ email }
               onChange={ this._handleInputChange.bind(this) } />
+              {!this._validateEmail() && <Label basic color = 'red' pointing> Invalid Phone Number </Label> }
             <Form.Group widths="equal">
             <Form.Input fluid
               type="password"
@@ -190,6 +198,7 @@ class UserPopup extends Component {
                 placeholder={ type }
                 onChange={ this._handleInputChange.bind(this) } />
             </Form.Group>
+            {!this._validatePhoneNum() && <Label basic color = 'red' pointing> Invalid Phone Number </Label> }
           </Form>
 
         </Modal.Content>

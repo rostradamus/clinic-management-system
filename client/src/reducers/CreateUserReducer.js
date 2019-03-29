@@ -41,6 +41,7 @@ export default (state = initialState, action) => {
     case CREATE_USER_ACTION_TYPE.PREV_SLIDE: {
       const index = isExisting ? slideIndex - 2 : slideIndex - 1;
       if(index === 0) return {...initialState, popup: true};
+      if(index === 1) return Object.assign({...state}, {isExisting: false, error: false, slideIndex: index});
       return Object.assign({...state}, {error: false, slideIndex: index});
     }
     case CREATE_USER_ACTION_TYPE.CLOSE_POPUP: {

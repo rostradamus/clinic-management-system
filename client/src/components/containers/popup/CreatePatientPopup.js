@@ -275,8 +275,8 @@ class CreatePatientPopup extends Component{
         <Input maxLength = '255' value={this.state.form[formtype][field]}
         placeholder={!PLACEHOLDER[field]? STATE_CONST[field] : PLACEHOLDER[field] } onChange={e=> this.handleInputChange(e, field, formtype)}/>
         {field === 'email' && !this.validateEmail() && <Label basic color = 'red' pointing> Invalid Email </Label> }
+        {field === 'phone_number' && !this.validatePhoneNum(field) && <Label basic color = 'red' pointing> Invalid Phone Number </Label> }
         </Form.Field>
-
         ))}
       </Container>
       );
@@ -291,7 +291,7 @@ class CreatePatientPopup extends Component{
         errorFields[field]=true;
         }
       }
-      if(!this.validateDate(field)) errorFields[field] = true;
+      if(!this.validateDate(field) || !this.validatePhoneNum(field)) errorFields[field] = true;
     });
     this.setState({
       error: {
@@ -305,6 +305,12 @@ class CreatePatientPopup extends Component{
     const {email} = this.state.form.User;
     const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return email === '' || regex.test(String(email).toLowerCase());
+  }
+
+  validatePhoneNum(field) {
+    const {phone_number} = this.state.form.User;
+    const regex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4}$/;
+    return field === "phone_number" ? (phone_number === "" || regex.test(String(phone_number))) : true;
   }
 
 
