@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from 'redux';
-import { Label, Input, Container, Grid, Card, Header } from "semantic-ui-react";
+import { Input, Container, Grid, Card, Header } from "semantic-ui-react";
 import { ReportAction } from "actions";
 import PatientCardMatrix from "./PatientCardMatrix";
 import { AggregateReportPopup } from "components/containers/popup";
@@ -71,17 +71,17 @@ class ReportContainer extends Component {
     return (
       <Container className="reportContainer">
         <Container className="reportSubContainer reportCategoryContainer">
-          <Header as='h1'>Category Summaries</Header>
+          <Header as='h1'>Aggregate Reports</Header>
           { this._renderCategoryLabels() }
         </Container>
         <Container className="reportSubContainer reportPatientListContainer">
-          <Header as='h1'>Patients</Header>
+          <Header as='h1'>Individual Reports</Header>
           <Input
             onChange={this.handleSearchText.bind(this)}
             className="searchInput"
             iconPosition="left"
             icon="search"
-            placeholder="Search"
+            placeholder="Search by patient"
           />
         </Container>
         <PatientCardMatrix

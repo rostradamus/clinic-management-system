@@ -51,3 +51,8 @@ h1.ui.header.summaryHeader {
 .ui.grid.aggStatisticContainer > .row.aggStatisticRow .aggStatisticColumn > p.aggStatisticDescription {
   text-align: center;
 }
+
+/**/
+div.ui.modal > div.actions.aggReportModalActionContainer {
+  padding: 0.75rem 1rem;
+}
