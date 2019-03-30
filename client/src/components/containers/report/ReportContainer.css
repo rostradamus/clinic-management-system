@@ -1,6 +1,6 @@
 .ui.container.reportSubContainer.reportCategoryContainer > .ui.equal.width.grid >
 .row.categoryCardRow > .column > .ui.card.categoryCard#categoryOne {
-  background-color: #2a9d8f;
+  background-color: #e76f51;
 }
 
 .ui.container.reportSubContainer.reportCategoryContainer > .ui.equal.width.grid >
@@ -10,7 +10,7 @@
 
 .ui.container.reportSubContainer.reportCategoryContainer > .ui.equal.width.grid >
 .row.categoryCardRow > .column > .ui.card.categoryCard#categoryThree {
-  background-color: #e76f51;
+  background-color: #2a9d8f;
 }
 
 .row.categoryCardRow > div.column > a.ui.card.categoryCard {

@@ -81,7 +81,7 @@ class PatientCardMatrix extends Component {
     const { patients } = this.props;
     const { isReportOpen, selectedPatient } = this.state;
     return (
-      <Container className="disableScroll patientCardMatrixContainer">
+      <Container className="patientCardMatrixContainer">
         <Grid className="patientCardGrid" columns={COLUMN_COUNT}>
           {this._generatePatientMatrix(patients)}
         </Grid>

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { Button, Header, Modal, Label, Container, Form, Grid, Divider } from "semantic-ui-react";
-import { DateInput, YearInput } from "semantic-ui-calendar-react";
+import { Button, Header, Modal, Container, Form, Grid, Divider } from "semantic-ui-react";
+import { YearInput } from "semantic-ui-calendar-react";
 import { AggregateReportStatistics } from "components/containers/report";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
@@ -9,10 +9,6 @@ import "./AggregateReportPopup.css";
 
 moment.locale("en");
 const CATEGORY_ARR = ["I", "II", "III"];
-const REPORT_CONST = {
-  DIAGNOSIS_NAME: "diagnosisName",
-  DIAGNOSIS_CATEGORY: "diagnosisCategory"
-};
 
 // Requires set of series and yAxis values
 const defaultChartOptions = point => {
@@ -81,7 +77,7 @@ class AggregateReportPopup extends Component {
 
   _renderButtons() {
     return(
-      <Modal.Actions>
+      <Modal.Actions className="aggReportModalActionContainer">
         <Button primary onClick={ this._print }>Print</Button>
         <Button  onClick={ this.props.onClose }>Close</Button>
       </Modal.Actions>
@@ -229,26 +225,24 @@ class AggregateReportPopup extends Component {
 
   render() {
     const { filterFisicalYear } = this.state;
-    const fisicalStartDate = moment(filterFisicalYear + "-01-01", "YYYY-MM-DD").format("YYYY-MM-DD");
-    const fisicalEndDate = moment(filterFisicalYear + "-12-31", "YYYY-MM-DD").format("YYYY-MM-DD");
+    const fisicalStartDate = moment(filterFisicalYear + "-04-01", "YYYY-MM-DD").format("YYYY-MM-DD");
+    const fisicalEndDate = moment(filterFisicalYear + "-03-31", "YYYY-MM-DD").add(1,"y").format("YYYY-MM-DD");
     const stats = this.aggregateReportStatistics.retrieveStatistics(fisicalStartDate, fisicalEndDate);
 
     return (
-      <Modal onClose={ this.props.onClose } open={ this.props.isOpen } centered={false}>
-        <Modal.Header className={"a"/**"header_ct aggregateHeader"*/}>
+      <Modal className="aggReportModalContainer" onClose={ this.props.onClose } open={ this.props.isOpen }>
+        <Modal.Header className={"aggModalHeaderContainer"}>
           <Grid>
             <Grid.Row>
               <Grid.Column width={13}>
                 { this._renderAggregateSummaryHeader() }
               </Grid.Column>
-
               <Grid.Column width={3}>
                 { this._renderDateFilter() }
               </Grid.Column>
             </Grid.Row>
           </Grid>
         </Modal.Header>
-
         <Modal.Content className="aggModalContentContainer" scrolling>
           { this._renderStastics(stats) }
           { this._renderMedianTherapyIntensityHistogram(stats) }

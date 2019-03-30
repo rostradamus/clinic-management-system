@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Header, Modal, Label, Container, Grid, Table, Form, Divider } from "semantic-ui-react";
+import { Button, Header, Modal, Container, Grid, Form, Divider } from "semantic-ui-react";
 import { DateInput } from "semantic-ui-calendar-react";
 import { IndividualReportStatistics } from "components/containers/report";
 import Highcharts from "highcharts";
@@ -95,7 +95,7 @@ class IndividualReportPopup extends Component {
 
   _renderButtons() {
     return(
-      <Modal.Actions>
+      <Modal.Actions className="individualReportActionContainer">
         <Button primary className="btn_pu" onClick={ this._print }>Print</Button>
         <Button className="btn_pu" onClick={ this.props.onClose }>Close</Button>
       </Modal.Actions>
@@ -281,13 +281,11 @@ class IndividualReportPopup extends Component {
 
   render() {
     const { popupInfo, isOpen, onClose } = this.props;
-    const recordData = popupInfo.recordDatas[0] || {};
-    const appointments = recordData.appointments || [];
     const { filterStartDate, filterEndDate } = this.state;
     const stats = this.individualReportStatistics.retrieveStatistics(filterStartDate, filterEndDate);
 
     return (
-      <Modal onClose={ onClose } open={ isOpen }>
+      <Modal className="individualReportContainer" onClose={ onClose } open={ isOpen }>
         <Modal.Header className="patientStatModalHeader">
           <Grid>
             <Grid.Row className="patientStatModalRow">
@@ -300,7 +298,6 @@ class IndividualReportPopup extends Component {
             </Grid.Row>
           </Grid>
         </Modal.Header>
-
         <Modal.Content className="patientContentContainer" scrolling>
           { this._renderStastics(stats) }
           { this._renderTherapyIntensityHistogram(stats) }

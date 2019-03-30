@@ -1,12 +1,19 @@
+/* Individual Patient Report Modal Container*/
+div.ui.scrolling.modal.transition.visible.active.individualReportContainer {
+  margin: 0;
+}
+
 /* Individual Patient Report Modal Header*/
 .ui.container.patientSummaryContainer .patientSummary .patientDetailContainer div .patientSummaryPatientName {
-  font-size: 3rem;
+  font-size: 2.5rem;
   margin-bottom: 0.5rem;
   margin-left: -2px;
+  font-weight: 700;
 }
 
 .patientSummaryContainer .ui.grid.patientSummary .patientDetailContainer * {
   font-size: 1rem;
+  font-weight: 500;
 }
 
 .patientSummaryContainer .ui.grid.patientSummary .row.patientDetailContainer {
@@ -28,7 +35,7 @@
 }
 
 .statDateFilterColumn.patientStatModalColumn .ui.form.patientStatDateContainer .statDateSeparator {
-  line-height: 5.5rem;
+  line-height: 4.5rem;
   height: 1rem;
 }
 
@@ -58,6 +65,10 @@
   text-align: center;
 }
 
+div.ui.modal > div.patientStatModalHeader.header {
+  line-height: 1rem;
+}
+
 /* Individual Patient Report Modal Content*/
 .ui.grid.patientStatisticContainer > .row.patientStatisticRow .patientStatisticColumn > p.patientStatisticValue {
   font-size: 5rem;
@@ -79,4 +90,9 @@
   font-size: 1.5rem;
   font-weight: 500;
   margin-bottom: 1.5rem;
+}
+
+/* Individual Patient report Modal Action Container*/
+div.ui.modal > div.actions.individualReportActionContainer {
+  padding: 0.75rem 1rem;
 }
