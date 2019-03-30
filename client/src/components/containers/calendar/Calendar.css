@@ -1,4 +1,3 @@
-
 /* Calendar Container */
 .ui.grid.calendarContainer .appointmentCalendar {
   height: 48rem;
@@ -41,3 +40,22 @@
     display: none !important;
   }
 }
+/* Calendar width css*/
+.ui.grid.calendarContainer {
+  min-width: 750px;
+  height: 100%;
+}
+
+.ui.grid.calendarContainer > div.row > .center.aligned.three.wide.column.non-printable.calendarSideBarContainer {
+  padding-left: 0;
+}
+
+.ui.grid.calendarContainer > div.row .thirteen.wide.column.calendarAppointmentContainer {
+  padding-left: 1rem;
+  padding-right: 2.5rem;
+}
+
+
+
+
+

@@ -5,18 +5,7 @@ import { Grid, Button, Icon } from "semantic-ui-react";
 import { PatientStaffSearch } from 'components/containers/popup';
 import { CalendarPopup } from 'components/containers/popup';
 import moment from 'moment';
-
-const buttonStyle = {
-  width: "70%"
-}
-
-const gridRowStyle = {
-  marginBottom: "16px"
-}
-
-const gridColumnStyle = {
-  minWidth: "250px"
-}
+import "./CalendarSideBar.css";
 
 const event = {
   "type_of_therapy": "",
@@ -57,29 +46,15 @@ class CalendarSideBar extends Component {
     const { isCalendarPopupOpen, isSearchOpen } = this.state;
     const { selectedUser, patientsStaffs, currentUser} = this.props;
     return(
-      <Grid.Column className="non-printable" width={2} textAlign="center" style={gridColumnStyle}>
+      <Grid.Column className="non-printable calendarSideBarContainer" width={3} textAlign="center">
         { currentUser && currentUser.type === "Administrator" ?
-          <Grid.Row style={gridRowStyle}>
+          <Grid.Row className="calendarSideBarRow">
             <Button
+              className="calendarSideBarButton"
               primary
               size='medium'
               icon labelPosition="right"
-              onClick={ this.toggleCalendarModal }
-              style={buttonStyle}>
-              Create
-              <Icon name='plus' />
-            </Button>
-          </Grid.Row>
-          : null
-        }
 
-        { currentUser && currentUser.type === "Administrator" ?
-          <Grid.Row style={gridRowStyle}>
-            <Button
-              primary
-              size='medium'
-              icon labelPosition="right"
-              style={buttonStyle}
               onClick={ this.toggleSearchModal }>
               Select View
               <Icon name='users' />
@@ -87,14 +62,29 @@ class CalendarSideBar extends Component {
           </Grid.Row>
           : null
         }
-
-        <Grid.Row>
+        { currentUser && currentUser.type === "Administrator" ?
+          <Grid.Row className="calendarSideBarRow">
+            <Button
+              className="calendarSideBarButton"
+              primary
+              size='medium'
+              icon labelPosition="right"
+              onClick={ this.toggleCalendarModal }
+            >
+              Create
+              <Icon name='plus' />
+            </Button>
+          </Grid.Row>
+          : null
+        }
+        <Grid.Row className="calendarSideBarRow">
           <Button
+            className="calendarSideBarButton"
             size='medium'
-            style={buttonStyle}
             disabled={ isEmpty(selectedUser) }
             // TODO: TD-70 implement our onw print functionality
-            onClick= {window.print.bind(window)}>
+            onClick= {window.print.bind(window)}
+          >
             Print
           </Button>
         </Grid.Row>

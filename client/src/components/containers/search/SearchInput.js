@@ -58,15 +58,13 @@ class SearchInput extends Component {
     const { filteredResults, searchText, selectedUser } = this.state;
     const { isSelectedUser } = this.props;
     return(
-      <div>
-        <Search
-          disabled={ isSelectedUser }
-          onResultSelect={ this.handleResultSelect }
-          onSearchChange={ this.handleSearchChange }
-          results={ !isSelectedUser ? filteredResults : [selectedUser] }
-          value={ searchText }
-        />
-      </div>
+      <Search
+        disabled={ isSelectedUser }
+        onResultSelect={ this.handleResultSelect }
+        onSearchChange={ this.handleSearchChange }
+        results={ !isSelectedUser ? filteredResults : [selectedUser] }
+        value={ searchText }
+      />
     );
   }
 }

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Modal, Menu, Input, Table } from 'semantic-ui-react';
-import { PatientStaffSearchAction, CalendarAction } from "actions";
+import { CalendarAction } from "actions";
 import { isEqual } from 'lodash';
 
 const USER_TYPE_MAP = {
@@ -46,7 +46,7 @@ class PatientStaffSearch extends Component {
     const { filter, sortDirection, sortKeys } = this.state;
     const filteredItems = this._getTypeFilteredItems(patientsStaffs, filter).filter(user => {
       const fullName = `${user.first_name} ${user.last_name}`;
-      return fullName.toLowerCase().includes(value);
+      return fullName.toLowerCase().includes(value.toLowerCase());
     });
 
     this.setState({

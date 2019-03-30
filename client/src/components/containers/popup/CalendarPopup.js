@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { isEqual } from 'lodash';
-import { Button, Modal, Form, Select, Radio, Confirm } from 'semantic-ui-react';
+import { Container, Button, Modal, Form, Select, Radio, Confirm, Label } from 'semantic-ui-react';
 import { DateInput, TimeInput } from 'semantic-ui-calendar-react';
 import { CalendarAction } from 'actions';
 import { SearchInput } from 'components/containers/search';
@@ -156,7 +156,7 @@ class CalendarPopup extends Component {
         .seconds(0);
 
       // if (!moment(appointmentTime, "hh:mm:ss").isBetween(openTime, closeTime)) return;
-      const timeError = this._validateTime(key, appointmentTime.toDate());
+      const timeError = this._validateTime(key, appointmentTime);
       if (timeError) {
         this.setState({
           [key]: appointmentTime.toDate(),
@@ -211,8 +211,8 @@ class CalendarPopup extends Component {
    */
   _validateTime(key, time) {
     const isKeyStart = key === POPUP_STATE_CONST.start;
-    const startTime = isKeyStart ? moment(time) : moment(this.state.start);
-    const endTime = isKeyStart ? moment(this.state.end) : moment(time);
+    const startTime = isKeyStart ? time : moment(this.state.start);
+    const endTime = isKeyStart ? moment(this.state.end) : time;
     return !startTime.isBefore(endTime);
   }
 
@@ -280,7 +280,8 @@ class CalendarPopup extends Component {
    */
   _isButtonDisabled() {
     const { patient, staff, start, end, startTimeError, endTimeError, therapyType } = this.state;
-    return !moment(start).isValid() || !moment(end).isValid()
+    const mStart = moment(start) , mEnd = moment(end);
+    return !mStart.isValid() || !mEnd.isValid() || !mStart.isBefore(mEnd)
       || isEqual(patient, {}) || isEqual(staff, {}) ||
       startTimeError || endTimeError || therapyType === "";
   }
@@ -331,6 +332,10 @@ class CalendarPopup extends Component {
           selectedUser={this._getAppropriateUser(USER_TYPE.patient)}
           isSelectedUser={ selectedUser && selectedUser.type === USER_TYPE.patient }
         />
+        {(isEqual(patient, {}) || !patient) ?
+          <Label basic color = 'red' pointing> Please select a patient. </Label>
+          : null
+        }
       </Form.Field>
     );
   }
@@ -348,6 +353,10 @@ class CalendarPopup extends Component {
           selectedUser={this._getAppropriateUser(USER_TYPE.staff)}
           isSelectedUser={ selectedUser && selectedUser.type === USER_TYPE.staff }
         />
+        {(isEqual(staff, {}) || !staff) ?
+          <Label basic color = 'red' pointing> Please select a staff. </Label>
+          : null
+        }
       </Form.Field>
     );
   }
@@ -356,11 +365,10 @@ class CalendarPopup extends Component {
     const {start, end, startTimeError, endTimeError} = this.state;
     const mStart = moment(start);
     const mEnd = moment(end);
-    const today = moment();
 
     return(
       <Form.Group widths='equal'>
-        <Form.Field error={ !mStart.isValid() || mStart.isBefore(today) }>
+        <Form.Field error={ !mStart.isValid() }>
           <label>Date *</label>
           <DateInput
             dateFormat="MM-DD-YYYY"
@@ -370,11 +378,16 @@ class CalendarPopup extends Component {
             iconPosition="left"
             onChange={ (e,data) => this._handleDateChange(e, data) }
           />
+          {!mStart.isValid() ?
+            <Label basic color = 'red' pointing> Date is not valid </Label>
+            : null
+          }
         </Form.Field>
 
         <Form.Field error={ !mStart.isValid() || startTimeError } >
           <label>Start Time *</label>
           <TimeInput
+            readOnly
             name="start"
             placeholder="Start"
             value={ mStart.format("HH:mm") }
@@ -383,11 +396,16 @@ class CalendarPopup extends Component {
               (e, data) => this._handleTimeChange(e, "start", data)
             }
           />
+          {!mStart.isValid() || startTimeError ?
+            <Label basic color = 'red' pointing> Start time must be before end time </Label>
+            : null
+          }
         </Form.Field>
 
         <Form.Field error={ !mEnd.isValid() || endTimeError } >
           <label>End Time *</label>
           <TimeInput
+            readOnly
             name="end"
             placeholder="End"
             value={ mEnd.format("HH:mm") }
@@ -396,6 +414,10 @@ class CalendarPopup extends Component {
               (e, data) => this._handleTimeChange(e, "end", data)
             }
           />
+          {!mEnd.isValid() || endTimeError ?
+            <Label basic color = 'red' pointing> End time must be after start time </Label>
+            : null
+          }
         </Form.Field>
       </Form.Group>
     );
@@ -438,14 +460,20 @@ class CalendarPopup extends Component {
   _renderTypeOfTherapy() {
     const { therapyType } = this.state;
     return(
-      <Form.Field
-        error = { therapyType === "" }
-        control={ Select }
-        placeholder={ this._getTherapyTypePlaceholder(therapyType) }
-        label=" Therapy Type *"
-        onChange={ this._handleTherapyTypeChange }
-        options={ THERAPY_TYPE_CONST }
-      />
+      <Container>
+        <Form.Field
+          error = { therapyType === "" }
+          control={ Select }
+          placeholder={ this._getTherapyTypePlaceholder(therapyType) }
+          label=" Therapy Type *"
+          onChange={ this._handleTherapyTypeChange }
+          options={ THERAPY_TYPE_CONST }
+        />
+        {therapyType === "" ?
+          <Label basic color = 'red' pointing> Please select a therapy type.</Label>
+          : null
+        }
+      </Container>
     );
   }
 
