@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import BigCalendar from 'react-big-calendar';
 import moment from 'moment';
-import { Grid, Header, Label, Icon, Segment, Message } from "semantic-ui-react";
+import { Grid, Header, Label, Icon, Container, Message } from "semantic-ui-react";
 import { CalendarPopup } from 'components/containers/popup';
+import CalendarCustomToolbar from "./CalendarCustomToolbar";
 import { ReactComponent as PlaceholderImg } from "assets/calendarPlaceholder.svg";
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import "./Calendar.css";
@@ -12,6 +13,11 @@ const localizer = BigCalendar.momentLocalizer(moment);
 const MAIN_CALENDAR_COL_WIDTH = 13;
 const appointmentStartTime = moment().hours(8).minute(0).second(0).toDate();
 const appointmentEndTime = moment().hours(17).minute(0).second(0).toDate();
+
+/**
+ * [CATEGORY_COLOR_ARRAY index 0: default color, 1: category one, 2: category two, 3 category three]
+ */
+const CATEGORY_COLOR_ARRAY = ["#265985", "#e76f51", "#e9c46a", "#2a9d8f"];
 
 class Calendar extends Component {
   constructor(props) {
@@ -116,6 +122,30 @@ class Calendar extends Component {
     )
   }
 
+  /**
+   * This function is used by big calendar react to style individual events
+   * @param  {Object}  event      [Object that contains information about an appointment]
+   * @param  {Date}  start        [Date object that includes start time of an appointment]
+   * @param  {Date}  end          [Date object that includes end time of an appointment]
+   * @param  {Boolean} isSelected [description]
+   * @return {Object}             [CSS style object]
+   */
+  eventStyleGetter(event, start, end, isSelected) {
+    const { patient_category } = event;
+    const categoryIdx = event && event.patient_category > 0 ? event.patient_category : 0;
+    const backgroundColor = CATEGORY_COLOR_ARRAY[categoryIdx];
+    const fontColor = categoryIdx === 1 || categoryIdx === 2 ? "#000000" : "#fff";
+
+    const style = {
+      backgroundColor: backgroundColor,
+      borderRadius: '0px',
+      color: fontColor,
+      border: `1px solid ${backgroundColor}`,
+      borderRadius: '5px'
+    };
+    return { style: style };
+  }
+
   render() {
     const today = moment().toDate();
     const { isCalendarPopupOpen } = this.state;
@@ -123,19 +153,19 @@ class Calendar extends Component {
 
     if (this._isEmptyUserObj(selectedUser)) {
       return (
-        <Grid.Column width={MAIN_CALENDAR_COL_WIDTH}>
-          <Segment className="calendarPlaceholder">
+        <Grid.Column className="calendarAppointmentContainer" width={MAIN_CALENDAR_COL_WIDTH}>
+          <Container className="calendarPlaceholder">
             <PlaceholderImg className="placeholderImage" />
             <p id="placeholderText">
               Click the "Select View" button to choose either a patient or staff.
             </p>
-          </Segment>
+          </Container>
         </Grid.Column>
       );
     }
     // If selected user exists with expected fields, show calendar.
     return (
-      <Grid.Column width={MAIN_CALENDAR_COL_WIDTH}>
+      <Grid.Column className="calendarAppointmentContainer" width={MAIN_CALENDAR_COL_WIDTH}>
         { errorMessage.status ? this.renderErrorMessage(errorMessage) : null }
         <Grid.Row>
           <Header className="calendarUser userName"> {this._getSelectedUserName(selectedUser)} </Header>
@@ -161,6 +191,8 @@ class Calendar extends Component {
             max={ appointmentEndTime }
             onSelectEvent={(e) => this.toggleAddModal(e, true)}
             onSelectSlot={(e) => this.toggleAddModal(e, false)}
+            components={ { toolbar: CalendarCustomToolbar } }
+            eventPropGetter={ this.eventStyleGetter }
           />
         </Grid.Row>
 

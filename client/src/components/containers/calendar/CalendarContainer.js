@@ -5,11 +5,7 @@ import { PatientStaffSearchAction } from 'actions';
 import { CalendarAction } from 'actions';
 import Calendar from "./Calendar";
 import CalendarSideBar from "./CalendarSideBar";
-
-const gridStyle = {
-  minWidth: "1000px",
-  height: "100%"
-}
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 class CalendarContainer extends Component {
   constructor(props) {
@@ -32,20 +28,22 @@ class CalendarContainer extends Component {
   render() {
     const { errorMessage, events, selectedUser, patientsStaffs, currentUser} = this.props;
     return (
-      <Grid className="calendarContainer" style={gridStyle}>
-        <CalendarSideBar
-          selectedUser={ selectedUser }
-          patientsStaffs={ patientsStaffs }
-          currentUser = { currentUser }
-        />
-        <Calendar
-          errorMessage={ errorMessage }
-          events={ events }
-          selectedUser={ selectedUser }
-          patientsStaffs={ patientsStaffs }
-          currentUser = { currentUser }
-          closeErrorMessage = { this.handleErrorMessageClose }
-        />
+      <Grid className="calendarContainer">
+        <Grid.Row>
+          <CalendarSideBar
+            selectedUser={ selectedUser }
+            patientsStaffs={ patientsStaffs }
+            currentUser = { currentUser }
+          />
+          <Calendar
+            errorMessage={ errorMessage }
+            events={ events }
+            selectedUser={ selectedUser }
+            patientsStaffs={ patientsStaffs }
+            currentUser = { currentUser }
+            closeErrorMessage = { this.handleErrorMessageClose }
+          />
+        </Grid.Row>
       </Grid>
     );
   }

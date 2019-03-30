@@ -3,7 +3,7 @@ const mysql = require('mysql');
 const moment = require('moment');
 
 const TABLE_NAME = "Appointment";
-const VISIBLE_COLUMNS = ["id", "patient_id", "staff_id", "record_id",
+const VISIBLE_COLUMNS = ["id", "patient_id", "staff_id", "record_id", "patient_category",
   "type_of_therapy", "start_date", "end_date", "repetition", "start_time", "end_time", "is_attend"];
 
 const USER_TABLE_NAME = "User";
