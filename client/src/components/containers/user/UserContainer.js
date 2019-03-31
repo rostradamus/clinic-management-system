@@ -63,8 +63,7 @@ class UserContainer extends Component {
           style={{ margin:"1rem"}}
           onClick={ () => this.props.dispatch(CreateUserAction.openPopup()) }>Create User</Button>
         <Button
-          primary
-          style={{ margin:"1rem"}}
+          secondary
           onClick={ () => this.props.dispatch(UserAction.getDischargedPatients()) }>Discharged Patients</Button>
         <CreateUserPopup />
         <DischargedPatientsPopup />

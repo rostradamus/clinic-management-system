@@ -23,44 +23,29 @@ class ReportContainer extends Component {
   }
 
   _renderCategoryLabels() {
-    return(
-      <Grid columns='equal'>
-        <Grid.Row className="categoryCardRow">
-          <Grid.Column>
-            <Card
-              id="categoryOne"
-              className="categoryCard"
-              header="I"
-              onClick={(e, data) => this.handleAggregateToggle(e, 1)}
-            />
-          </Grid.Column>
-
-          <Grid.Column>
-            <Card
-              id="categoryTwo"
-              className="categoryCard"
-              header="II"
-              onClick={(e, data) => this.handleAggregateToggle(e, 2)}
-            />
-          </Grid.Column>
-
-          <Grid.Column>
-            <Card
-              id="categoryThree"
-              className="categoryCard"
-              header="III"
-              onClick={(e, data) => this.handleAggregateToggle(e, 3)}
-            />
-          </Grid.Column>
-
-          <Grid.Column>
-            {/** Left in hear for spacing*/}
-          </Grid.Column>
-          <Grid.Column>
-            {/** Left in hear for spacing*/}
-          </Grid.Column>
-        </Grid.Row>
-      </Grid>
+    return (
+      <Container>
+        <Grid className="categoryCardGrid" columns={5}>
+          <Card
+            id="categoryOne"
+            className="categoryCard"
+            header="I"
+            onClick={(e, data) => this.handleAggregateToggle(e, 1)}
+          />
+          <Card
+            id="categoryTwo"
+            className="categoryCard"
+            header="II"
+            onClick={(e, data) => this.handleAggregateToggle(e, 2)}
+          />
+          <Card
+            id="categoryThree"
+            className="categoryCard"
+            header="III"
+            onClick={(e, data) => this.handleAggregateToggle(e, 3)}
+          />
+        </Grid>
+      </Container>
     )
   }
 
@@ -71,8 +56,8 @@ class ReportContainer extends Component {
     return (
       <Container className="reportContainer">
         <Container className="reportSubContainer reportCategoryContainer">
-          <Header as='h1'>Aggregate Reports</Header>
-          { this._renderCategoryLabels() }
+          <Header as='h1'>Aggregate Reports by Category</Header>
+          {this._renderCategoryLabels()}
         </Container>
         <Container className="reportSubContainer reportPatientListContainer">
           <Header as='h1'>Individual Reports</Header>
@@ -81,19 +66,19 @@ class ReportContainer extends Component {
             className="searchInput"
             iconPosition="left"
             icon="search"
-            placeholder="Search by patient"
+            placeholder="Search by Patient"
           />
         </Container>
         <PatientCardMatrix
-          patients={ patients }
-          popupInfo= { popupInfo }
+          patients={patients}
+          popupInfo={popupInfo}
         />
-        { isAggregateOpen ?
+        {isAggregateOpen ?
           <AggregateReportPopup
-            isOpen={ isAggregateOpen }
-            categorySummary={ categorySummary }
-            onClose={ closeAggregateSummaryPopup }
-            selectedCategory={ selectedCategory }
+            isOpen={isAggregateOpen}
+            categorySummary={categorySummary}
+            onClose={closeAggregateSummaryPopup}
+            selectedCategory={selectedCategory}
           /> : null
         }
       </Container>
@@ -103,7 +88,7 @@ class ReportContainer extends Component {
 
 const mapStateToProp = state => {
   const { searchText, patients, categorySummary, isAggregateOpen, selectedCategory } = state.report;
-  const filteredPatients = patients.filter(patient => patient.patientName.toLowerCase().includes(searchText.toLowerCase()) );
+  const filteredPatients = patients.filter(patient => patient.patientName.toLowerCase().includes(searchText.toLowerCase()));
   return {
     selectedCategory,
     categorySummary,
@@ -121,4 +106,4 @@ const mapDispatchToProps = dispatch => {
   }, dispatch);
 }
 
-export default connect(mapStateToProp, mapDispatchToProps) (ReportContainer);
+export default connect(mapStateToProp, mapDispatchToProps)(ReportContainer);

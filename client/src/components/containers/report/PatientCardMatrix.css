@@ -1,9 +1,8 @@
 .ui.card.patientCard {
   margin: 0 1.5rem 2.3rem 0;
   width: 14rem;
-  height: 9rem;
-  border: 2px solid #eeeeee;
-  box-shadow: 0 0.3rem 0.6rem 0 rgba(0, 0, 0, 0.25);
+  height: 8.5rem;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   position: relative;
 }
 
@@ -14,7 +13,7 @@
 .ui.card.patientCard > .content > .header.patientCardHeader {
   font-size: 1.25rem;
   font-weight: bold;
-  color: #000000;
+  color: #212121;
 }
 
 .ui.card.patientCard > .content > .description.patientCardDescription {

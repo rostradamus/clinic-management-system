@@ -38,8 +38,7 @@ class App extends Component {
       <Router>
         <div className="App" style={{ height: "100%" }}>
           <Layouts.NavBar />
-          {/* <Container className="app-body" style={{ padding: "1rem 0", width: "100%", height: "100%" }}> */}
-          <Container className="app-body" style={{ width: "100%", height: "100%" }}>
+          <Container className="app-body" style={{ width: "100%" }}>
             <Switch>
               <Route key="login" exact path="/login" component={Containers.LoginContainer}/>
               <PrivateRoute key="appointment" exact path="/" component={Containers.CalendarContainer} hasLoggedIn={this.props.auth.hasLoggedIn} />

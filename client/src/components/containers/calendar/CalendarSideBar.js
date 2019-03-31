@@ -46,7 +46,14 @@ class CalendarSideBar extends Component {
     const { isCalendarPopupOpen, isSearchOpen } = this.state;
     const { selectedUser, patientsStaffs, currentUser} = this.props;
     return(
-      <Grid.Column className="non-printable calendarSideBarContainer" width={3} textAlign="center">
+      <Grid.Column 
+      className="non-printable calendarSideBarContainer"
+      widescreen={1}
+      largeScreen={2}
+      computer={3}
+      tablet={4}
+      mobile={4} 
+      textAlign="center">
         { currentUser && currentUser.type === "Administrator" ?
           <Grid.Row className="calendarSideBarRow">
             <Button
@@ -54,7 +61,6 @@ class CalendarSideBar extends Component {
               primary
               size='medium'
               icon labelPosition="right"
-
               onClick={ this.toggleSearchModal }>
               Select View
               <Icon name='users' />
@@ -69,8 +75,7 @@ class CalendarSideBar extends Component {
               primary
               size='medium'
               icon labelPosition="right"
-              onClick={ this.toggleCalendarModal }
-            >
+              onClick={ this.toggleCalendarModal }>
               Create
               <Icon name='plus' />
             </Button>
@@ -80,12 +85,14 @@ class CalendarSideBar extends Component {
         <Grid.Row className="calendarSideBarRow">
           <Button
             className="calendarSideBarButton"
+            primary
             size='medium'
             disabled={ isEmpty(selectedUser) }
+            icon labelPosition="right"
             // TODO: TD-70 implement our onw print functionality
-            onClick= {window.print.bind(window)}
-          >
+            onClick= {window.print.bind(window)}>
             Print
+            <Icon name='print' />
           </Button>
         </Grid.Row>
 

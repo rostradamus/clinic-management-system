@@ -83,10 +83,8 @@ class IndividualReportPopup extends Component {
     });
   }
 
-  _returnDiagnosis(recordData, diagnosis) {
-    return recordData[diagnosis].replace(/\w\S*/g, (txt) => {
-        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-    });
+  _capitalizeDiagnosis(diagnosis) {
+    return diagnosis.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
   }
 
   _returnCategory(recordData, category) {
@@ -127,7 +125,7 @@ class IndividualReportPopup extends Component {
           <Grid.Row className="patientDetailContainer">
             <Grid.Column width={3} className="patientDetailDescription">Diagnosis</Grid.Column>
             <Grid.Column width={13} className="patientDetailValue">
-              { recordData[REPORT_CONST.DIAGNOSIS_NAME] }
+              { this._capitalizeDiagnosis(recordData[REPORT_CONST.DIAGNOSIS_NAME]) }
             </Grid.Column>
           </Grid.Row>
         </Grid>
@@ -176,7 +174,7 @@ class IndividualReportPopup extends Component {
     return(
       <Container className="patientReportContentContainer">
         <Header className="patientReportModalContentHeader">
-          Therapy Intensity Statistics
+          Therapy Intensity Statistics (in Minutes)
         </Header>
         <Grid className="patientStatisticContainer">
           <Grid.Row className="patientStatisticRow">
@@ -223,8 +221,8 @@ class IndividualReportPopup extends Component {
     const chartOptions = Object.assign({...defaultChartOptions("minutes")}, {...series}, {...yAxis});
     return (
       <Container className="patientReportContentContainer">
+        <Header className="patientReportModalContentHeader">Median Therapy Intensity by Disciplines</Header>
         <HighchartsReact highcharts={Highcharts} options={chartOptions} />
-        <Divider />
       </Container>
     );
   }
@@ -250,7 +248,6 @@ class IndividualReportPopup extends Component {
       <Container className="patientReportContentContainer">
         <Header className="patientReportModalContentHeader">Number of Sessions Attended by Disciplines</Header>
         <HighchartsReact highcharts={Highcharts} options={chartOptions} />
-        <Divider />
       </Container>
     );
   }

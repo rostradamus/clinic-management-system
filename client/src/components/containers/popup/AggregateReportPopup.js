@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Header, Modal, Container, Form, Grid, Divider } from "semantic-ui-react";
+import { Button, Header, Modal, Container, Form, Grid } from "semantic-ui-react";
 import { YearInput } from "semantic-ui-calendar-react";
 import { AggregateReportStatistics } from "components/containers/report";
 import Highcharts from "highcharts";
@@ -40,7 +40,7 @@ class AggregateReportPopup extends Component {
     super(props);
     this.aggregateReportStatistics = new AggregateReportStatistics(this.props.categorySummary);
     this.state = {
-      filterFisicalYear: moment().format("YYYY")
+      fiscalDate: moment()
     };
 
     this._handleFilterDateChange = this._handleFilterDateChange.bind(this);
@@ -63,15 +63,8 @@ class AggregateReportPopup extends Component {
   }
 
   _handleFilterDateChange(event, { value }) {
-    const chosenDate = moment(value, "YYYY");
     this.setState({
-      filterFisicalYear: chosenDate.format("YYYY"),
-    });
-  }
-
-  _returnDiagnosis(recordData, diagnosis) {
-    return recordData[diagnosis].replace(/\w\S*/g, (txt) => {
-        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+      fiscalDate: moment().year(value).month("April").date(1)
     });
   }
 
@@ -85,17 +78,19 @@ class AggregateReportPopup extends Component {
   }
 
   _renderDateFilter() {
-    const { filterFisicalYear } = this.state;
+    const { fiscalDate } = this.state;
+    let fiscalDates = this._calculateFiscalDates(fiscalDate);
+    let yearValue = moment(fiscalDates.start).format("YYYY");
     return(
       <Form className="aggReportFormContainer">
         <Form.Field className="aggReportFormField">
-          <label className="aggReportFilterLabel">Select Fisical Year</label>
+          <label className="aggReportFilterLabel">Select Fiscal Year</label>
           <YearInput
             className="aggReportYearInput"
             icon={false}
             dateFormat="YYYY"
             name="date"
-            value={ filterFisicalYear }
+            value={ yearValue }
             onChange={ this._handleFilterDateChange }
           />
         </Form.Field>
@@ -117,7 +112,7 @@ class AggregateReportPopup extends Component {
   _renderStastics(stats) {
     return(
       <Container className="aggReportContentContainer">
-        <Header className="aggReportModalContentHeader">Therapy Intensity Statistics</Header>
+        <Header className="aggReportModalContentHeader">Therapy Intensity Statistics (in Minutes)</Header>
         <Grid className="aggStatisticContainer">
           <Grid.Row className="aggStatisticRow">
             <Grid.Column width={4} className="aggStatisticColumn">
@@ -141,7 +136,6 @@ class AggregateReportPopup extends Component {
             </Grid.Column>
           </Grid.Row>
         </Grid>
-        <Divider />
       </Container>
     );
   }
@@ -167,7 +161,6 @@ class AggregateReportPopup extends Component {
       <Container className="aggReportContentContainer">
         <Header className="aggReportModalContentHeader">Median Therapy Intensity by Disciplines</Header>
         <HighchartsReact highcharts={Highcharts} options={chartOptions} />
-        <Divider />
       </Container>
     );
   }
@@ -194,7 +187,6 @@ class AggregateReportPopup extends Component {
       <Container className="aggReportContentContainer">
         <Header className="aggReportModalContentHeader">Median Number of Sessions Attended by Disciplines</Header>
         <HighchartsReact highcharts={Highcharts} options={chartOptions} />
-        <Divider />
       </Container>
     );
   }
@@ -222,12 +214,28 @@ class AggregateReportPopup extends Component {
       </Container>
     );
   }
+ 
+  _calculateFiscalDates(date) {
+    let year = moment(date).year();
+    let start = moment().year(year).month("April").date(1);
+    let end = moment().year(year).month("March").date(31);
+
+    if (moment(date).quarter() === 1) {
+      start.subtract(1, "y");
+    } else {
+      end.add(1, "y");
+    }
+
+    return {
+      start: start.format("YYYY-MM-DD"),
+      end: end.format("YYYY-MM-DD")
+    };
+  }
 
   render() {
-    const { filterFisicalYear } = this.state;
-    const fisicalStartDate = moment(filterFisicalYear + "-04-01", "YYYY-MM-DD").format("YYYY-MM-DD");
-    const fisicalEndDate = moment(filterFisicalYear + "-03-31", "YYYY-MM-DD").add(1,"y").format("YYYY-MM-DD");
-    const stats = this.aggregateReportStatistics.retrieveStatistics(fisicalStartDate, fisicalEndDate);
+    const { fiscalDate } = this.state;
+    let fiscalDates = this._calculateFiscalDates(fiscalDate);
+    const stats = this.aggregateReportStatistics.retrieveStatistics(fiscalDates.start, fiscalDates.end);
 
     return (
       <Modal className="aggReportModalContainer" onClose={ this.props.onClose } open={ this.props.isOpen }>

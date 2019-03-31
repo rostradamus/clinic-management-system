@@ -1,32 +1,35 @@
-.ui.container.reportSubContainer.reportCategoryContainer > .ui.equal.width.grid >
-.row.categoryCardRow > .column > .ui.card.categoryCard#categoryOne {
+.ui.card.categoryCard {
+  margin: 0 1.5rem 2.3rem 0;
+  width: 14rem;
+  height: 8rem;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+  position: relative;
+}
+
+.ui.card.categoryCard#categoryOne {
   background-color: #e76f51;
 }
 
-.ui.container.reportSubContainer.reportCategoryContainer > .ui.equal.width.grid >
-.row.categoryCardRow > .column > .ui.card.categoryCard#categoryTwo {
+.ui.card.categoryCard#categoryTwo {
   background-color: #e9c46a;
 }
 
-.ui.container.reportSubContainer.reportCategoryContainer > .ui.equal.width.grid >
-.row.categoryCardRow > .column > .ui.card.categoryCard#categoryThree {
+.ui.card.categoryCard#categoryThree {
   background-color: #2a9d8f;
 }
 
-.row.categoryCardRow > div.column > a.ui.card.categoryCard {
-  height: 7rem;
-  text-align: center;
-  border-radius: 20px;
+.ui.card.categoryCard > div.content > div.header {
+  font-size: 2.2rem;
+  font-weight: 400;
+  color: #212121;
 }
 
-.row.categoryCardRow > div.column > a.ui.card.categoryCard > div.content > div.header {
-  font-weight: bold;
-  font-size: 2.5rem;
-  line-height: 2em;
+.ui.grid.categoryCardGrid {
+  margin: 2rem 0 0 0;
 }
 
 .ui.container.reportSubContainer.reportPatientListContainer > div.input.searchInput {
-  width: 30rem;
+  width: 45rem;
 }
 
 div.ui.container.reportSubContainer {
