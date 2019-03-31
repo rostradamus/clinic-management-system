@@ -5,19 +5,14 @@ import { Grid, Header, Label, Icon, Container, Message } from "semantic-ui-react
 import { CalendarPopup } from 'components/containers/popup';
 import CalendarCustomToolbar from "./CalendarCustomToolbar";
 import { ReactComponent as PlaceholderImg } from "assets/calendarPlaceholder.svg";
+import { TherapyType, TherapyTypeColour } from "enums";
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import "./Calendar.css";
 
 moment.locale('en');
 const localizer = BigCalendar.momentLocalizer(moment);
-const MAIN_CALENDAR_COL_WIDTH = 13;
 const appointmentStartTime = moment().hours(8).minute(0).second(0).toDate();
 const appointmentEndTime = moment().hours(17).minute(0).second(0).toDate();
-
-/**
- * [CATEGORY_COLOR_ARRAY index 0: default color, 1: category one, 2: category two, 3 category three]
- */
-const CATEGORY_COLOR_ARRAY = ["#265985", "#e76f51", "#e9c46a", "#2a9d8f"];
 
 class Calendar extends Component {
   constructor(props) {
@@ -64,9 +59,11 @@ class Calendar extends Component {
    * @param  {User} options.staff
    * @return {Object} [if patient and staff exist return {title:...} else returns {}]
    */
-  _generateTitle({ patient, staff }) {
+  _generateTitle({ patient, staff, type_of_therapy }) {
     if (patient && staff) {
-      const title = `Patient: ${patient.first_name} ${patient.last_name} - Staff: ${staff.first_name} ${staff.last_name}`;
+      const title = `Patient: ${patient.first_name} ${patient.last_name},
+      Staff: ${staff.first_name} ${staff.last_name},
+      Therapy Type: ${type_of_therapy}`;
       return { title };
     }
     return {};
@@ -96,7 +93,7 @@ class Calendar extends Component {
    * TODO: this is a code smell, could be better if we had universal enums to store all these.
    */
   _getUserTypeIconName(t) {
-    return t === "Patient" ? "user": (t === "Staff" ? "user md" : null);
+    return t === "Patient" ? "user" : (t === "Staff" ? "user md" : null);
   }
 
   _isEmptyUserObj(user) {
@@ -117,7 +114,7 @@ class Calendar extends Component {
         negative
         onDismiss={this.handleErrorDismiss}>
         <Message.Header>There was some errors with your submission</Message.Header>
-        <p>{ errorMessage.message }</p>
+        <p>{errorMessage.message}</p>
       </Message>
     )
   }
@@ -131,29 +128,35 @@ class Calendar extends Component {
    * @return {Object}             [CSS style object]
    */
   eventStyleGetter(event, start, end, isSelected) {
-    const { patient_category } = event;
-    const categoryIdx = event && event.patient_category > 0 ? event.patient_category : 0;
-    const backgroundColor = CATEGORY_COLOR_ARRAY[categoryIdx];
-    const fontColor = categoryIdx === 1 || categoryIdx === 2 ? "#000000" : "#fff";
+    const { type_of_therapy } = event;
+    const fontColor = "#fff";
+    let backgroundColor = TherapyTypeColour.DEFAULT;
+
+    if (type_of_therapy) {
+      // NOTE: No need for iterating through keys if computed property names can be done in enums.js
+      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#Computed_property_names
+      const typeKey = Object.keys(TherapyType).find(key => TherapyType[key] === type_of_therapy);
+      backgroundColor = TherapyTypeColour[typeKey];
+    }
 
     const style = {
       backgroundColor: backgroundColor,
-      borderRadius: '0px',
       color: fontColor,
       border: `1px solid ${backgroundColor}`,
       borderRadius: '5px'
     };
+
     return { style: style };
   }
 
   render() {
     const today = moment().toDate();
     const { isCalendarPopupOpen } = this.state;
-    const { errorMessage, events, selectedUser, patientsStaffs, currentUser} = this.props;
+    const { errorMessage, events, selectedUser, patientsStaffs, currentUser } = this.props;
 
     if (this._isEmptyUserObj(selectedUser)) {
       return (
-        <Grid.Column className="calendarAppointmentContainer" width={MAIN_CALENDAR_COL_WIDTH}>
+        <Grid.Column className="calendarAppointmentContainer">
           <Container className="calendarPlaceholder">
             <PlaceholderImg className="placeholderImage" />
             <p id="placeholderText">
@@ -165,8 +168,8 @@ class Calendar extends Component {
     }
     // If selected user exists with expected fields, show calendar.
     return (
-      <Grid.Column className="calendarAppointmentContainer" width={MAIN_CALENDAR_COL_WIDTH}>
-        { errorMessage.status ? this.renderErrorMessage(errorMessage) : null }
+      <Grid.Column className="calendarAppointmentContainer" >
+        {errorMessage.status ? this.renderErrorMessage(errorMessage) : null}
         <Grid.Row>
           <Header className="calendarUser userName"> {this._getSelectedUserName(selectedUser)} </Header>
         </Grid.Row>
@@ -181,28 +184,28 @@ class Calendar extends Component {
           <BigCalendar
             className="appointmentCalendar"
             selectable
-            popup={ true }
-            localizer={ localizer }
-            events={ this.parseEventsToCalendarEvents(events) }
+            popup={true}
+            localizer={localizer}
+            events={this.parseEventsToCalendarEvents(events)}
             defaultView={BigCalendar.Views.WORK_WEEK}
-            defaultDate={ today }
-            views={ [BigCalendar.Views.DAY, BigCalendar.Views.WORK_WEEK, BigCalendar.Views.MONTH] }
-            min={ appointmentStartTime }
-            max={ appointmentEndTime }
+            defaultDate={today}
+            views={[BigCalendar.Views.DAY, BigCalendar.Views.WORK_WEEK, BigCalendar.Views.MONTH]}
+            min={appointmentStartTime}
+            max={appointmentEndTime}
             onSelectEvent={(e) => this.toggleAddModal(e, true)}
             onSelectSlot={(e) => this.toggleAddModal(e, false)}
-            components={ { toolbar: CalendarCustomToolbar } }
-            eventPropGetter={ this.eventStyleGetter }
+            components={{ toolbar: CalendarCustomToolbar }}
+            eventPropGetter={this.eventStyleGetter}
           />
         </Grid.Row>
 
         {currentUser && currentUser.type === "Administrator" && isCalendarPopupOpen ?
           <CalendarPopup
-            isOpen={ isCalendarPopupOpen }
-            onClose={ this.toggleAddModal }
-            event={ this.state.selectedEvent }
-            patientsStaffs={ patientsStaffs }
-            selectedUser={ selectedUser }
+            isOpen={isCalendarPopupOpen}
+            onClose={this.toggleAddModal}
+            event={this.state.selectedEvent}
+            patientsStaffs={patientsStaffs}
+            selectedUser={selectedUser}
           />
           : null
         }

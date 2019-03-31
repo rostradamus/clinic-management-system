@@ -1,5 +1,6 @@
 .calendarSideBarContainer .row.calendarSideBarRow .button.calendarSideBarButton {
-  width: 155px;
-  min-width: 155px;
-  margin: 0 0 1rem 0;
+  width: 90%;
+  min-width: 139px;
+  font-size: 0.9em;
+  margin: 0 0 1rem 1rem;
 }

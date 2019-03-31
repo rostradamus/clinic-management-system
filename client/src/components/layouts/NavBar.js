@@ -4,7 +4,7 @@ import { Link, withRouter } from "react-router-dom";
 import { Menu, Dropdown, Icon } from "semantic-ui-react";
 import { ReactComponent as Logo } from "assets/logo.svg";
 import { AuthAction, UserAction } from "actions";
-import { UserType, MenuTitle } from "../../enums";
+import { UserType, MenuTitle } from "enums";
 import '../../css/navBar.css';
 
 const menuItems = [

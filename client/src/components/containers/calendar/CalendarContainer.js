@@ -28,7 +28,7 @@ class CalendarContainer extends Component {
   render() {
     const { errorMessage, events, selectedUser, patientsStaffs, currentUser} = this.props;
     return (
-      <Grid className="calendarContainer">
+      <Grid className="calendarContainer" columns='equal'>
         <Grid.Row>
           <CalendarSideBar
             selectedUser={ selectedUser }

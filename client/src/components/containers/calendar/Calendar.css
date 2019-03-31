@@ -1,6 +1,7 @@
 /* Calendar Container */
 .ui.grid.calendarContainer .appointmentCalendar {
-  height: 48rem;
+  padding-right: 3rem;
+  height: 46rem;
 }
 
 .ui.grid.calendarContainer .calendarPlaceholder {
@@ -8,7 +9,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 58rem;
+  height: 55rem;
   box-shadow: none;
   border: none;
 }
@@ -35,27 +36,18 @@
   text-align: center;
 }
 
+.rbc-toolbar-label {
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
 @media print {
   .non-printable {
     display: none !important;
   }
 }
+
 /* Calendar width css*/
 .ui.grid.calendarContainer {
-  min-width: 750px;
-  height: 100%;
+  min-width: 900px;
 }
-
-.ui.grid.calendarContainer > div.row > .center.aligned.three.wide.column.non-printable.calendarSideBarContainer {
-  padding-left: 0;
-}
-
-.ui.grid.calendarContainer > div.row .thirteen.wide.column.calendarAppointmentContainer {
-  padding-left: 1rem;
-  padding-right: 2.5rem;
-}
-
-
-
-
-
