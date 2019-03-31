@@ -387,6 +387,7 @@ class CalendarPopup extends Component {
         <Form.Field error={ !mStart.isValid() || startTimeError } >
           <label>Start Time *</label>
           <TimeInput
+            closable={ true }
             readOnly
             name="start"
             placeholder="Start"
@@ -405,6 +406,7 @@ class CalendarPopup extends Component {
         <Form.Field error={ !mEnd.isValid() || endTimeError } >
           <label>End Time *</label>
           <TimeInput
+            closable={ true }
             readOnly
             name="end"
             placeholder="End"
