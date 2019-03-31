@@ -75,6 +75,7 @@ routes.get("/category/:category_type", async (req, res) => {
   }
 });
 
+//TODO:: This function is currently not being used.
 routes.get("/:user_id", async (req, res) => {
   try {
     const patientInfo = await reportManager.getPatientInfoFromUserId(req.params.user_id);
