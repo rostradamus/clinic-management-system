@@ -2,10 +2,12 @@ import React, { Component } from "react";
 import { Button, Header, Modal, Container, Grid, Form, Label, Table } from "semantic-ui-react";
 import { DateInput } from "semantic-ui-calendar-react";
 import { IndividualReportStatistics } from "components/containers/report";
+import { PrintReport } from "components/containers/printTemplate";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import moment from "moment";
 import "./IndividualReportPopup.css";
+
 
 moment.locale("en");
 const REPORT_CONST = {
@@ -41,7 +43,6 @@ class IndividualReportPopup extends Component {
 
   constructor(props) {
     super(props);
-
     const recordData = props.popupInfo.recordDatas[0];
     const filterEndDate = recordData.dischargeDate ?
       moment(recordData.dischargeDate, "YYYY-MM-DD").format("YYYY-MM-DD") :
@@ -50,10 +51,12 @@ class IndividualReportPopup extends Component {
     this.individualReportStatistics = new IndividualReportStatistics(recordData.appointments);
 
     this.state = {
+      printView: false,
       filterStartDate: moment(recordData.admissionDate, "YYYY-MM-DD").format("YYYY-MM-DD"),
       filterEndDate: filterEndDate
     };
 
+    this.handlePrintState = this.handlePrintState.bind(this);
     this._handleFilterDateChange = this._handleFilterDateChange.bind(this);
     this._renderStastics = this._renderStastics.bind(this);
     this._renderDateFilter = this._renderDateFilter.bind(this);
@@ -74,7 +77,11 @@ class IndividualReportPopup extends Component {
   }
 
   _print() {
-    alert("Not yet implemented");
+    window.print(window);
+  }
+
+  handlePrintState() {
+    this.setState({printView: !this.state.printView});
   }
 
   _handleFilterDateChange(event, { value }, key) {
@@ -93,10 +100,10 @@ class IndividualReportPopup extends Component {
   }
 
   _renderButtons() {
-    return (
-      <Modal.Actions className="individualReportActionContainer">
-        <Button primary className="btn_pu" onClick={this._print}>Print</Button>
-        <Button className="btn_pu" onClick={this.props.onClose}>Close</Button>
+    return(
+      <Modal.Actions className="individualReportActionContainer non-printable ">
+        <Button primary className="btn_pu" onClick={ this._print }>Print</Button>
+        <Button className="btn_pu" onClick={ this.props.onClose }>Close</Button>
       </Modal.Actions>
     )
   }
@@ -181,8 +188,8 @@ class IndividualReportPopup extends Component {
   }
 
   _renderStastics(stats) {
-    return (
-      <Container className="patientReportContentContainer">
+    return(
+      <Container className="patientReportContentContainer non-printable">
         <Header className="patientReportModalContentHeader">
           Therapy Intensity Statistics (in Minutes)
         </Header>
@@ -230,7 +237,7 @@ class IndividualReportPopup extends Component {
     const yAxis = { yAxis: { min: 0, title: { text: "Minutes" } } };
     const chartOptions = Object.assign({ ...defaultChartOptions("minutes") }, { ...series }, { ...yAxis });
     return (
-      <Container className="patientReportContentContainer">
+      <Container className="patientReportContentContainer non-printable">
         <Header className="patientReportModalContentHeader">Median Therapy Intensity by Disciplines</Header>
         <HighchartsReact highcharts={Highcharts} options={chartOptions} />
       </Container>
@@ -255,7 +262,7 @@ class IndividualReportPopup extends Component {
     const yAxis = { yAxis: { min: 0, tickInterval: 1, title: { text: "Number of Sessions" } } };
     const chartOptions = Object.assign({ ...defaultChartOptions("times") }, { ...series }, { ...yAxis });
     return (
-      <Container className="patientReportContentContainer">
+      <Container className="patientReportContentContainer non-printable">
         <Header className="patientReportModalContentHeader">Number of Sessions Attended by Disciplines</Header>
         <HighchartsReact highcharts={Highcharts} options={chartOptions} />
       </Container>
@@ -279,7 +286,7 @@ class IndividualReportPopup extends Component {
     const yAxis = { yAxis: { min: 0, tickInterval: 1, title: { text: "Number of Sessions" } } };
     const chartOptions = Object.assign({ ...defaultChartOptions("times") }, { ...series }, { ...yAxis });
     return (
-      <Container className="patientReportContentContainer">
+      <Container className="patientReportContentContainer non-printable">
         <Header className="patientReportModalContentHeader">Number of Sessions Missed by Disciplines</Header>
         <HighchartsReact highcharts={Highcharts} options={chartOptions} />
       </Container>
@@ -288,10 +295,10 @@ class IndividualReportPopup extends Component {
 
   _renderStaffRows(map) {
     let rows = [];
-
+    let keyIdx = 0;
     map.forEach((type, name) => {
       rows.push(
-        <Table.Row>
+        <Table.Row key={keyIdx ++}>
           <Table.Cell>{name}</Table.Cell>
           <Table.Cell>{type}</Table.Cell>
         </Table.Row>
@@ -303,7 +310,7 @@ class IndividualReportPopup extends Component {
 
   _renderSupportStaffList({ staffNameTypeMap }) {
     return (
-      <Container className="patientReportContentContainer">
+      <Container className="patientReportContentContainer non-printable">
         <Header className="patientReportModalContentHeader">Support Personnel List</Header>
         <Table celled columns={2}>
           <Table.Header>
@@ -323,12 +330,11 @@ class IndividualReportPopup extends Component {
 
   render() {
     const { popupInfo, isOpen, onClose } = this.props;
-    const { filterStartDate, filterEndDate } = this.state;
+    const { filterStartDate, filterEndDate, printView } = this.state;
     const stats = this.individualReportStatistics.retrieveStatistics(filterStartDate, filterEndDate);
-
     return (
-      <Modal className="individualReportContainer" onClose={onClose} open={isOpen}>
-        <Modal.Header className="patientStatModalHeader">
+      <Modal className="individualReportContainer" onClose={ onClose } open={ isOpen }>
+        <Modal.Header className="patientStatModalHeader non-printable">
           <Grid>
             <Grid.Row className="patientStatModalRow">
               <Grid.Column width={10} className="patientStatModalColumn">
@@ -346,6 +352,12 @@ class IndividualReportPopup extends Component {
           {this._renderDidAttendHistogram(stats)}
           {this._renderDidNotAttendHistogram(stats)}
           {this._renderSupportStaffList(stats)}
+          <PrintReport
+            stats={ stats }
+            patientInfo={ popupInfo }
+            filterStartDate={ filterStartDate }
+            filterEndDate={ filterEndDate }
+          />
         </Modal.Content>
         {this._renderButtons()}
       </Modal>
