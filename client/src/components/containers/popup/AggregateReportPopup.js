@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Button, Header, Modal, Container, Form, Grid } from "semantic-ui-react";
 import { YearInput } from "semantic-ui-calendar-react";
 import { AggregateReportStatistics } from "components/containers/report";
+import { PrintReport } from "components/containers/printTemplate";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import moment from "moment";
@@ -59,7 +60,7 @@ class AggregateReportPopup extends Component {
   }
 
   _print() {
-    alert("Not yet implemented");
+    window.print(window);
   }
 
   _handleFilterDateChange(event, { value }) {
@@ -70,7 +71,7 @@ class AggregateReportPopup extends Component {
 
   _renderButtons() {
     return(
-      <Modal.Actions className="aggReportModalActionContainer">
+      <Modal.Actions className="aggReportModalActionContainer non-printable">
         <Button primary onClick={ this._print }>Print</Button>
         <Button  onClick={ this.props.onClose }>Close</Button>
       </Modal.Actions>
@@ -111,7 +112,7 @@ class AggregateReportPopup extends Component {
 
   _renderStastics(stats) {
     return(
-      <Container className="aggReportContentContainer">
+      <Container className="aggReportContentContainer non-printable">
         <Header className="aggReportModalContentHeader">Therapy Intensity Statistics (in Minutes)</Header>
         <Grid className="aggStatisticContainer">
           <Grid.Row className="aggStatisticRow">
@@ -158,7 +159,7 @@ class AggregateReportPopup extends Component {
     const chartOptions = Object.assign({...defaultChartOptions("minutes")}, {...series}, {...yAxis});
 
     return (
-      <Container className="aggReportContentContainer">
+      <Container className="aggReportContentContainer non-printable">
         <Header className="aggReportModalContentHeader">Median Therapy Intensity by Disciplines</Header>
         <HighchartsReact highcharts={Highcharts} options={chartOptions} />
       </Container>
@@ -184,7 +185,7 @@ class AggregateReportPopup extends Component {
     const chartOptions = Object.assign({...defaultChartOptions("times")}, {...series}, {...yAxis});
 
     return (
-      <Container className="aggReportContentContainer">
+      <Container className="aggReportContentContainer non-printable">
         <Header className="aggReportModalContentHeader">Median Number of Sessions Attended by Disciplines</Header>
         <HighchartsReact highcharts={Highcharts} options={chartOptions} />
       </Container>
@@ -208,13 +209,13 @@ class AggregateReportPopup extends Component {
     const yAxis = { yAxis: { min: 0, tickInterval: 1, title: { text: "Number of Sessions" } } };
     const chartOptions = Object.assign({...defaultChartOptions("times")}, {...series}, {...yAxis});
     return (
-      <Container className="aggReportContentContainer">
+      <Container className="aggReportContentContainer non-printable">
         <Header className="aggReportModalContentHeader">Median Number of Sessions Missed by Disciplines</Header>
         <HighchartsReact highcharts={Highcharts} options={chartOptions} />
       </Container>
     );
   }
- 
+
   _calculateFiscalDates(date) {
     let year = moment(date).year();
     let start = moment().year(year).month("April").date(1);
@@ -239,7 +240,7 @@ class AggregateReportPopup extends Component {
 
     return (
       <Modal className="aggReportModalContainer" onClose={ this.props.onClose } open={ this.props.isOpen }>
-        <Modal.Header className={"aggModalHeaderContainer"}>
+        <Modal.Header className="aggModalHeaderContainer non-printable">
           <Grid>
             <Grid.Row>
               <Grid.Column width={13}>
@@ -256,6 +257,12 @@ class AggregateReportPopup extends Component {
           { this._renderMedianTherapyIntensityHistogram(stats) }
           { this._renderMedianNumberOfAttendedByDisciplines(stats) }
           { this._renderMedianNumberOfMissedByDisciplines(stats) }
+          <PrintReport
+            stats={ stats }
+            filterStartDate={ fiscalDates.start }
+            filterEndDate={ fiscalDates.end }
+            selectedCategory={ this.props.selectedCategory }
+          />
         </Modal.Content>
         { this._renderButtons() }
       </Modal>

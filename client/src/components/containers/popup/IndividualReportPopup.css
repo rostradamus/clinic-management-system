@@ -114,3 +114,15 @@ div.ui.modal > div.patientStatModalHeader.header {
 div.ui.modal > div.actions.individualReportActionContainer {
   padding: 0.75rem 1rem;
 }
+
+@media print {
+  .printReportTableContainer {
+    display: block;
+    width: auto;
+    height: auto;
+  }
+
+  .non-printable {
+    display: none !important;
+  }
+}
