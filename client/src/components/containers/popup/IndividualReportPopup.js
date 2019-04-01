@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Header, Modal, Container, Grid, Form, Divider } from "semantic-ui-react";
+import { Button, Header, Modal, Container, Grid, Form, Divider, Label } from "semantic-ui-react";
 import { DateInput } from "semantic-ui-calendar-react";
 import { IndividualReportStatistics } from "components/containers/report";
 import Highcharts from "highcharts";
@@ -134,12 +134,13 @@ class IndividualReportPopup extends Component {
   }
 
   _renderDateFilter() {
-    const { filterEndDate, filterStartDate } = this.state;
+    const { filterStartDate, filterEndDate } = this.state;
     const { admissionDate } = this.props.popupInfo.recordDatas[0];
+    const isTimeValid = moment(filterStartDate, "YYYY-MM-DD").isBefore(moment(filterEndDate, "YYYY-MM-DD"));
     return (
       <Form className="patientStatDateContainer">
         <Form.Group>
-          <Form.Input className="patientStatFormInput">
+          <Form.Input className="patientStatFormInput" error={!isTimeValid}>
             <label className="patientStatDateLabel">Start Date</label>
             <DateInput
               icon={false}
@@ -151,9 +152,13 @@ class IndividualReportPopup extends Component {
               value={ moment(filterStartDate, "YYYY-MM-DD").format("YYYY-MM-DD") }
               onChange={(e, data) => this._handleFilterDateChange(e, data, "filterStartDate") }
             />
+            {!isTimeValid ?
+              <Label basic color = 'red' pointing>Start time must be before end time</Label>
+              : null
+            }
           </Form.Input>
           <label className="statDateSeparator">-</label>
-          <Form.Input className="patientStatFormInput">
+          <Form.Input className="patientStatFormInput" error={!isTimeValid}>
             <label className="patientStatDateLabel">End Date</label>
             <DateInput
               icon={false}
@@ -164,6 +169,10 @@ class IndividualReportPopup extends Component {
               value={ moment(filterEndDate, "YYYY-MM-DD").format("YYYY-MM-DD") }
               onChange={(e, data) => this._handleFilterDateChange(e, data, "filterEndDate") }
             />
+            {!isTimeValid ?
+              <Label basic color = 'red' pointing>End time must be after start time</Label>
+              : null
+            }
           </Form.Input>
         </Form.Group>
       </Form>
