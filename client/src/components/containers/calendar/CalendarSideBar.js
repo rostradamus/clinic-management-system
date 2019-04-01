@@ -46,13 +46,13 @@ class CalendarSideBar extends Component {
     const { isCalendarPopupOpen, isSearchOpen } = this.state;
     const { selectedUser, patientsStaffs, currentUser} = this.props;
     return(
-      <Grid.Column 
+      <Grid.Column
       className="non-printable calendarSideBarContainer"
-      widescreen={1}
+      widescreen={2}
       largeScreen={2}
       computer={3}
       tablet={4}
-      mobile={4} 
+      mobile={4}
       textAlign="center">
         { currentUser && currentUser.type === "Administrator" ?
           <Grid.Row className="calendarSideBarRow">
