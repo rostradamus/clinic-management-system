@@ -37,6 +37,10 @@ div.ui.scrolling.modal.transition.visible.active.individualReportContainer {
   margin: 0;
 }
 
+.patientStatModalRow .statDateFilterColumn .ui.form.patientStatDateContainer .fields .ui.input .ui.red.pointing.basic.label {
+  width: 8rem;
+}
+
 .patientStatDateContainer .patientStatFormInput .input div .patientStateDateInput > .ui.input > i.calendar.icon {
   display: none;
 }
