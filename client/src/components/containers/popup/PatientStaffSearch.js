@@ -32,34 +32,29 @@ class PatientStaffSearch extends Component {
 
   _handleMenuItemClick(event, data) {
     const { patientsStaffs } = this.props;
-    const { sortDirection, sortKeys } = this.state;
-    const filteredItems = this._getTypeFilteredItems(patientsStaffs, data.name);
+    const { sortDirection, sortKeys, searchText } = this.state;
 
     this.setState({
       filter: data.name,
-      filteredItems: this._getSortedItems(filteredItems, sortDirection, sortKeys)
+      filteredItems: this._getFilterdAndSortedItems(patientsStaffs, sortDirection, sortKeys, data.name, searchText)
     });
   }
 
   _handleSearchInputChange(event, { value }) {
     const { patientsStaffs } = this.props;
-    const { filter, sortDirection, sortKeys } = this.state;
-    const filteredItems = this._getTypeFilteredItems(patientsStaffs, filter).filter(user => {
-      const fullName = `${user.first_name} ${user.last_name}`;
-      return fullName.toLowerCase().includes(value.toLowerCase());
-    });
-
+    const { sortDirection, sortKeys, filter } = this.state;
     this.setState({
       searchText: value,
-      filteredItems: this._getSortedItems(filteredItems, sortDirection, sortKeys)
+      filteredItems: this._getFilterdAndSortedItems(patientsStaffs, sortDirection, sortKeys, filter, value)
     });
   }
 
   handleSort(keys) {
-    const { filteredItems, sortDirection } = this.state;
+    const { patientsStaffs } = this.props;
+    const { sortDirection, filter, searchText } = this.state;
     const newDirection = sortDirection === 1 ? -1 : 1;
     this.setState({
-      filteredItems: this._getSortedItems(filteredItems, newDirection, keys),
+      filteredItems: this._getFilterdAndSortedItems(patientsStaffs, newDirection, keys, filter, searchText),
       sortDirection: newDirection,
       sortKeys: keys
     });
@@ -70,11 +65,20 @@ class PatientStaffSearch extends Component {
     this.props.onClose();
   }
 
+  _getFilterdAndSortedItems(arr, dir, keys, filter, searchText) {
+    const filteredItems = this._getSearchTextFilteredItems(this._getTypeFilteredItems(arr, filter), searchText);
+    return this._getSortedItems(filteredItems, dir, keys);
+  };
+
   _getTypeFilteredItems(arr, filter) {
-    if (filter === "patient" || filter === "staff") {
-      return arr.filter(user => user.type === USER_TYPE_MAP[filter]);
-    }
-    return arr;
+    return (filter === "patient" || filter === "staff") ? arr.filter(user => user.type === USER_TYPE_MAP[filter]) : arr;
+  }
+
+  _getSearchTextFilteredItems(arr, searchText) {
+    return arr.filter(item => {
+      const fullName = `${item.first_name} ${item.last_name}`;
+      return fullName.toLowerCase().includes(searchText.toLowerCase());
+    });
   }
 
   _getSortedItems(arr, dir, keys) {

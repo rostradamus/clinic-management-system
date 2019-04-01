@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { isEqual } from 'lodash';
-import { Container, Button, Modal, Form, Select, Radio, Confirm, Label } from 'semantic-ui-react';
+import { Container, Button, Modal, Form, Select, Confirm, Label } from 'semantic-ui-react';
 import { DateInput, TimeInput } from 'semantic-ui-calendar-react';
 import { CalendarAction } from 'actions';
 import { SearchInput } from 'components/containers/search';
@@ -38,11 +38,6 @@ const POPUP_STATE_CONST = {
   start: "start",
   end: "end",
   repeat: "repeat"
-};
-
-const POPUP_ERROR_CONST = {
-  start: "startTimeError",
-  end: "endTimeError"
 };
 
 class CalendarPopup extends Component {
@@ -160,7 +155,8 @@ class CalendarPopup extends Component {
       if (timeError) {
         this.setState({
           [key]: appointmentTime.toDate(),
-          [POPUP_ERROR_CONST[key]]: timeError
+          startTimeError: true,
+          endTimeError: true
         });
       } else {
         this.setState({
@@ -371,6 +367,7 @@ class CalendarPopup extends Component {
         <Form.Field error={ !mStart.isValid() }>
           <label>Date *</label>
           <DateInput
+            readOnly
             dateFormat="MM-DD-YYYY"
             name="date"
             placeholder="Date"
@@ -444,9 +441,9 @@ class CalendarPopup extends Component {
     const {isAttend} = this.state;
     return(
       <Form.Field>
-        <Radio
+        <label>{ isAttend ? "Patient attended" : "Patient did not attend" }</label>
+        <Form.Radio
           toggle
-          label={ isAttend ? "Patient attended" : "Patient did not attend" }
           onChange={ this._handleAttendanceChange }
           checked={ isAttend }
         />
@@ -462,7 +459,6 @@ class CalendarPopup extends Component {
   _renderTypeOfTherapy() {
     const { therapyType } = this.state;
     return(
-      <Container>
         <Form.Field
           error = { therapyType === "" }
           control={ Select }
@@ -470,12 +466,12 @@ class CalendarPopup extends Component {
           label=" Therapy Type *"
           onChange={ this._handleTherapyTypeChange }
           options={ THERAPY_TYPE_CONST }
-        />
-        {therapyType === "" ?
-          <Label basic color = 'red' pointing> Please select a therapy type.</Label>
-          : null
-        }
-      </Container>
+        >
+          {therapyType === "" ?
+            <Label basic color = 'red' pointing> Please select a therapy type.</Label>
+            : null
+          }
+        </Form.Field>
     );
   }
 
