@@ -74,7 +74,9 @@ class CalendarPopup extends Component {
     this._handleTimeChange = this._handleTimeChange.bind(this);
     this._handleDateChange = this._handleDateChange.bind(this);
     this._handleAttendanceChange = this._handleAttendanceChange.bind(this);
-    this._handleTherapyTypeChange = this._handleTherapyTypeChange.bind(this);
+
+    // Currently not in use leaving for warranty period.
+    // this._handleTherapyTypeChange = this._handleTherapyTypeChange.bind(this);
 
     // Helper functions
     this._updateTimeToCorrectDate = this._updateTimeToCorrectDate.bind(this);
@@ -172,13 +174,7 @@ class CalendarPopup extends Component {
     this.setState({ isAttend: !this.state.isAttend });
   }
 
-  _handleTherapyTypeChange(event, { value }) {
-    if(THERAPY_TYPE_CONST.some(element => element.value === value)) {
-      this.setState({ therapyType: value });
-    } else {
-      this.setState({ therapyType: "" })
-    }
-  }
+
 
   /**
    * @param  {[String]} key [Will be either "start" or "end"]
@@ -275,11 +271,11 @@ class CalendarPopup extends Component {
    * @return {Boolean}
    */
   _isButtonDisabled() {
-    const { patient, staff, start, end, startTimeError, endTimeError, therapyType } = this.state;
+    const { patient, staff, start, end, startTimeError, endTimeError } = this.state;
     const mStart = moment(start) , mEnd = moment(end);
     return !mStart.isValid() || !mEnd.isValid() || !mStart.isBefore(mEnd)
       || isEqual(patient, {}) || isEqual(staff, {}) ||
-      startTimeError || endTimeError || therapyType === "";
+      startTimeError || endTimeError;
   }
 
   handleCancellationPopup() {
@@ -450,6 +446,15 @@ class CalendarPopup extends Component {
       </Form.Field>
     )
   }
+  /** TODO: There functions are currently automated in the back end. Leaving it just incase of warranty period
+
+   _handleTherapyTypeChange(event, { value }) {
+    if(THERAPY_TYPE_CONST.some(element => element.value === value)) {
+      this.setState({ therapyType: value });
+    } else {
+      this.setState({ therapyType: "" })
+    }
+  }
 
   _getTherapyTypePlaceholder(value) {
     const therapy = THERAPY_TYPE_CONST.find(elem => elem.value === value);
@@ -474,6 +479,7 @@ class CalendarPopup extends Component {
         </Form.Field>
     );
   }
+  */
 
   _renderModalContent() {
     const { start, isUpdateAppointment } = this.state;
@@ -482,10 +488,10 @@ class CalendarPopup extends Component {
         { this._renderPatientForm() }
         { this._renderStaffForm() }
         { this._renderDateTimeForm() }
-        { this._renderTypeOfTherapy() }
         { moment(start).isBefore(moment()) && isUpdateAppointment ?
           this._renderAttendanceForm() : null
         }
+        { /**this._renderTypeOfTherapy()**/ }
         { /** this._renderRepeatHeaderForm() */}
       </Form>
     );

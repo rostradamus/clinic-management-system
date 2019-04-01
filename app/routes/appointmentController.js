@@ -1,6 +1,7 @@
 const routes = require('express').Router();
 const appointmentManager = require("@app/helpers/queryManager/appointment");
 const admissionRecordManager = require("@app/helpers/queryManager/admissionRecord");
+const staffManager = require("@app/helpers/queryManager/staff");
 // TODO: Remove as moment will be added as global variable.
 const moment = require('moment');
 const emailManager = require("@app/helpers/emailManager");
@@ -99,8 +100,9 @@ routes.get("/", async (req, res) => {
 
 // POST /api/appointments
 routes.post("/", async (req, res) => {
-  const {patient, staff, start, end, isCancelled, therapyType, isAttend} = req.body;
+  const {patient, staff, start, end, isCancelled, isAttend} = req.body;
   try {
+    const dbStaff = await staffManager.getStaffWithId(staff.id);
     const admissionRecords = await admissionRecordManager.getCurrentAdmissionRecords({patient_id : patient.id});
     if (admissionRecords.length === 0) {
       return res.status(400).json({
@@ -110,13 +112,13 @@ routes.post("/", async (req, res) => {
         }
       });
     }
-
+    const therapistType = dbStaff[0].Staff.therapist_type.replace(/\s/g,'');
     const data = {
       patient_id: patient.id,
       staff_id: staff.id,
       record_id: admissionRecords[0].id,
       patient_category: admissionRecords[0].patient_category,
-      type_of_therapy: therapyType,
+      type_of_therapy: therapistType,
       start_date: moment(start, "YYYY-MM-DDTHH:mm").format("YYYY-MM-DD"),
       start_time: moment(start, "YYYY-MM-DDTHH:mm").format("HH:mm:ss"),
       end_time: moment(end, "YYYY-MM-DDTHH:mm").format("HH:mm:ss"),
@@ -175,12 +177,14 @@ routes.post("/", async (req, res) => {
 
 // PUT /api/appointments/:appointment_id
 routes.put("/:appointment_id", async (req, res) => {
-  const {patient, staff, start, end, isCancelled, therapyType, isAttend} = req.body;
+  const {patient, staff, start, end, isCancelled, isAttend} = req.body;
   const { appointment_id } = req.params;
 
   try {
     const currentAppointment = await appointmentManager.getAppointmentWithId(appointment_id);
     const admissionRecords = await admissionRecordManager.getCurrentAdmissionRecords({patient_id : patient.id});
+    const dbStaff = await staffManager.getStaffWithId(staff.id);
+
     if (admissionRecords.length === 0) {
       return res.status(400).json({
         errorMessage: {
@@ -190,12 +194,13 @@ routes.put("/:appointment_id", async (req, res) => {
       });
     }
 
+    const therapistType = dbStaff[0].Staff.therapist_type.replace(/\s/g,'');
     const data = {
       patient_id: patient.id,
       staff_id: staff.id,
       record_id: admissionRecords[0].id,
       patient_category: admissionRecords[0].patient_category,
-      type_of_therapy: therapyType,
+      type_of_therapy: therapistType,
       start_date: moment(start, "YYYY-MM-DDTHH:mm").format("YYYY-MM-DD"),
       start_time: moment(start, "YYYY-MM-DDTHH:mm").format("HH:mm:ss"),
       end_time: moment(end, "YYYY-MM-DDTHH:mm").format("HH:mm:ss"),
