@@ -29,6 +29,8 @@ class IndividualReportStatistics {
   numberOfAttendedByDisciplines;
   numberOfMissedByDisciplines;
 
+  staffNameTypeMap;
+
   constructor(appointments) {
     this.appointments = appointments;
   }
@@ -41,7 +43,8 @@ class IndividualReportStatistics {
       totalMaximum: this.totalMaximum,
       medianTherapyIntensityByDisciplines: this.medianTherapyIntensityByDisciplines,
       numberOfAttendedByDisciplines: this.numberOfAttendedByDisciplines,
-      numberOfMissedByDisciplines: this.numberOfMissedByDisciplines
+      numberOfMissedByDisciplines: this.numberOfMissedByDisciplines,
+      staffNameTypeMap: this.staffNameTypeMap
     };
   }
 
@@ -56,6 +59,8 @@ class IndividualReportStatistics {
       = this.numberOfAttendedByDisciplines
       = this.numberOfMissedByDisciplines
       = new Array(therapyTypesForReport.length).fill(0);
+
+    this.staffNameTypeMap = new Map();
   }
 
   isValidAppointment(appointment, start, end) {
@@ -87,6 +92,9 @@ class IndividualReportStatistics {
     this.appointments.forEach(appointment => {
       if (this.isValidAppointment(appointment, this.startDate, this.endDate)) {
         let type = appointment.therapyType;
+        let staffName = appointment.staffName;
+
+        this.staffNameTypeMap.set(staffName, type);
 
         if (appointment.isAttend) {
           let duration = appointment.duration;
@@ -146,6 +154,7 @@ class IndividualReportStatistics {
     this.endDate = moment(endDateStr, DATE_FORMAT);
     this.attendedSessions = new Map();
     this.missedSessions = new Map();
+    this.staffNameTypeMap = new Map();
     this.allAttendedDurations = [];
     this.totalSum = 0;
 

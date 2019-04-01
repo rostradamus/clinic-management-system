@@ -40,6 +40,7 @@ function groupByPatient(appointmentList) {
     let appointment = {};
 
     if (validateAppointmentDate(item.admission_date, item.discharge_date, item.start_date)) {
+      appointment.staffName = item.staff_name;
       appointment.appointmentId = item.appointment_id;
       appointment.startDate = item.start_date;
       appointment.endDate = item.end_date;

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Header, Modal, Container, Grid, Form, Divider, Label } from "semantic-ui-react";
+import { Button, Header, Modal, Container, Grid, Form, Label, Table } from "semantic-ui-react";
 import { DateInput } from "semantic-ui-calendar-react";
 import { IndividualReportStatistics } from "components/containers/report";
 import Highcharts from "highcharts";
@@ -20,7 +20,7 @@ const defaultChartOptions = point => {
     chart: { type: "column" },
     title: { text: "" },
     subtitle: { text: "" },
-    xAxis: { categories: ["PT", "PTRA", "OT", "OTRA", "SLP", "SLPA"], crosshair: true},
+    xAxis: { categories: ["PT", "PTRA", "OT", "OTRA", "SLP", "SLPA"], crosshair: true },
     tooltip: {
       headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
       pointFormat: `<tr><td style="color:{series.color};padding:0">{series.name}: </td><td style="padding:0"><b>{point.y:.f} ${point}</b></td></tr>`,
@@ -44,8 +44,8 @@ class IndividualReportPopup extends Component {
 
     const recordData = props.popupInfo.recordDatas[0];
     const filterEndDate = recordData.dischargeDate ?
-        moment(recordData.dischargeDate, "YYYY-MM-DD").format("YYYY-MM-DD") :
-        moment().format("YYYY-MM-DD");
+      moment(recordData.dischargeDate, "YYYY-MM-DD").format("YYYY-MM-DD") :
+      moment().format("YYYY-MM-DD");
 
     this.individualReportStatistics = new IndividualReportStatistics(recordData.appointments);
 
@@ -61,6 +61,7 @@ class IndividualReportPopup extends Component {
     this._renderTherapyIntensityHistogram = this._renderTherapyIntensityHistogram.bind(this);
     this._renderDidAttendHistogram = this._renderDidAttendHistogram.bind(this);
     this._renderDidNotAttendHistogram = this._renderDidNotAttendHistogram.bind(this);
+    this._renderSupportStaffList = this._renderSupportStaffList.bind(this);
   }
 
   componentDidMount() {
@@ -92,17 +93,17 @@ class IndividualReportPopup extends Component {
   }
 
   _renderButtons() {
-    return(
+    return (
       <Modal.Actions className="individualReportActionContainer">
-        <Button primary className="btn_pu" onClick={ this._print }>Print</Button>
-        <Button className="btn_pu" onClick={ this.props.onClose }>Close</Button>
+        <Button primary className="btn_pu" onClick={this._print}>Print</Button>
+        <Button className="btn_pu" onClick={this.props.onClose}>Close</Button>
       </Modal.Actions>
     )
   }
 
   _renderPatientSummaryHeader(popupInfo) {
     const recordData = popupInfo.recordDatas[0];
-    return(
+    return (
       <Container className="patientSummaryContainer">
         <Grid className="patientSummary">
           <Grid.Row className="patientDetailContainer">
@@ -118,14 +119,14 @@ class IndividualReportPopup extends Component {
           <Grid.Row className="patientDetailContainer">
             <Grid.Column width={3} className="patientDetailDescription">Category</Grid.Column>
             <Grid.Column width={13} className="patientDetailValue">
-              { recordData[REPORT_CONST.DIAGNOSIS_CATEGORY] }
+              {recordData[REPORT_CONST.DIAGNOSIS_CATEGORY]}
             </Grid.Column>
           </Grid.Row>
 
           <Grid.Row className="patientDetailContainer">
             <Grid.Column width={3} className="patientDetailDescription">Diagnosis</Grid.Column>
             <Grid.Column width={13} className="patientDetailValue">
-              { this._capitalizeDiagnosis(recordData[REPORT_CONST.DIAGNOSIS_NAME]) }
+              {this._capitalizeDiagnosis(recordData[REPORT_CONST.DIAGNOSIS_NAME])}
             </Grid.Column>
           </Grid.Row>
         </Grid>
@@ -148,12 +149,12 @@ class IndividualReportPopup extends Component {
               dateFormat="YYYY-MM-DD"
               name="date"
               placeholder="Date"
-              minDate={ moment(admissionDate, "YYYY-MM-DD").format("YYYY-MM-DD") }
-              value={ moment(filterStartDate, "YYYY-MM-DD").format("YYYY-MM-DD") }
-              onChange={(e, data) => this._handleFilterDateChange(e, data, "filterStartDate") }
+              minDate={moment(admissionDate, "YYYY-MM-DD").format("YYYY-MM-DD")}
+              value={moment(filterStartDate, "YYYY-MM-DD").format("YYYY-MM-DD")}
+              onChange={(e, data) => this._handleFilterDateChange(e, data, "filterStartDate")}
             />
             {!isTimeValid ?
-              <Label basic color = 'red' pointing>Start time must be before end time</Label>
+              <Label basic color='red' pointing>Start time must be before end time</Label>
               : null
             }
           </Form.Input>
@@ -166,11 +167,11 @@ class IndividualReportPopup extends Component {
               dateFormat="YYYY-MM-DD"
               name="date"
               placeholder="Date"
-              value={ moment(filterEndDate, "YYYY-MM-DD").format("YYYY-MM-DD") }
-              onChange={(e, data) => this._handleFilterDateChange(e, data, "filterEndDate") }
+              value={moment(filterEndDate, "YYYY-MM-DD").format("YYYY-MM-DD")}
+              onChange={(e, data) => this._handleFilterDateChange(e, data, "filterEndDate")}
             />
             {!isTimeValid ?
-              <Label basic color = 'red' pointing>End time must be after start time</Label>
+              <Label basic color='red' pointing>End time must be after start time</Label>
               : null
             }
           </Form.Input>
@@ -180,7 +181,7 @@ class IndividualReportPopup extends Component {
   }
 
   _renderStastics(stats) {
-    return(
+    return (
       <Container className="patientReportContentContainer">
         <Header className="patientReportModalContentHeader">
           Therapy Intensity Statistics (in Minutes)
@@ -188,22 +189,22 @@ class IndividualReportPopup extends Component {
         <Grid className="patientStatisticContainer">
           <Grid.Row className="patientStatisticRow">
             <Grid.Column width={4} className="patientStatisticColumn">
-              <p className="patientStatisticValue">{ stats.totalAverage }</p>
+              <p className="patientStatisticValue">{stats.totalAverage}</p>
               <p className="patientStatisticDescription">Average</p>
             </Grid.Column>
 
             <Grid.Column width={4} className="patientStatisticColumn">
-              <p className="patientStatisticValue">{ stats.totalMedian } </p>
+              <p className="patientStatisticValue">{stats.totalMedian} </p>
               <p className="patientStatisticDescription">Median</p>
             </Grid.Column>
 
             <Grid.Column width={4} className="patientStatisticColumn">
-              <p className="patientStatisticValue">{ stats.totalMaximum }</p>
+              <p className="patientStatisticValue">{stats.totalMaximum}</p>
               <p className="patientStatisticDescription">Maximum</p>
             </Grid.Column>
 
             <Grid.Column width={4} className="patientStatisticColumn">
-              <p className="patientStatisticValue">{ stats.totalMinimum }</p>
+              <p className="patientStatisticValue">{stats.totalMinimum}</p>
               <p className="patientStatisticDescription">Minimum</p>
             </Grid.Column>
           </Grid.Row>
@@ -212,7 +213,7 @@ class IndividualReportPopup extends Component {
     );
   }
 
-  _renderTherapyIntensityHistogram({medianTherapyIntensityByDisciplines}) {
+  _renderTherapyIntensityHistogram({ medianTherapyIntensityByDisciplines }) {
     const series = {
       series: [{
         showInLegend: false,
@@ -227,7 +228,7 @@ class IndividualReportPopup extends Component {
       }]
     };
     const yAxis = { yAxis: { min: 0, title: { text: "Minutes" } } };
-    const chartOptions = Object.assign({...defaultChartOptions("minutes")}, {...series}, {...yAxis});
+    const chartOptions = Object.assign({ ...defaultChartOptions("minutes") }, { ...series }, { ...yAxis });
     return (
       <Container className="patientReportContentContainer">
         <Header className="patientReportModalContentHeader">Median Therapy Intensity by Disciplines</Header>
@@ -252,7 +253,7 @@ class IndividualReportPopup extends Component {
     };
 
     const yAxis = { yAxis: { min: 0, tickInterval: 1, title: { text: "Number of Sessions" } } };
-    const chartOptions = Object.assign({...defaultChartOptions("times")}, {...series}, {...yAxis});
+    const chartOptions = Object.assign({ ...defaultChartOptions("times") }, { ...series }, { ...yAxis });
     return (
       <Container className="patientReportContentContainer">
         <Header className="patientReportModalContentHeader">Number of Sessions Attended by Disciplines</Header>
@@ -276,11 +277,46 @@ class IndividualReportPopup extends Component {
       }]
     };
     const yAxis = { yAxis: { min: 0, tickInterval: 1, title: { text: "Number of Sessions" } } };
-    const chartOptions = Object.assign({...defaultChartOptions("times")}, {...series}, {...yAxis});
+    const chartOptions = Object.assign({ ...defaultChartOptions("times") }, { ...series }, { ...yAxis });
     return (
       <Container className="patientReportContentContainer">
         <Header className="patientReportModalContentHeader">Number of Sessions Missed by Disciplines</Header>
         <HighchartsReact highcharts={Highcharts} options={chartOptions} />
+      </Container>
+    );
+  }
+
+  _renderStaffRows(map) {
+    let rows = [];
+
+    map.forEach((type, name) => {
+      rows.push(
+        <Table.Row>
+          <Table.Cell>{name}</Table.Cell>
+          <Table.Cell>{type}</Table.Cell>
+        </Table.Row>
+      )
+    });
+
+    return rows;
+  }
+
+  _renderSupportStaffList({ staffNameTypeMap }) {
+    return (
+      <Container className="patientReportContentContainer">
+        <Header className="patientReportModalContentHeader">Support Personnel List</Header>
+        <Table celled columns={2}>
+          <Table.Header>
+            <Table.Row>
+              <Table.HeaderCell>Therapist Name</Table.HeaderCell>
+              <Table.HeaderCell>Therapy Type</Table.HeaderCell>
+            </Table.Row>
+          </Table.Header>
+
+          <Table.Body>
+            {this._renderStaffRows(staffNameTypeMap)}
+          </Table.Body>
+        </Table>
       </Container>
     );
   }
@@ -291,26 +327,27 @@ class IndividualReportPopup extends Component {
     const stats = this.individualReportStatistics.retrieveStatistics(filterStartDate, filterEndDate);
 
     return (
-      <Modal className="individualReportContainer" onClose={ onClose } open={ isOpen }>
+      <Modal className="individualReportContainer" onClose={onClose} open={isOpen}>
         <Modal.Header className="patientStatModalHeader">
           <Grid>
             <Grid.Row className="patientStatModalRow">
               <Grid.Column width={10} className="patientStatModalColumn">
-                { this._renderPatientSummaryHeader(popupInfo) }
+                {this._renderPatientSummaryHeader(popupInfo)}
               </Grid.Column>
               <Grid.Column width={6} className="statDateFilterColumn patientStatModalColumn">
-                { this._renderDateFilter() }
+                {this._renderDateFilter()}
               </Grid.Column>
             </Grid.Row>
           </Grid>
         </Modal.Header>
         <Modal.Content className="patientContentContainer" scrolling>
-          { this._renderStastics(stats) }
-          { this._renderTherapyIntensityHistogram(stats) }
-          { this._renderDidAttendHistogram(stats) }
-          { this._renderDidNotAttendHistogram(stats) }
+          {this._renderStastics(stats)}
+          {this._renderTherapyIntensityHistogram(stats)}
+          {this._renderDidAttendHistogram(stats)}
+          {this._renderDidNotAttendHistogram(stats)}
+          {this._renderSupportStaffList(stats)}
         </Modal.Content>
-        { this._renderButtons() }
+        {this._renderButtons()}
       </Modal>
     );
   }
