@@ -4,8 +4,10 @@ import { withRouter } from "react-router-dom";
 import { AuthAction } from 'actions';
 import { isEmpty } from "lodash";
 import { bindActionCreators } from 'redux';
-import { Form, Button, Segment, Label } from "semantic-ui-react";
+import { Form, Button, Segment, Label, Image } from "semantic-ui-react";
 import { ReactComponent as Logo } from "assets/logo.svg";
+import aprilfoolsbg from "assets/aprilfoolsbg.png";
+import jerry from "assets/jerry.jpeg";
 import "./LoginForm.css";
 
 class LoginForm extends Component {
@@ -52,7 +54,7 @@ class LoginForm extends Component {
       return null;
     return (
       <Label basic color='red' pointing>
-        { this.props.err.message }
+        {this.props.err.message}
       </Label>
     );
   }
@@ -63,9 +65,12 @@ class LoginForm extends Component {
 
   render() {
     return (
-      <div className="loginFormBackground">
+      // <div className="loginFormBackground">
+      <div className="loginFormBackground" style={{ backgroundImage: `url(${aprilfoolsbg})` }}>
         <div className="loginFormWrapper">
-          <Logo className="loginLogo" />
+          {/* <Logo className="loginLogo" /> */}
+          <Image className="floating" src={jerry} />
+
           <Segment className="centerLoginSegment">
             <Form onSubmit={this.handleSubmit} className="loginForm" >
               <Form.Field className="loginField">
@@ -77,7 +82,7 @@ class LoginForm extends Component {
                   value={this.state.username}
                   onChange={this.handleInputChange}
                   style={{ border: "none", padding: "0", height: "50px" }} />
-                { this.handleLoginError("username") }
+                {this.handleLoginError("username")}
               </Form.Field>
 
               <Form.Field className="loginField">
@@ -89,9 +94,12 @@ class LoginForm extends Component {
                   value={this.state.password}
                   onChange={this.handleInputChange}
                   style={{ border: "none", padding: "0", height: "50px" }} />
-                { this.handleLoginError("password") }
+                {this.handleLoginError("password")}
               </Form.Field>
-              <Button primary fluid type="submit" className="loginButton">LOGIN</Button>
+              <Button primary fluid type="submit" className="loginButton">
+                HAPPY APRIL FOOL'S :)
+              {/* LOGIN */}
+              </Button>
             </Form>
           </Segment>
         </div>
