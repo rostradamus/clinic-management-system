@@ -42,7 +42,7 @@ NODE_PATH=src/
 2. On your .env file, add NODE_ENV value depending on which database you want to use.
 ```
 NODE_ENV=development
-``` 
+```
 for testing create .env.test file and add
 ```
 NODE_ENV=test
@@ -55,7 +55,7 @@ npm install
 4. Log in to your MySQL console and create databases with following command
 ```
 CREATE DATABASE schedule_system_development;
-CREATE DATABASE schedule_system_test;
+CREATE DATABASE database_cleaner;
 ```
 5. Run the following command
 ```
@@ -79,4 +79,8 @@ $ npm run server-dev
 $ cd client
 $ npm install
 $ npm run start
+```
+
+### Commands to run tests
+NODE_ENV=test npm run test
 ```
