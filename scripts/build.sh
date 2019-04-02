@@ -17,7 +17,7 @@ cd ./client
 rm -rf node_modules
 npm install
 echo "=============RUNNING FRONTEND BUILD JOB============="
-NODE_ENV=production npm run build &&
+NODE_ENV=production npm run build
 echo "=============DATABASE MIGRATION============="
 cd ../
 NODE_ENV=production node node_modules/db-migrate/bin/db-migrate up --verbose
