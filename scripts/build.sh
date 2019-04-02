@@ -5,10 +5,10 @@ npm -v
 echo "=============NPM VERSION============="
 node -v
 echo "=============RUNNING GIT CHECKOUT JOB============="
-git checkout master
+git checkout build-deploy-script
 echo "=============PULLING MOST RECENT HEAD============="
 git fetch
-git reset --hard origin/master
+git reset --hard origin/build-deploy-script
 echo "=============RUNNING BACKEND LIBRARY IMPORT JOB============="
 rm -rf node_modules
 NODE_ENV=production npm install
