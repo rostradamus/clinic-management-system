@@ -19,7 +19,7 @@ app.use(morgan('dev'));
 app.use(
   cookieSession({
     name: "session",
-    maxAge: 1 * 1 * 60 * 60 * 1000,
+    maxAge: 1 * 1 * 3 * 60 * 1000,
     keys: [process.env.COOKIE_SESSION_KEY]
   })
 );
