@@ -11,9 +11,9 @@ class UserTable extends Component {
   _renderTableRow(user) {
     return (
       <Table.Row
-        key={ user.id }
-        onClick={ () =>
-          this.props.dispatch(UserAction.openUserPopup(user)) }>
+        key={user.id}
+        onClick={() =>
+          this.props.dispatch(UserAction.openUserPopup(user))}>
         <Table.Cell content={`${user.first_name} ${user.last_name}`} />
         <Table.Cell content={user.email} />
         <Table.Cell content={user.phone_number} />
@@ -26,7 +26,7 @@ class UserTable extends Component {
     const { sort, processedUsers } = this.props.user;
     const sortKey = sort.keys.join(" ");
     return (
-      <Table basic="very" columns={5} selectable sortable>
+      <Table basic="very" columns={5} selectable sortable style={{ marginBottom: "8rem" }}>
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell
@@ -53,7 +53,7 @@ class UserTable extends Component {
         </Table.Header>
 
         <Table.Body
-          children={ processedUsers.map(this._renderTableRow.bind(this)) } />
+          children={processedUsers.map(this._renderTableRow.bind(this))} />
 
 
       </Table>
@@ -78,7 +78,7 @@ const mapStateToProps = state => {
       return 0;
     });
   return {
-    user: Object.assign({...state.user}, {processedUsers})
+    user: Object.assign({ ...state.user }, { processedUsers })
   };
 };
 
