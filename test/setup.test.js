@@ -1,5 +1,9 @@
 require('module-alias/register');
 const server = require('@root/server', {bustCache: true} );
+const connection = require("@config/db/connection");
+global.db = connection.connectDatabase();
+let DatabaseCleaner = require('database-cleaner');
+global.databaseCleaner = new DatabaseCleaner("mysql");
 global.chai = require("chai");
 global.sinon = require("sinon");
 global.chaiHttp = require("chai-http");

@@ -4,14 +4,14 @@ const userManager = require('@app/helpers/queryManager/user');
 describe("userController Unit Tests", () => {
 
   describe("get '/api/users'", () => {
-    let getAllActiveUsersStub;
+    let getAllOngoingUsers;
 
     before(() => {
-      getAllActiveUsersStub = stub(userManager, "getAllActiveUsers").resolves(users);
+      getAllOngoingUsersStub = stub(userManager, "getAllOngoingUsers").resolves(users);
     });
 
     after(() => {
-      userManager.getAllActiveUsers.restore();
+      userManager.getAllOngoingUsers.restore();
     });
 
     it("expect res to be length 7 and status 200", async () => {
@@ -19,7 +19,7 @@ describe("userController Unit Tests", () => {
       expect(res.status).to.equal(200);
       expect(res.body.length).to.equal(users.length);
       expect(res.body).to.deep.equal(users);
-      expect(getAllActiveUsersStub.callCount).to.equal(1);
+      expect(getAllOngoingUsersStub.callCount).to.equal(1);
     });
   });
 
