@@ -14,10 +14,10 @@ rm -rf node_modules
 NODE_ENV=production npm install
 echo "=============RUNNING FRONTEND LIBRARY IMPORT JOB============="
 cd ./client
-pwd
 rm -rf node_modules
 npm install
-NODE_ENV=production npm run build
+echo "=============RUNNING FRONTEND BUILD JOB============="
+NODE_ENV=production npm run build &&
 echo "=============DATABASE MIGRATION============="
 cd ../
 NODE_ENV=production node node_modules/db-migrate/bin/db-migrate up --verbose
