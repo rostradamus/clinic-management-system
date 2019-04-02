@@ -14,7 +14,7 @@ const PATIENT_CAT = [
   { key: '3', text: '3', value: '3' }
 ];
 const PLACEHOLDER = {
-  mrn: '1 to 10 alphanumeric characters',
+  mrn: '1 to 10 digits',
   type_of_injury: 'ex. stroke',
 }
 
@@ -115,7 +115,7 @@ class CreatePatientPopup extends Component{
 
   handlemrnSubmit( ){
     const mrn = this.state.form.Patient['mrn'];
-    if(mrn.length > 0 && mrn.length <= 10 && /^[a-z0-9]+$/i.test(mrn)){
+    if(mrn.length > 0 && mrn.length <= 10 && /^[0-9]+$/i.test(mrn)){
       this.props.getPatient(mrn);
     }else{
       this.setState({error: {

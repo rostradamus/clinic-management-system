@@ -6,8 +6,6 @@ import { isEmpty } from "lodash";
 import { bindActionCreators } from 'redux';
 import { Form, Button, Segment, Label, Image } from "semantic-ui-react";
 import { ReactComponent as Logo } from "assets/logo.svg";
-import aprilfoolsbg from "assets/aprilfoolsbg.png";
-import jerry from "assets/jerry.jpeg";
 import "./LoginForm.css";
 
 class LoginForm extends Component {
@@ -65,12 +63,9 @@ class LoginForm extends Component {
 
   render() {
     return (
-      // <div className="loginFormBackground">
-      <div className="loginFormBackground" style={{ backgroundImage: `url(${aprilfoolsbg})` }}>
+      <div className="loginFormBackground">
         <div className="loginFormWrapper">
-          {/* <Logo className="loginLogo" /> */}
-          <Image className="floating" src={jerry} />
-
+          <Logo className="loginLogo" />
           <Segment className="centerLoginSegment">
             <Form onSubmit={this.handleSubmit} className="loginForm" >
               <Form.Field className="loginField">
@@ -97,8 +92,7 @@ class LoginForm extends Component {
                 {this.handleLoginError("password")}
               </Form.Field>
               <Button primary fluid type="submit" className="loginButton">
-                HAPPY APRIL FOOL'S :)
-              {/* LOGIN */}
+                LOGIN
               </Button>
             </Form>
           </Segment>

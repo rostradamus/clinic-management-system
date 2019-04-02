@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { isEmpty } from "lodash";
 import { UserAction } from "actions";
-import { Confirm, Modal, Button, Icon, Form, Label, Container} from "semantic-ui-react";
+import { Confirm, Modal, Button, Form, Label } from "semantic-ui-react";
 import "./UserPopup.css";
 
 const INITIAL_STATE = {
