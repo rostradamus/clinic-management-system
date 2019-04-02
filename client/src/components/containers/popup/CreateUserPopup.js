@@ -13,7 +13,7 @@ export const STATE_CONST = {
   phone_number:"Phone Number",
   date_of_birth:"Birth Date",
   address:"Address",
-  mrn:"MRN Number",
+  mrn:"Medical Record Number",
   type_of_injury:"Type of Injury",
   patient_type:"Type of Patient",
   admission_date:"Admission Date",
