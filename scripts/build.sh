@@ -15,7 +15,8 @@ NODE_ENV=production npm install
 cd ./client
 echo "=============RUNNING FRONTEND LIBRARY IMPORT JOB============="
 rm -rf node_modules
-npm install && NODE_ENV=production npm run build
+npm install
+NODE_ENV=production npm run build
 echo "=============RUNNING BUILD JOB============="
 cd ../
 echo "=============DATABASE MIGRATION============="
