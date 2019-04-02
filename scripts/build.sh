@@ -19,4 +19,5 @@ rm -rf node_modules
 npm install
 NODE_ENV=production npm run build
 echo "=============DATABASE MIGRATION============="
+cd ../
 NODE_ENV=production node node_modules/db-migrate/bin/db-migrate up --verbose
