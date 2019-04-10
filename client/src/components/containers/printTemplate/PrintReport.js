@@ -7,14 +7,16 @@ class PrintReport extends React.Component {
     const { medianTherapyIntensityByDisciplines,
       numberOfAttendedByDisciplines, numberOfMissedByDisciplines } = stats;
     return(
-      <div>
+      <div className="printReportTableContainer">
         { this.renderPatientInfo(patientInfo, filterStartDate, filterEndDate) }
         { this.renderTherapyIntensityStatisticInMin(stats) }
         { this.renderTherapyTable(medianTherapyIntensityByDisciplines, "Median Therapy Intensity by Disciplines in minutes") }
         { this.renderTherapyTable(numberOfAttendedByDisciplines, "Number of Sessions Attended by Disciplines") }
         { this.renderTherapyTable(numberOfMissedByDisciplines, "Number of Sessions Missed by Disciplines") }
+        <div class="pagebreak"></div>
+        { this.renderSupportStaffList(stats) }
       </div>
-    )
+    );
   }
 
   renderReport(stats, patientInfo, filterStartDate, filterEndDate, selectedCategory) {
@@ -30,8 +32,12 @@ class PrintReport extends React.Component {
       medianNumberOfAttendedByDisciplines, medianNumberOfMissedByDisciplines} = stats;
 
     return(
-      <div>
-        <h2>{`Category ${selectedCategory} Aggregate Report`}</h2>
+      <div className="printReportTableContainer">
+        <div className="printReportTableDiv">
+          <p className="printReportTableTitle categoryName">
+            {`Category ${selectedCategory} Aggregate Report`}
+          </p>
+        </div>
         { this.renderAggregateHeaderTable(selectedCategory, filterStartDate, filterEndDate) }
         { this.renderTherapyIntensityStatisticInMin(stats) }
         { this.renderTherapyTable(medianTherapyIntensityByDisciplines, "Median Therapy Intensity by Disciplines in minutes") }
@@ -43,7 +49,7 @@ class PrintReport extends React.Component {
 
   renderAggregateHeaderTable(selectedCategory, filterStartDate, filterEndDate) {
     return(
-      <div>
+      <div className="printReportTableDiv">
         <Table columns={2} celled className="printReportTable">
           <Table.Header>
             <Table.Row>
@@ -64,8 +70,8 @@ class PrintReport extends React.Component {
 
   renderTherapyTable(arr, title) {
     return (
-      <div>
-        <p>{title}</p>
+      <div className="printReportTableDiv">
+        <p className="printReportTableTitle">{title}</p>
         <Table columns={6} celled className="printReportTable">
           <Table.Header>
             <Table.Row>
@@ -94,8 +100,8 @@ class PrintReport extends React.Component {
 
   renderTherapyIntensityStatisticInMin(stats) {
     return(
-      <div>
-        <p>Therapy Intensity Statistics (in Minutes)</p>
+      <div className="printReportTableDiv">
+        <p className="printReportTableTitle">Therapy Intensity Statistics (in Minutes)</p>
         <Table columns={4} celled className="printReportTable">
           <Table.Header>
             <Table.Row>
@@ -120,12 +126,11 @@ class PrintReport extends React.Component {
 
   renderPatientInfo({patientName, patientId, recordDatas}, filterStartDate, filterEndDate) {
     return(
-      <div>
-        <p>Patient Summary</p>
-        <Table columns={6} celled className="printReportTable">
+      <div className="printReportTableDiv">
+        <p className="printReportTableTitle patientName">{ `Patient: ${patientName}` }</p>
+        <Table columns={5} celled className="printReportTable">
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell>{ patientName }</Table.HeaderCell>
               <Table.HeaderCell>MRN</Table.HeaderCell>
               <Table.HeaderCell>Patient Category</Table.HeaderCell>
               <Table.HeaderCell>Diagnosis</Table.HeaderCell>
@@ -135,7 +140,6 @@ class PrintReport extends React.Component {
           </Table.Header>
           <Table.Body>
             <Table.Row>
-              <Table.Cell></Table.Cell>
               <Table.Cell>{ patientId }</Table.Cell>
               <Table.Cell>{ recordDatas[0]["diagnosisCategory"] }</Table.Cell>
               <Table.Cell>{ recordDatas[0]["diagnosisName"] }</Table.Cell>
@@ -148,13 +152,44 @@ class PrintReport extends React.Component {
     );
   }
 
-  render() {
-    const { stats, patientInfo, filterStartDate, filterEndDate, selectedCategory } = this.props;
+  _renderStaffRows(map) {
+    let rows = [];
+    let keyIdx = 0;
+    map.forEach((type, name) => {
+      rows.push(
+        <Table.Row key={keyIdx ++}>
+          <Table.Cell>{name}</Table.Cell>
+          <Table.Cell>{type}</Table.Cell>
+        </Table.Row>
+      )
+    });
+
+    return rows;
+  }
+
+  renderSupportStaffList({ staffNameTypeMap }) {
     return (
-      <div className="printReportTableContainer">
-        { this.renderReport(stats, patientInfo, filterStartDate, filterEndDate, selectedCategory) }
+      <div className="printReportTableDiv supportPersonnelListContainer">
+        <p className="printReportTableTitle">Support Personnel List</p>
+        <Table celled columns={2} className="printReportTable">
+          <Table.Header>
+            <Table.Row>
+              <Table.HeaderCell>Therapist Name</Table.HeaderCell>
+              <Table.HeaderCell>Therapy Type</Table.HeaderCell>
+            </Table.Row>
+          </Table.Header>
+
+          <Table.Body>
+            {this._renderStaffRows(staffNameTypeMap)}
+          </Table.Body>
+        </Table>
       </div>
     );
+  }
+
+  render() {
+    const { stats, patientInfo, filterStartDate, filterEndDate, selectedCategory } = this.props;
+    return this.renderReport(stats, patientInfo, filterStartDate, filterEndDate, selectedCategory);
   }
 }
 

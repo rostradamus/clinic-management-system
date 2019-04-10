@@ -59,10 +59,30 @@ div.ui.modal > div.actions.aggReportModalActionContainer {
 
 @media print {
   .printReportTableContainer {
-    display: block;
+    display: block !important;
     width: auto;
     height: auto;
   }
+
+  .printReportTableDiv {
+    margin-bottom: 30px;
+    font-size: 1.25rem;
+  }
+
+  .printReportTableTitle {
+    font-size: 1.75rem;
+    font-weight: bold;
+  }
+
+  .printReportTableTitle.categoryName {
+    font-size: 2.25rem;
+  }
+
+  .ui.page.modals.dimmer.transition.visible.active {
+    display: none !important;
+    opacity: 0;
+  }
+
   .non-printable {
     display: none !important;
   }

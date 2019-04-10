@@ -151,6 +151,7 @@ class IndividualReportPopup extends Component {
           <Form.Input className="patientStatFormInput" error={!isTimeValid}>
             <label className="patientStatDateLabel">Start Date</label>
             <DateInput
+              readOnly
               icon={false}
               className="patientStateDateInput patientStatStartDate"
               dateFormat="YYYY-MM-DD"
@@ -169,6 +170,7 @@ class IndividualReportPopup extends Component {
           <Form.Input className="patientStatFormInput" error={!isTimeValid}>
             <label className="patientStatDateLabel">End Date</label>
             <DateInput
+              readOnly
               icon={false}
               className="patientStateDateInput patientStatEndDate"
               dateFormat="YYYY-MM-DD"
@@ -333,34 +335,36 @@ class IndividualReportPopup extends Component {
     const { filterStartDate, filterEndDate, printView } = this.state;
     const stats = this.individualReportStatistics.retrieveStatistics(filterStartDate, filterEndDate);
     return (
-      <Modal className="individualReportContainer" onClose={ onClose } open={ isOpen }>
-        <Modal.Header className="patientStatModalHeader non-printable">
-          <Grid>
-            <Grid.Row className="patientStatModalRow">
-              <Grid.Column width={10} className="patientStatModalColumn">
-                {this._renderPatientSummaryHeader(popupInfo)}
-              </Grid.Column>
-              <Grid.Column width={6} className="statDateFilterColumn patientStatModalColumn">
-                {this._renderDateFilter()}
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
-        </Modal.Header>
-        <Modal.Content className="patientContentContainer" scrolling>
-          {this._renderStastics(stats)}
-          {this._renderTherapyIntensityHistogram(stats)}
-          {this._renderDidAttendHistogram(stats)}
-          {this._renderDidNotAttendHistogram(stats)}
-          {this._renderSupportStaffList(stats)}
-          <PrintReport
-            stats={ stats }
-            patientInfo={ popupInfo }
-            filterStartDate={ filterStartDate }
-            filterEndDate={ filterEndDate }
-          />
-        </Modal.Content>
-        {this._renderButtons()}
-      </Modal>
+      <div>
+        <Modal className="individualReportContainer non-printable" onClose={ onClose } open={ isOpen }>
+          <Modal.Header className="patientStatModalHeader non-printable">
+            <Grid>
+              <Grid.Row className="patientStatModalRow">
+                <Grid.Column width={10} className="patientStatModalColumn">
+                  {this._renderPatientSummaryHeader(popupInfo)}
+                </Grid.Column>
+                <Grid.Column width={6} className="statDateFilterColumn patientStatModalColumn">
+                  {this._renderDateFilter()}
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
+          </Modal.Header>
+          <Modal.Content className="patientContentContainer" scrolling>
+            {this._renderStastics(stats)}
+            {this._renderTherapyIntensityHistogram(stats)}
+            {this._renderDidAttendHistogram(stats)}
+            {this._renderDidNotAttendHistogram(stats)}
+            {this._renderSupportStaffList(stats)}
+          </Modal.Content>
+          {this._renderButtons()}
+        </Modal>
+        <PrintReport
+          stats={ stats }
+          patientInfo={ popupInfo }
+          filterStartDate={ filterStartDate }
+          filterEndDate={ filterEndDate }
+        />
+      </div>
     );
   }
 }

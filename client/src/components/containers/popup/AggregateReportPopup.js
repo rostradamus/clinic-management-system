@@ -87,6 +87,7 @@ class AggregateReportPopup extends Component {
         <Form.Field className="aggReportFormField">
           <label className="aggReportFilterLabel">Select Fiscal Year</label>
           <YearInput
+            readOnly
             className="aggReportYearInput"
             icon={false}
             dateFormat="YYYY"
@@ -239,33 +240,35 @@ class AggregateReportPopup extends Component {
     const stats = this.aggregateReportStatistics.retrieveStatistics(fiscalDates.start, fiscalDates.end);
 
     return (
-      <Modal className="aggReportModalContainer" onClose={ this.props.onClose } open={ this.props.isOpen }>
-        <Modal.Header className="aggModalHeaderContainer non-printable">
-          <Grid>
-            <Grid.Row>
-              <Grid.Column width={13}>
-                { this._renderAggregateSummaryHeader() }
-              </Grid.Column>
-              <Grid.Column width={3}>
-                { this._renderDateFilter() }
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
-        </Modal.Header>
-        <Modal.Content className="aggModalContentContainer" scrolling>
-          { this._renderStastics(stats) }
-          { this._renderMedianTherapyIntensityHistogram(stats) }
-          { this._renderMedianNumberOfAttendedByDisciplines(stats) }
-          { this._renderMedianNumberOfMissedByDisciplines(stats) }
-          <PrintReport
-            stats={ stats }
-            filterStartDate={ fiscalDates.start }
-            filterEndDate={ fiscalDates.end }
-            selectedCategory={ this.props.selectedCategory }
-          />
-        </Modal.Content>
-        { this._renderButtons() }
-      </Modal>
+      <div>
+        <Modal className="aggReportModalContainer non-printable" onClose={ this.props.onClose } open={ this.props.isOpen }>
+          <Modal.Header className="aggModalHeaderContainer non-printable">
+            <Grid>
+              <Grid.Row>
+                <Grid.Column width={13}>
+                  { this._renderAggregateSummaryHeader() }
+                </Grid.Column>
+                <Grid.Column width={3}>
+                  { this._renderDateFilter() }
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
+          </Modal.Header>
+          <Modal.Content className="aggModalContentContainer" scrolling>
+            { this._renderStastics(stats) }
+            { this._renderMedianTherapyIntensityHistogram(stats) }
+            { this._renderMedianNumberOfAttendedByDisciplines(stats) }
+            { this._renderMedianNumberOfMissedByDisciplines(stats) }
+          </Modal.Content>
+          { this._renderButtons() }
+        </Modal>
+        <PrintReport
+          stats={ stats }
+          filterStartDate={ fiscalDates.start }
+          filterEndDate={ fiscalDates.end }
+          selectedCategory={ this.props.selectedCategory }
+        />
+      </div>
     );
   }
 }
