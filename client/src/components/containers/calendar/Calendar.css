@@ -42,6 +42,35 @@
 }
 
 @media print {
+  .rbc-event-label {
+    color: black !important;
+    font-size: 1rem;
+  }
+
+  .rbc-day-slot.rbc-time-column.rbc-now.rbc-today div.rbc-events-container {
+    margin-right: 0;
+  }
+
+  .rbc-event-content {
+    color: black !important;
+    font-size: 1.25rem;
+  }
+
+  .ui.equal.width.grid.calendarContainer {
+    width: 100%;
+    margin: 0;
+  }
+
+  .column.calendarAppointmentContainer {
+    padding: 0px;
+  }
+
+  .ui.grid.calendarContainer .appointmentCalendar {
+    height: 1100px;
+    width: 100%;
+    padding-right: 0;
+  }
+
   .non-printable {
     display: none !important;
   }

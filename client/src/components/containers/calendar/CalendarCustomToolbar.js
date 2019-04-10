@@ -9,14 +9,14 @@ class CustomToolbar extends Toolbar {
 
   render() {
     return (
-      <div className='rbc-toolbar'>
-        <div className="rbc-btn-group">
+      <div className="rbc-toolbar">
+        <div className="rbc-btn-group non-printable">
           <button type="button" onClick={() => this.navigate('PREV')}>{"<"}</button>
           <button type="button" onClick={() => this.navigate('TODAY')} >Today</button>
           <button type="button" onClick={() => this.navigate('NEXT')}>{">"}</button>
         </div>
         <span className="rbc-toolbar-label">{this.props.label}</span>
-        <div className="rbc-btn-group">
+        <div className="rbc-btn-group non-printable">
           <button type="button" onClick={this.view.bind(null, 'day')}>Day</button>
           <button type="button" onClick={this.view.bind(null, 'work_week')}>Work Week</button>
           <button type="button" onClick={this.view.bind(null, 'month')}>Month</button>
