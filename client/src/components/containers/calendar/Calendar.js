@@ -141,7 +141,7 @@ class Calendar extends Component {
 
     const style = {
       backgroundColor: backgroundColor,
-      color: fontColor,
+      // color: fontColor,
       border: `1px solid ${backgroundColor}`,
       borderRadius: '5px'
     };
@@ -174,7 +174,7 @@ class Calendar extends Component {
           <Header className="calendarUser userName"> {this._getSelectedUserName(selectedUser)} </Header>
         </Grid.Row>
 
-        <Grid.Row className="calendarUser userTypeRow">
+        <Grid.Row className="calendarUser userTypeRow non-printable">
           <Label basic color='black'>
             <Icon name={this._getUserTypeIconName(selectedUser.type)} /> {selectedUser.type}
           </Label>
