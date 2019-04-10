@@ -55,11 +55,11 @@ class ReportContainer extends Component {
 
     return (
       <Container className="reportContainer">
-        <Container className="reportSubContainer reportCategoryContainer">
+        <Container className="reportSubContainer reportCategoryContainer non-printable">
           <Header as='h1'>Aggregate Reports by Category</Header>
           {this._renderCategoryLabels()}
         </Container>
-        <Container className="reportSubContainer reportPatientListContainer">
+        <Container className="reportSubContainer reportPatientListContainer non-printable">
           <Header as='h1'>Individual Reports</Header>
           <Input
             onChange={this.handleSearchText.bind(this)}
