@@ -142,31 +142,47 @@ class CalendarPopup extends Component {
     });
   }
 
-  _handleTimeChange(event, key, { value }) {
-    const hhmm = value.split(":");
-    if (hhmm.length === 2) {
-      // const openTime = moment(this.state[key], "hh:mm:ss").hours(7).minutes(59).seconds(59);
-      // const closeTime = moment(this.state[key], "hh:mm:ss").hours(17).minutes(0).seconds(1);
-      const appointmentTime = moment(this.state[key])
-        .hours(parseInt(hhmm[0]))
-        .minutes(parseInt(hhmm[1]))
-        .seconds(0);
-
-      // if (!moment(appointmentTime, "hh:mm:ss").isBetween(openTime, closeTime)) return;
-      const timeError = this._validateTime(key, appointmentTime);
-      if (timeError) {
-        this.setState({
-          [key]: appointmentTime.toDate(),
-          startTimeError: true,
-          endTimeError: true
-        });
-      } else {
-        this.setState({
-          [key]: appointmentTime,
-          startTimeError: false,
-          endTimeError: false
-        });
+  /**
+   * Converts "hh:mm AM/PM" to 24 hour format
+   * @param  {String} value [time in 12 hour format with AM/PM ex: "2:00 PM"]
+   * @return {Object}       [properties hours: int, minutes: int]
+   */
+  _parseToTwentyFourHourFormat(value) {
+    const timeAMPM = value.split(" ");
+    const hhmm = timeAMPM[0].split(":");
+    if (timeAMPM[1] === "PM") {
+      return {
+        hours: (parseInt(hhmm[0]) + 12),
+        minutes: parseInt(hhmm[1])
       }
+    } else if(timeAMPM[1] === "AM") {
+      return {
+        hours: (parseInt(hhmm[0])),
+        minutes: parseInt(hhmm[1])
+      }
+    }
+  }
+
+  _handleTimeChange(event, key, { value }) {
+    const hhmm = this._parseToTwentyFourHourFormat(value);
+    const appointmentTime = moment(this.state[key])
+      .hours(hhmm.hours)
+      .minutes(hhmm.minutes)
+      .seconds(0);
+
+    const timeError = this._validateTime(key, appointmentTime);
+    if (timeError) {
+      this.setState({
+        [key]: appointmentTime.toDate(),
+        startTimeError: true,
+        endTimeError: true
+      });
+    } else {
+      this.setState({
+        [key]: appointmentTime.toDate(),
+        startTimeError: false,
+        endTimeError: false
+      });
     }
   }
 
@@ -380,11 +396,12 @@ class CalendarPopup extends Component {
         <Form.Field error={ !mStart.isValid() || startTimeError } >
           <label>Start Time *</label>
           <TimeInput
+            timeFormat={"AMPM"}
             closable={ true }
             readOnly
             name="start"
             placeholder="Start"
-            value={ mStart.format("HH:mm") }
+            value={ mStart.format("hh:mm A") }
             iconPosition="left"
             onChange={
               (e, data) => this._handleTimeChange(e, "start", data)
@@ -399,11 +416,12 @@ class CalendarPopup extends Component {
         <Form.Field error={ !mEnd.isValid() || endTimeError } >
           <label>End Time *</label>
           <TimeInput
+            timeFormat={"AMPM"}
             closable={ true }
             readOnly
             name="end"
             placeholder="End"
-            value={ mEnd.format("HH:mm") }
+            value={ mEnd.format("hh:mm A") }
             iconPosition="left"
             onChange={
               (e, data) => this._handleTimeChange(e, "end", data)
