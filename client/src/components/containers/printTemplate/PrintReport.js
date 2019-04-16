@@ -13,7 +13,7 @@ class PrintReport extends React.Component {
         { this.renderTherapyTable(medianTherapyIntensityByDisciplines, "Median Therapy Intensity by Disciplines in minutes") }
         { this.renderTherapyTable(numberOfAttendedByDisciplines, "Number of Sessions Attended by Disciplines") }
         { this.renderTherapyTable(numberOfMissedByDisciplines, "Number of Sessions Missed by Disciplines") }
-        <div class="pagebreak"></div>
+        <div className="pagebreak"></div>
         { this.renderSupportStaffList(stats) }
       </div>
     );

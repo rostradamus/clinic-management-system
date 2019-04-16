@@ -67,7 +67,7 @@ export default class CreateUserAction {
         payload: {}
       });
       try {
-        const res = await axios.post("/api/admins/", data);
+        const res = await axios.post("/api/admins", data);
         dispatch({
           type: CREATE_USER_ACTION_TYPE.ADMIN_CREATE_SUCCESS,
           payload: res.data
@@ -87,8 +87,9 @@ export default class CreateUserAction {
         type: CREATE_USER_ACTION_TYPE.STAFF_CREATE_REQUEST,
         payload: {}
       });
+      let res;
       try {
-        const res = await axios.post("/api/staffs/", data);
+        res = await axios.post("/api/staffs", data);
         dispatch({
           type: CREATE_USER_ACTION_TYPE.STAFF_CREATE_SUCCESS,
           payload: res.data
