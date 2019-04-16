@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { Label, Modal, Grid, Button, Select, Header, Input, Form, Container, Divider, Message} from "semantic-ui-react";
+import { Label, Modal, Grid, Button, Select, Header, Input,
+  Form, Container, Divider, Message, Confirm } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import * as moment from 'moment';
 import { UserAction, CreateUserAction } from 'actions';
@@ -14,6 +15,7 @@ class CreateStaffPopup extends Component{
   constructor(props) {
     super(props);
     this.initialState = {
+      isConfirming: false,
       form: {
         therapist_type: THERAPIST_TYPE[0].value,
         first_name: '',
@@ -78,10 +80,19 @@ class CreateStaffPopup extends Component{
   handleFinalValidation(event) {
     event.preventDefault();
     if(!this.validateForm()) return;
-    if(this.props.typeUser === 'Administrator'){
-      this.handleCreateAdmin();
-    }else this.handleCreateStaff();
+    this.setState({isConfirming: true});
+
   }
+
+  handleConfirm() {
+    if (this.props.typeUser === 'Administrator') {
+      this.handleCreateAdmin();
+    } else {
+      this.handleCreateStaff();
+    }
+    this.setState({isConfirming: false});
+  }
+
 
   handleCreateStaff() {
     const {therapist_type, ... User} = this.state.form;
@@ -259,6 +270,14 @@ class CreateStaffPopup extends Component{
         {!this.props.created && this.renderForm()}
         {this.props.created && this.renderFinal()}
         <Modal.Actions children={this.renderModalActionButton()}/>
+        <Confirm
+          id="create-staff-popup-confirm"
+          content={`Are you sure you want to create this ${this.props.typeUser.toLowerCase()}?`}
+          cancelButton="No"
+          confirmButton="Yes"
+          open={this.state.isConfirming}
+          onConfirm={ this.handleConfirm.bind(this) }
+          onCancel={ () => this.setState({isConfirming: false}) } />
       </Modal>
     );
   }

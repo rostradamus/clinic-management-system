@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { Label, Modal, Grid, Button, Select, Header, Input, Form, Container, Message } from "semantic-ui-react";
+import { Label, Modal, Grid, Button, Select, Header, Input,
+  Form, Container, Message, Confirm } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import * as moment from 'moment';
 import { UserAction, CreateUserAction } from 'actions';
@@ -22,6 +23,7 @@ class CreatePatientPopup extends Component {
   constructor(props) {
     super(props);
     this.initialState = {
+      isConfirming: false,
       form: {
         User: {
           type: 'Patient',
@@ -140,25 +142,31 @@ class CreatePatientPopup extends Component {
   }
 
   handleNewAdmissionSubmit(event) {
-    const admissionFields = ['type_of_injury', 'discharge_date', 'admission_date', 'patient_category'];
     event.preventDefault();
-    if (this.validateField(admissionFields)) {
-      if (this.props.exists) {
-        const admissionRecord = Object.assign(
-          {
-            admissionRecord: {
-              ...this.state.form.Admission_record,
-              patient_id: this.props.patient[0].User.id
-            }
-          });
-        this.props.createAdmissionRecord(admissionRecord)
-      } else {
-        const { User, Patient, Admission_record } = this.state.form;
-        this.props.createPatient({ User, Patient, Admission_record })
-          .then(() => this.props.getUsers())
-          .catch(() => "fail...");
-      }
+    const admissionFields = ['type_of_injury', 'discharge_date', 'admission_date', 'patient_category'];
+    if (!this.validateField(admissionFields))
+      return;
+    return this.setState({isConfirming: true});
+  }
+
+  handleConfirm() {
+    if (this.props.exists) {
+      const admissionRecord = Object.assign(
+        {
+          admissionRecord: {
+            ...this.state.form.Admission_record,
+            patient_id: this.props.patient[0].User.id
+          }
+        });
+      this.props.createAdmissionRecord(admissionRecord);
+
+    } else {
+      const { User, Patient, Admission_record } = this.state.form;
+      this.props.createPatient({ User, Patient, Admission_record })
+        .then(() =>  this.props.getUsers())
+        .catch(() => "fail...");
     }
+    this.setState({isConfirming: false});
   }
 
   handleNewAccountSubmit() {
@@ -421,9 +429,16 @@ class CreatePatientPopup extends Component {
         <Modal.Header>Patient</Modal.Header>
         {this.renderPage()}
         <Modal.Actions children={this.renderModalActionButton()} />
+        <Confirm
+          id="create-patient-popup-confirm"
+          open={this.state.isConfirming}
+          content="Are you sure you want to create this patient?"
+          confirmButton="Yes"
+          onConfirm={ this.handleConfirm.bind(this) }
+          cancelButton="No"
+          onCancel={ () => this.setState({isConfirming: false}) } />
       </Modal>
-
-    )
+    );
   }
 }
 
