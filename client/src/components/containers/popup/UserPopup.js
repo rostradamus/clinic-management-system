@@ -9,7 +9,8 @@ import "./UserPopup.css";
 
 const INITIAL_STATE = {
   open: false,
-  deleteOpen: false,
+  isConfirmingDelete: false,
+  isConfirmingEdit: false,
   user: {
     first_name: "",
     last_name: "",
@@ -28,7 +29,7 @@ const INITIAL_STATE = {
   }
 };
 
- const CONFIRM_CONTENT = {
+const CONFIRM_CONTENT = {
   Staff: "Are you sure you want to delete this staff?",
   Administrator: "Are you sure you want to delete this administrator?",
   Patient: "Are you sure you want to discharge this patient?"}
@@ -56,7 +57,7 @@ class UserPopup extends Component {
     }else this.setState({user:{...this.state.user, [name]: value},error:{...this.state.error, [name]: false}});
     }
 
-  _saveUser() {
+  handleConfirmEdit() {
     const {user} = this.state;
     if (!this._validateFields())
       return;
@@ -70,7 +71,7 @@ class UserPopup extends Component {
       .catch(() => alert("Fatal: This should never happen"));
   }
 
-  _deleteUser(data) {
+  handleConfirmDelete() {
     let deleteAction;
     const {user} = this.state;
     const {type} = this.state.user;
@@ -156,11 +157,6 @@ class UserPopup extends Component {
     this.setState(INITIAL_STATE);
   };
 
-  _deleteOpen = () => {
-    const {deleteOpen} = this.state;
-    this.setState({ deleteOpen: !deleteOpen })
-  };
-
   render() {
     const { first_name, last_name, email, password, cPassword,
       phone_number, type  } = this.state.user;
@@ -226,21 +222,34 @@ class UserPopup extends Component {
           </Form>
 
         </Modal.Content>
-          <Modal.Actions>
-            {!(this.props.user && this.props.user.id === this.props.current_user.id) &&
-              <Button negative onClick={this._deleteOpen}>{type === 'Patient' ?  'Discharge' : 'Delete'}</Button>}
-              <Confirm id="userPopup_confirm"
-                confirmButton={type === 'Patient' ?  'Discharge' : 'Delete'}
-                open={this.state.deleteOpen}
-                onCancel={this._deleteOpen}
-                content ={CONFIRM_CONTENT[type]}
-                onConfirm={() => this._deleteUser(this.state) }/>
-              <Button
-              primary
-              onClick={ () => this._saveUser() }>
-              Save
-            </Button>
+        <Modal.Actions>
+          {!(this.props.user && this.props.user.id === this.props.current_user.id) &&
+            <Button
+              negative
+              onClick={ () => this.setState({isConfirmingDelete: true}) }>
+              {type === 'Patient' ?  'Discharge' : 'Delete'}
+            </Button>}
+          <Button
+            primary
+            onClick={ () => this.setState({isConfirmingEdit: true}) }>
+            Save
+          </Button>
         </Modal.Actions>
+        <Confirm
+          id="user-popup-delete-confirm"
+          open={this.state.isConfirmingDelete}
+          content ={CONFIRM_CONTENT[type]}
+          confirmButton={type === 'Patient' ?  'Discharge' : 'Delete'}
+          onConfirm={ this.handleConfirmDelete.bind(this) }
+          onCancel={ () => this.setState({isConfirmingDelete: false}) } />
+        <Confirm
+          id="user-popup-edit-confirm"
+          open={this.state.isConfirmingEdit}
+          content={`Are you sure you want to edit this ${type.toLowerCase()}?`}
+          confirmButton="Yes"
+          onConfirm={ this.handleConfirmEdit.bind(this) }
+          cancelButton="No"
+          onCancel={ () => this.setState({isConfirmingEdit: false}) } />
       </Modal>
     );
   }
