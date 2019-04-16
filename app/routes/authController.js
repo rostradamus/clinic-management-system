@@ -2,6 +2,7 @@ const routes = require("express").Router();
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const userManager = require("@app/helpers/queryManager/user");
+const staffManager = require("@app/helpers/queryManager/staff");
 const bcrypt = require("bcrypt");
 
 passport.serializeUser(({ username }, done) => done(null, username));
@@ -11,7 +12,18 @@ passport.deserializeUser((username, done) =>
       if (result.length === 0) {
         return done(null, false, { message: "User does NOT exist. "})
       }
-      return done(null, result[0]);
+      const currentUser = result[0];
+      if (currentUser.type === "Staff") {
+        staffManager.getStaffWithId(currentUser.id)
+          .then(res => {
+            if (res.length === 0)
+              return done(err, null, { message: "Database is in trouble"});
+            return done(null, Object.assign({...currentUser}, {therapist_type: res[0].Staff.therapist_type}));
+          })
+          .catch(err => done(err, null, { message: "Database is in trouble"}));
+      } else {
+        return done(null, currentUser);
+      }
     })
     .catch(err => done(err, null, { message: "User does NOT exist."}))
 );
@@ -26,8 +38,19 @@ passport.use(new LocalStrategy((username, password, done) => {
         bcrypt.compare(password, result[0].password)
           .then(res => {
             if (res) {
-              delete result[0].password;
-              return done(null, result[0]);
+              const currentUser = result[0];
+              delete currentUser.password;
+              if (currentUser.type === "Staff") {
+                staffManager.getStaffWithId(currentUser.id)
+                  .then(res => {
+                    if (res.length === 0)
+                      return done(err, null, { message: "Database is in trouble"});
+                    return done(null, Object.assign({...currentUser}, {therapist_type: res[0].Staff.therapist_type}));
+                  })
+                  .catch(err => done(err, null, { message: "Database is in trouble"}));
+              } else {
+                return done(null, currentUser);
+              }
             } else {
               return done(null, false, { field: "password", message: "The password you’ve entered is incorrect."});
             }
@@ -35,7 +58,19 @@ passport.use(new LocalStrategy((username, password, done) => {
           .catch(err => { throw err; });
       } else {
         if (password === result[0].password) {
-          return done(null, result[0]);
+          const currentUser = result[0];
+          delete currentUser.password;
+          if (currentUser.type === "Staff") {
+            staffManager.getStaffWithId(currentUser.id)
+              .then(res => {
+                if (res.length === 0)
+                  return done(err, null, { message: "Database is in trouble"});
+                return done(null, Object.assign({...currentUser}, {therapist_type: res[0].Staff.therapist_type}));
+              })
+              .catch(err => done(err, null, { message: "Database is in trouble"}));
+          } else {
+            return done(null, currentUser);
+          }
         } else {
           return done(null, false, { field: "password", message: "The password you’ve entered is incorrect."});
         }

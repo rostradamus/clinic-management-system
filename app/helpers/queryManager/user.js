@@ -59,13 +59,18 @@ module.exports = {
       columns: this.VISIBILE_COLUMNS,
       where: Object.assign({...query}, { active: true })
     };
-    const stmt = qm.getBaseQuery(this.TABLE_NAME, options) + " AND (type = 'Administrator' OR type = 'Staff')";
+    const stmt = qm.getBaseQuery(this.TABLE_NAME, options) + " AND type = 'Administrator'";
     const users = await qm.makeQuery(stmt);
     const patientManager = require("@app/helpers/queryManager/patient");
-    const patients = await patientManager.getOngoingPatients(query);
-    patients.forEach(patient => {
-      users.push(patient.User);
-    });
+    const staffManager = require("@app/helpers/queryManager/staff");
+    const [patients, staffs] = await Promise.all([
+      patientManager.getOngoingPatients(query),
+      staffManager.getActiveStaffs(query)
+    ]);
+    patients.forEach(patient =>
+      users.push(patient.User));
+    staffs.forEach(staff =>
+      users.push(Object.assign({...staff.User}, staff.Staff)));
 
     return users;
   },
