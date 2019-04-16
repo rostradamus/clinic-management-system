@@ -6,18 +6,9 @@ import { UserAction, CreateUserAction } from 'actions';
 import { STATE_CONST } from './CreateUserPopup';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import './CreateUserPopup.css';
+import { THERAPIST_TYPE } from "enums";
 
-const THERAPIST_TYPE = [
-  { key: 'PT', text: 'PT', value: 'PT' },
-  { key: 'PT RA', text: 'PT RA', value: 'PT RA' },
-  { key: 'OT', text: 'OT', value: 'OT' },
-  { key: 'OT RA', text: 'OT RA', value: 'OT RA' },
-  { key: 'SLP', text: 'SLP', value: 'SLP' },
-  { key: 'SLPA', text: 'SLPA', value: 'SLPA' },
-  { key: 'SW', text: 'SW', value: 'SW' },
-  { key: 'SWA', text: 'SWA', value: 'SWA' }
-];
+import './CreateUserPopup.css';
 
 class CreateStaffPopup extends Component{
   constructor(props) {
@@ -166,7 +157,7 @@ class CreateStaffPopup extends Component{
     );
   }
 
-   renderRepeatDropDownForm(type, field) {
+  renderRepeatDropDownForm(type, field) {
     return(
       <Form.Field
         className="user-field"

@@ -1,4 +1,5 @@
 import { USER_ACTION_TYPE } from "actions/ActionTypes";
+import { UserType } from "enums";
 import axios from "axios";
 
 export default class UserAction {
@@ -105,10 +106,19 @@ export default class UserAction {
         payload: {}
       });
       try {
-        const res = await axios.put(`/api/users/${data.id}`, data);
+        let res;
+        if (data.type === UserType.STAFF) {
+          const therapistType = data.therapist_type;
+          delete data.therapist_type;
+          const body = Object.assign({}, {User: data}, {Staff: {therapist_type: therapistType}});
+          res = await axios.put(`/api/staffs/${data.id}`, body);
+          data.therapist_type = therapistType;
+        } else {
+          res = await axios.put(`/api/users/${data.id}`, data);
+        }
         dispatch({
           type: USER_ACTION_TYPE.EDIT_SUCCESS,
-          payload: res.data
+          payload: data
         });
       } catch (err) {
         dispatch({

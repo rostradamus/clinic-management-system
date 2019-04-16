@@ -35,6 +35,9 @@ const TherapyType = {
   OTHER: "Other"
 }
 
+const THERAPIST_TYPE = Object.entries(TherapyType).map(entry =>
+  ({ key: entry[0], value: entry[0], text: entry[1] }));
+
 const TherapyTypeColour = {
   PT: "#e9a451",
   PTRA: "#69202f",
@@ -52,7 +55,7 @@ const TherapyTypeColour = {
   PSYCH: "#b96332",
   PSYCHIATRY: "#d696bb",
 
-  // Loop back from start at this point. 
+  // Loop back from start at this point.
   // Invest into finding more colours, if necessary
   // for support for all therapy types.
   VOC: "#e9a451",
@@ -76,5 +79,6 @@ module.exports = {
   UserType: UserType,
   MenuTitle: MenuTitle,
   TherapyType: TherapyType,
-  TherapyTypeColour: TherapyTypeColour
+  TherapyTypeColour: TherapyTypeColour,
+  THERAPIST_TYPE: THERAPIST_TYPE
 }

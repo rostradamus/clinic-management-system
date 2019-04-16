@@ -2,7 +2,9 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { isEmpty } from "lodash";
 import { UserAction } from "actions";
-import { Confirm, Modal, Button, Form, Label } from "semantic-ui-react";
+import { Confirm, Modal, Button, Form, Label, Select } from "semantic-ui-react";
+import { STATE_CONST } from './CreateUserPopup';
+import { UserType, THERAPIST_TYPE } from "enums";
 import "./UserPopup.css";
 
 const INITIAL_STATE = {
@@ -39,7 +41,7 @@ class UserPopup extends Component {
 
   static getDerivedStateFromProps(props, state) {
     if (props.user && !state.open) {
-       return {
+      return {
         ...state,
         open: true,
         user: props.user
@@ -128,6 +130,27 @@ class UserPopup extends Component {
     );
   }
 
+  renderRepeatDropDownForm(list, field) {
+    const { therapist_type } = this.state.user;
+    const currentTherapistType = THERAPIST_TYPE.find(therapistType =>
+      therapistType.key === therapist_type.replace(/\s/g, ""));
+    return(
+      <Form.Field
+        className="user-field"
+        name="therapist_type"
+        disabled={ this.props.current_user.type !== UserType.ADMIN }
+        defaultValue={ currentTherapistType.value }
+        control={ Select }
+        options={ list }
+        label={{ children: STATE_CONST[field], htmlFor: 'form-select-control-repeat' }}
+        placeholder= { currentTherapistType.value }
+        search
+        searchInput={{ id: 'form-select-control-repeat' }}
+        onChange={ this._handleInputChange.bind(this) }
+      />
+    );
+  }
+
   _closePopup = () => {
     this.props.dispatch(UserAction.closeUserPopup());
     this.setState(INITIAL_STATE);
@@ -186,19 +209,20 @@ class UserPopup extends Component {
             </Form.Field>
             </Form.Group>
             {!this._validatePassword() && <Label basic color='red' pointing> Passwords do not match </Label>}
-            <Form.Group widths="equal">
+          <Form.Group widths="equal">
             <Form.Input fluid error={this.state.error.phone_number}
               label="Phone Number"
               name="phone_number"
               value={ phone_number }
               onChange={ this._handleInputChange.bind(this) } />
-              <Form.Input fluid readOnly
-                label="Type"
-                name="type"
-                placeholder={ type }
-                onChange={ this._handleInputChange.bind(this) } />
+            <Form.Input fluid readOnly
+              label="Type"
+              name="type"
+              placeholder={ type }
+              onChange={ this._handleInputChange.bind(this) } />
             </Form.Group>
             {!this._validatePhoneNum() && <Label basic color = 'red' pointing> Invalid Phone Number </Label> }
+            { type === UserType.STAFF ? this.renderRepeatDropDownForm(THERAPIST_TYPE, "therapist_type") : null }
           </Form>
 
         </Modal.Content>
