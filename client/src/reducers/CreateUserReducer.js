@@ -54,10 +54,16 @@ export default (state = initialState, action) => {
     case CREATE_USER_ACTION_TYPE.EMAIL_FETCH_FAILURE:
     case CREATE_USER_ACTION_TYPE.ADMIN_CREATE_FAILURE:
     case CREATE_USER_ACTION_TYPE.PATIENT_CREATE_FAILURE:
-    case CREATE_USER_ACTION_TYPE.CREATE_ADMISSION_RECORD_FAILURE:{
-      if(action.payload.error.response.data.code ==='ER_DUP_ENTRY')
-          user[0] = [];
-      return Object.assign({...state}, {user: user}, action.payload);
+    case CREATE_USER_ACTION_TYPE.CREATE_ADMISSION_RECORD_FAILURE: {
+      let message;
+      const errorData = action.payload.error.response.data;
+      if(errorData.code ==='ER_DUP_ENTRY') {
+        user[0] = [];
+        errorData.message = "User with requested email already exists."
+      }
+      return Object.assign({...state}, {user: user}, {error: {
+        message: errorData.message || message}
+      });
     }
     case CREATE_USER_ACTION_TYPE.STAFF_CREATE_SUCCESS:
     case CREATE_USER_ACTION_TYPE.ADMIN_CREATE_SUCCESS:

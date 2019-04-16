@@ -29,6 +29,15 @@ module.exports = {
   VISIBILE_COLUMNS: ["id", "username", "email", "phone_number",
     "first_name","last_name", "type", "permission_level", "active"],
 
+  UNSAFE_getInactiveUserWithUsername: function(username) {
+    const options = {
+      columns: this.VISIBILE_COLUMNS,
+      where: { username, active: false }
+    };
+    const stmt = qm.getBaseQuery(this.TABLE_NAME, options);
+    return qm.makeQuery(stmt);
+  },
+
   getUserWithUsername: function(username, isForAuth) {
     const options = {
       columns: isForAuth ? [...this.VISIBILE_COLUMNS, ...AUTH_ONLY_COLUMNS] : this.VISIBILE_COLUMNS,
@@ -87,11 +96,15 @@ module.exports = {
     return qm.createThenGetEntry(this.TABLE_NAME, user, { columns: this.VISIBILE_COLUMNS });
   },
 
-  updateUserWithId: async function(id, data) {
-    if (data.password && process.env.NODE_ENV === "production") {
-      const encryptedPassword = await bcrypt.hash(data.password, BCRYPT_SALT_ROUNDS);
-      data["password"] = encryptedPassword;
+  updateUserWithId: async function(id, data, isReactivate) {
+    if (data.password || isReactivate) {
+      let newPassword = data.password || data.phone_number.substr(-4);
+      if (process.env.NODE_ENV === "production") {
+        newPassword = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS);
+      }
+      data["password"] = newPassword;
     }
+
     return await qm.updateThenGetEntry(this.TABLE_NAME, id, data, { columns: this.VISIBILE_COLUMNS });
   },
 

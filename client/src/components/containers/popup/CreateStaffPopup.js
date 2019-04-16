@@ -129,8 +129,8 @@ class CreateStaffPopup extends Component{
       <Modal.Content scrolling>
         <Form id="create-user">
         {this.props.error && <Message negative>
-           <Message.Header>There has been an error with your submission.</Message.Header>
-          {this.props.user.length !== 0 && <p> Existing Email! </p>}
+          <Message.Header>There has been an error with your submission.</Message.Header>
+          <p> {this.props.error.message} </p>
          </Message> }
           <Header>Basic Information</Header>
           {this.renderFieldHelper(['first_name', 'last_name', 'phone_number', 'email'])}
