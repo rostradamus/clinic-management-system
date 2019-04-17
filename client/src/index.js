@@ -8,9 +8,29 @@ import reduxThunk from "redux-thunk";
 import reducers from "./reducers";
 import * as serviceWorker from "./serviceWorker";
 import "semantic-ui-css/semantic.min.css";
+import axios from "axios";
+import { AUTH_ACTION_TYPE } from "actions/ActionTypes";
 
 const middlewares = process.env.NODE_ENV !== "production" ? [reduxThunk, logger] : [reduxThunk];
 const store = createStore(reducers, {}, applyMiddleware(...middlewares));
+
+// Add a response interceptor
+axios.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response.status === 401) {
+      store.dispatch({
+        type: AUTH_ACTION_TYPE.SESSION_EXPIRED,
+        payload: {
+          current_user: null,
+          isFetching: false,
+          hasLoggedIn: false
+        }
+      });
+    }
+
+    return Promise.reject(error);
+  });
 
 ReactDOM.render(
   <Provider store={store}>
