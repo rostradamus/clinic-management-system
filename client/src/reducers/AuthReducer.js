@@ -15,6 +15,7 @@ export default (state = initialState, action) => {
         case AUTH_ACTION_TYPE.LOGOUT_REQUEST:
         case AUTH_ACTION_TYPE.LOGOUT_SUCCESS:
         case AUTH_ACTION_TYPE.LOGOUT_FAILURE:
+        case AUTH_ACTION_TYPE.SESSION_EXPIRED:
           return Object.assign({...state}, action.payload);
         case USER_ACTION_TYPE.EDIT_SUCCESS:{
           if (state.current_user.id !== action.payload.id)

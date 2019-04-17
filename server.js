@@ -32,6 +32,11 @@ app.use(passport.session());
 app.use(express.static(`${__dirname}/client/build`));
 app.disable('etag');
 
+// Use Session check middleware for authentication
+const whiteList = [/\/api\/user\/session((\/)?(.*))/];
+const sessionChecker = require("@app/middlewares/sessionChecker");
+app.use(sessionChecker(whiteList));
+
 // Serve API Routes
 app.use("/api", require('@routes'));
 

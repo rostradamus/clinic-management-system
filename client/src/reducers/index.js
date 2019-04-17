@@ -17,7 +17,8 @@ const appReducer = combineReducers({
 });
 
 export default (state, action) => {
-  if (action.type === AUTH_ACTION_TYPE.LOGOUT_SUCCESS ) {
+  if (action.type === AUTH_ACTION_TYPE.LOGOUT_SUCCESS
+    || action.type === AUTH_ACTION_TYPE.SESSION_EXPIRED) {
     state = undefined;
   }
 
