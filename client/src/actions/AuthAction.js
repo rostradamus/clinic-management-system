@@ -1,6 +1,9 @@
 import { AUTH_ACTION_TYPE } from "actions/ActionTypes";
 import axios from "axios";
 
+const sleep = (ms) =>
+  new Promise(resolve => setTimeout(resolve, ms));
+
 export default class AuthAction {
   static checkUser = () => {
     return async (dispatch) => {
@@ -9,6 +12,7 @@ export default class AuthAction {
         payload: { isFetching: true }
       });
       let res;
+      await sleep(1000);
       try {
         res = await axios.get("/api/user/session");
         dispatch({
@@ -35,6 +39,7 @@ export default class AuthAction {
         payload: { isFetching: true }
       });
       let res;
+      await sleep(1000);
       try {
         res = await axios.post("/api/user/session", {
           username: username,
