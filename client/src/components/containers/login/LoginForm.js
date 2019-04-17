@@ -4,7 +4,7 @@ import { withRouter } from "react-router-dom";
 import { AuthAction } from 'actions';
 import { isEmpty } from "lodash";
 import { bindActionCreators } from 'redux';
-import { Form, Button, Segment, Label, Image } from "semantic-ui-react";
+import { Form, Button, Segment, Label, Image, Loader } from "semantic-ui-react";
 import { ReactComponent as Logo } from "assets/logo.svg";
 import "./LoginForm.css";
 
@@ -57,45 +57,43 @@ class LoginForm extends Component {
     );
   }
 
-  // validateForm() {
-  //   return this.state.username.length > 0 && this.state.password.length > 0;
-  // }
-
   render() {
     return (
       <div className="loginFormBackground">
         <div className="loginFormWrapper">
           <Logo className="loginLogo" />
-          <Segment className="centerLoginSegment">
-            <Form onSubmit={this.handleSubmit} className="loginForm" >
-              <Form.Field className="loginField">
-                <input
-                  type="text"
-                  name="username"
-                  autoComplete="username"
-                  placeholder="Username"
-                  value={this.state.username}
-                  onChange={this.handleInputChange}
-                  style={{ border: "none", padding: "0", height: "50px" }} />
-                {this.handleLoginError("username")}
-              </Form.Field>
+          {this.props.isFetching ? (<Loader active inline/>) :
+            <Segment className="centerLoginSegment">
+              <Form onSubmit={this.handleSubmit} className="loginForm" >
+                <Form.Field className="loginField">
+                  <input
+                    type="text"
+                    name="username"
+                    autoComplete="username"
+                    placeholder="Username"
+                    value={this.state.username}
+                    onChange={this.handleInputChange}
+                    style={{ border: "none", padding: "0", height: "50px" }} />
+                  {this.handleLoginError("username")}
+                </Form.Field>
 
-              <Form.Field className="loginField">
-                <input
-                  type="password"
-                  name="password"
-                  autoComplete="current-password"
-                  placeholder="Password"
-                  value={this.state.password}
-                  onChange={this.handleInputChange}
-                  style={{ border: "none", padding: "0", height: "50px" }} />
-                {this.handleLoginError("password")}
-              </Form.Field>
-              <Button primary fluid type="submit" className="loginButton">
-                LOGIN
-              </Button>
-            </Form>
-          </Segment>
+                <Form.Field className="loginField">
+                  <input
+                    type="password"
+                    name="password"
+                    autoComplete="current-password"
+                    placeholder="Password"
+                    value={this.state.password}
+                    onChange={this.handleInputChange}
+                    style={{ border: "none", padding: "0", height: "50px" }} />
+                  {this.handleLoginError("password")}
+                </Form.Field>
+                <Button primary fluid type="submit" className="loginButton">
+                  LOGIN
+                </Button>
+              </Form>
+            </Segment>
+          }
         </div>
       </div>
     )
