@@ -85,7 +85,7 @@ module.exports = {
   },
 
   createUser: async function(data) {
-    const initialPassword = data.phone_number.substr(-4);
+    const initialPassword = data.password || data.phone_number.substr(-4);
     const encryptedPassword = await bcrypt.hash(initialPassword, BCRYPT_SALT_ROUNDS);
     const user = Object.assign(
       {...data},
