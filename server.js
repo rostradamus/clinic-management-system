@@ -13,9 +13,22 @@ moment.locale("en");
 global.moment = moment;
 
 const db = require("@config/db/connection").connectDatabase();
+const setupInitialAccount = require("./setupInitialAccount");
+setupInitialAccount()
+  .then(res => {
+    if (res === false) {
+      console.log("Admin User exists. Skipping initial account setup.");
+    }
+    if (res) {
+      console.log("Admin User: " + res.username + " created");
+    }
+  })
+  .catch(err => {
+    console.error(err);
+  });
 
 const app = express();
-app.use(morgan('dev'));
+app.use(morgan(process.env.NODE_ENV === "production" ? "common" : "dev"));
 app.use(
   cookieSession({
     name: "session",
@@ -30,7 +43,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(express.static(`${__dirname}/client/build`));
-app.disable('etag');
+app.disable("etag");
 
 // Use Session check middleware for authentication
 const whiteList = [/\/api\/user\/session((\/)?(.*))/];

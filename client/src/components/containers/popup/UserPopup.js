@@ -223,7 +223,7 @@ class UserPopup extends Component {
 
         </Modal.Content>
         <Modal.Actions>
-          {!(this.props.user && this.props.user.id === this.props.current_user.id) &&
+          {!(this.props.user && (this.props.user.id === this.props.current_user.id || this.props.user.username === "ADMIN")) &&
             <Button
               negative
               onClick={ () => this.setState({isConfirmingDelete: true}) }>
